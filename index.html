@@ -37,9 +37,12 @@
         </div>
     </div>
 
+    <!-- Forzamos la lectura del catálogo -->
     <script>
         document.write('<script src="catalogo.js?v=' + Math.random() + '"><\/script>');
     </script>
-    <script src="tienda.js"></script>
+    
+    <!-- ACÁ ESTÁ EL CAMBIO ANTI-CACHÉ PARA EL MOTOR DE LA TIENDA -->
+    <script src="tienda.js?v=1"></script>
 </body>
 </html>
