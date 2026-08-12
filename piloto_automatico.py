@@ -4,7 +4,7 @@ import sys
 import time
 import random
 import json
-import subprocess # NUEVO: Para controlar Git automáticamente
+import subprocess
 from playwright.sync_api import sync_playwright
 
 # --- CONFIGURACIÓN ---
@@ -173,12 +173,9 @@ def rutina_actualizacion():
                         "talles": talles_datos,
                         "foto": ruta_foto_final
                     })
-                    print(f"  [{i}/{len(productos_detectados)}] ✅ OK: {nombre} ({len(talles_datos)} talles)")
                 else:
-                    print(f"  [{i}/{len(productos_detectados)}] ⚠️ Sin foto local: {nombre}")
-                    
-            except Exception as e:
-                print(f"  [{i}/{len(productos_detectados)}] ❌ Error al leer modelo: {nombre}")
+                    pass
+            except:
                 continue
                 
         browser.close()
@@ -190,27 +187,22 @@ def rutina_actualizacion():
             talles_json = json.dumps(p['talles'])
             f.write(f"  {{ modelo: '{p['modelo']}', talles: {talles_json}, foto: '{p['foto']}' }},\n")
         f.write("];\n")
-    
-    print(f"\n✅ Catálogo local actualizado. Guardando en la nube...")
 
-    # --- NUEVA AUTOMATIZACIÓN DE GITHUB ---
+    # --- AUTOMATIZACIÓN DE GITHUB CON AVISO CLARO ---
     try:
         hora_subida = time.strftime('%H:%M:%S')
-        # Ejecuta git add, commit y push silenciosamente
         subprocess.run(["git", "add", ARCHIVO_JS], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         
-        # El comando commit puede fallar si no hay cambios reales en el stock, lo manejamos suavemente
         resultado_commit = subprocess.run(["git", "commit", "-m", f"Stock actualizado a las {hora_subida}"], capture_output=True, text=True)
         
         if "nothing to commit" not in resultado_commit.stdout:
             subprocess.run(["git", "push", "origin", "main"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            print(f"🚀 ¡ÉXITO! Stock subido a tu página pública.")
+            print(f"[{hora_subida}] 🔄 HUBO CAMBIOS: El stock se actualizó y se subió a la web.")
         else:
-            print(f"📌 Sin cambios: El proveedor no modificó el stock desde el último escaneo.")
+            print(f"[{hora_subida}] ⏸️ NO HUBO CAMBIOS: El stock sigue exactamente igual.")
             
     except Exception as e:
-        print(f"⚠️ Error al subir a GitHub: {e} (Se reintentará en el próximo ciclo)")
-    # ----------------------------------------
+        print(f"⚠️ Error al verificar o subir a GitHub: {e}")
 
 def main():
     print("🤖 PILOTO AUTOMÁTICO VINCULADO A INTERNET")
