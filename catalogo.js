@@ -24,7 +24,7 @@ const stock_actualizado = [
   { modelo: 'Dunk glistter celeste', talles: [{"talle": 37, "stock": 2}, {"talle": 38, "stock": 2}], foto: 'Fotos/Dunk glistter celeste.jpeg' },
   { modelo: 'Jordan low CHAROL', talles: [{"talle": 43, "stock": 1}], foto: 'Fotos/Jordan low CHAROL.jpeg' },
   { modelo: 'New balance 9060 suela rosa', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 2}], foto: 'Fotos/New balance 9060 suela rosa.jpeg' },
-  { modelo: 'Vans Haylan 01', talles: [{"talle": 35, "stock": 1}, {"talle": 40, "stock": 1}], foto: 'Fotos/Vans Haylan 01.jpeg' },
+  { modelo: 'Vans Haylan 01', talles: [{"talle": 40, "stock": 1}], foto: 'Fotos/Vans Haylan 01.jpeg' },
   { modelo: 'Vans HAYLAN NOVA', talles: [{"talle": 36, "stock": 2}, {"talle": 38, "stock": 1}, {"talle": 39, "stock": 1}], foto: 'Fotos/Vans HAYLAN NOVA.jpeg' },
   { modelo: 'Dunk glitter rosa', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 4}, {"talle": 38, "stock": 4}, {"talle": 39, "stock": 3}, {"talle": 40, "stock": 1}], foto: 'Fotos/Dunk glitter rosa.jpeg' },
   { modelo: 'Deportivas fit black', talles: [{"talle": 35, "stock": 4}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 4}, {"talle": 38, "stock": 8}, {"talle": 39, "stock": 2}], foto: 'Fotos/Deportivas fit black.jpeg' },
