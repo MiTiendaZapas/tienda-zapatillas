@@ -3,7 +3,7 @@ const stock_actualizado = [
   { modelo: 'Vans KNU clasicas', talles: [{"talle": 34, "stock": 4}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 1}], foto: 'Fotos/Vans KNU clasicas.jpeg' },
   { modelo: 'Panda sb dunk', talles: [{"talle": 35, "stock": 3}, {"talle": 37, "stock": 7}, {"talle": 38, "stock": 4}, {"talle": 39, "stock": 2}, {"talle": 43, "stock": 17}], foto: 'Fotos/Panda sb dunk.jpeg' },
   { modelo: 'Adidas forum blancas', talles: [{"talle": 35, "stock": 3}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 8}, {"talle": 39, "stock": 3}, {"talle": 40, "stock": 6}, {"talle": 41, "stock": 2}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 2}], foto: 'Fotos/Adidas forum blancas.jpeg' },
-  { modelo: 'New balance 530 running', talles: [{"talle": 40, "stock": 1}, {"talle": 42, "stock": 5}, {"talle": 43, "stock": 7}, {"talle": 44, "stock": 3}, {"talle": 45, "stock": 3}], foto: 'Fotos/New balance 530 running.jpeg' },
+  { modelo: 'New balance 530 running', talles: [{"talle": 42, "stock": 5}, {"talle": 43, "stock": 7}, {"talle": 44, "stock": 3}, {"talle": 45, "stock": 3}], foto: 'Fotos/New balance 530 running.jpeg' },
   { modelo: 'Super star black', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 1}, {"talle": 42, "stock": 3}], foto: 'Fotos/Super star black.jpeg' },
   { modelo: 'Air forcé suela celeste', talles: [{"talle": 39, "stock": 1}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 2}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Air forcé suela celeste.jpeg' },
   { modelo: 'Puma 180 WHITE', talles: [{"talle": 34, "stock": 4}, {"talle": 35, "stock": 6}, {"talle": 38, "stock": 1}], foto: 'Fotos/Puma 180 WHITE.jpeg' },
