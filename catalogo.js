@@ -88,11 +88,11 @@ const stock_actualizado = [
   { modelo: 'NB celeste 9060', talles: [{"talle": 35, "stock": 1}], foto: 'Fotos/NB celeste 9060.jpeg' },
   { modelo: 'New balance 530 marrones', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 4}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 3}, {"talle": 40, "stock": 1}], foto: 'Fotos/New balance 530 marrones.jpeg' },
   { modelo: 'Vans Haylan pink', talles: [{"talle": 36, "stock": 1}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 1}], foto: 'Fotos/Vans Haylan pink.jpeg' },
-  { modelo: 'Jordan 1 bordo/rosa', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 1}], foto: 'Fotos/Jordan 1 bordo rosa.jpeg' },
   { modelo: 'Vans Haylan black luxo', talles: [{"talle": 40, "stock": 1}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 3}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Vans Haylan black luxo.jpeg' },
   { modelo: 'Dunk verde oliva', talles: [{"talle": 41, "stock": 2}, {"talle": 42, "stock": 3}, {"talle": 43, "stock": 3}, {"talle": 44, "stock": 2}, {"talle": 45, "stock": 1}], foto: 'Fotos/Dunk verde oliva.jpeg' },
   { modelo: 'Dunk gris gamusa', talles: [{"talle": 39, "stock": 1}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 3}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Dunk gris gamusa.jpeg' },
   { modelo: 'Vans Haylan azul luxo', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 1}], foto: 'Fotos/Vans Haylan azul luxo.jpeg' },
   { modelo: 'Jordan 1 celeste / verniz', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 1}], foto: 'Fotos/Jordan 1 celeste verniz.jpeg' },
   { modelo: 'Nb ABZORB white', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 2}], foto: 'Fotos/Nb ABZORB white.jpeg' },
+  { modelo: 'Jordan 1 bordo/rosa', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 1}], foto: 'Fotos/Jordan 1 bordo rosa.jpeg' },
 ];
