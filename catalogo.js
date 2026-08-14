@@ -1,7 +1,7 @@
 const stock_actualizado = [
   { modelo: 'Air forcé 1 blancas', talles: [{"talle": 35, "stock": 2}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 4}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 3}, {"talle": 40, "stock": 10}, {"talle": 41, "stock": 9}, {"talle": 42, "stock": 7}, {"talle": 43, "stock": 4}, {"talle": 44, "stock": 3}], foto: 'Fotos/Air forcé 1 blancas.jpeg' },
   { modelo: 'Vans KNU clasicas', talles: [{"talle": 34, "stock": 4}], foto: 'Fotos/Vans KNU clasicas.jpeg' },
-  { modelo: 'Panda sb dunk', talles: [{"talle": 35, "stock": 3}, {"talle": 37, "stock": 6}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 2}, {"talle": 43, "stock": 17}], foto: 'Fotos/Panda sb dunk.jpeg' },
+  { modelo: 'Panda sb dunk', talles: [{"talle": 35, "stock": 3}, {"talle": 37, "stock": 6}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 2}, {"talle": 43, "stock": 16}], foto: 'Fotos/Panda sb dunk.jpeg' },
   { modelo: 'Adidas forum blancas', talles: [{"talle": 35, "stock": 3}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 7}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 6}, {"talle": 41, "stock": 2}, {"talle": 42, "stock": 1}, {"talle": 43, "stock": 2}], foto: 'Fotos/Adidas forum blancas.jpeg' },
   { modelo: 'New balance 530 running', talles: [{"talle": 42, "stock": 5}, {"talle": 43, "stock": 6}, {"talle": 44, "stock": 3}, {"talle": 45, "stock": 3}], foto: 'Fotos/New balance 530 running.jpeg' },
   { modelo: 'Puma 180 WHITE', talles: [{"talle": 34, "stock": 5}, {"talle": 35, "stock": 8}, {"talle": 36, "stock": 4}, {"talle": 37, "stock": 4}, {"talle": 38, "stock": 2}], foto: 'Fotos/Puma 180 WHITE.jpeg' },
@@ -32,7 +32,7 @@ const stock_actualizado = [
   { modelo: 'Adidas fórum verde summer', talles: [{"talle": 35, "stock": 1}, {"talle": 38, "stock": 1}, {"talle": 40, "stock": 1}], foto: 'Fotos/Adidas fórum verde summer.jpeg' },
   { modelo: 'Dunk látex negra', talles: [{"talle": 42, "stock": 2}], foto: 'Fotos/Dunk látex negra.jpeg' },
   { modelo: 'Jordan 1 verniz', talles: [{"talle": 36, "stock": 1}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 1}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 1}, {"talle": 43, "stock": 1}, {"talle": 44, "stock": 1}], foto: 'Fotos/Jordan 1 verniz.jpeg' },
-  { modelo: 'Shox black', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 2}, {"talle": 40, "stock": 1}], foto: 'Fotos/Shox black.jpeg' },
+  { modelo: 'Shox black', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 2}], foto: 'Fotos/Shox black.jpeg' },
   { modelo: 'Air force 1 blanca /pipa gris', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 41, "stock": 1}, {"talle": 42, "stock": 1}], foto: 'Fotos/Air force 1 blanca pipa gris.jpeg' },
   { modelo: 'Jordan retro 4 panda', talles: [{"talle": 38, "stock": 1}, {"talle": 39, "stock": 3}, {"talle": 40, "stock": 5}, {"talle": 41, "stock": 6}, {"talle": 42, "stock": 3}, {"talle": 43, "stock": 3}, {"talle": 44, "stock": 1}], foto: 'Fotos/Jordan retro 4 panda.jpeg' },
   { modelo: 'Samba Classic', talles: [{"talle": 41, "stock": 1}, {"talle": 43, "stock": 3}, {"talle": 44, "stock": 1}], foto: 'Fotos/Samba Classic.jpeg' },
@@ -90,10 +90,4 @@ const stock_actualizado = [
   { modelo: 'NB celeste 9060', talles: [{"talle": 35, "stock": 1}], foto: 'Fotos/NB celeste 9060.jpeg' },
   { modelo: 'Vans Haylan black luxo', talles: [{"talle": 40, "stock": 1}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 1}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Vans Haylan black luxo.jpeg' },
   { modelo: 'Nb ABZORB white', talles: [{"talle": 35, "stock": 2}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 2}], foto: 'Fotos/Nb ABZORB white.jpeg' },
-  { modelo: 'Jordan 1 brillosa', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 1}], foto: 'Fotos/Jordan 1 brillosa.jpeg' },
-  { modelo: 'Vans Haylan azul luxo', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 3}, {"talle": 40, "stock": 1}], foto: 'Fotos/Vans Haylan azul luxo.jpeg' },
-  { modelo: 'Dunk verde oliva', talles: [{"talle": 41, "stock": 2}, {"talle": 42, "stock": 3}, {"talle": 43, "stock": 3}, {"talle": 44, "stock": 2}, {"talle": 45, "stock": 1}], foto: 'Fotos/Dunk verde oliva.jpeg' },
-  { modelo: 'Dunk gris gamusa', talles: [{"talle": 39, "stock": 1}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 3}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Dunk gris gamusa.jpeg' },
-  { modelo: 'Jordan 1 celeste / verniz', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 1}], foto: 'Fotos/Jordan 1 celeste verniz.jpeg' },
-  { modelo: 'Jordan 1 bordo/rosa', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 1}], foto: 'Fotos/Jordan 1 bordo rosa.jpeg' },
 ];
