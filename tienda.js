@@ -55,10 +55,13 @@ function cargarProductos() {
     stock_actualizado.forEach((producto, index) => {
         if(!producto.talles || producto.talles.length === 0) return;
 
-        let opcionesTalles = producto.talles.map(t => {
+        let botonesTalles = producto.talles.map(t => {
             let numeroTalle = t.talle !== undefined ? t.talle : t;
             let cantidadStock = t.stock !== undefined ? t.stock : 99;
-            return `<option value="${numeroTalle}" data-stock="${cantidadStock}">Talle ${numeroTalle}</option>`;
+            let sinStockClass = cantidadStock <= 0 ? 'disabled' : '';
+            let disabledAttr = cantidadStock <= 0 ? 'disabled' : '';
+
+            return `<button type="button" class="talle-cuadro ${sinStockClass}" data-talle="${numeroTalle}" data-stock="${cantidadStock}" ${disabledAttr} onclick="seleccionarTalle(${index}, '${numeroTalle}', ${cantidadStock}, this)">${numeroTalle}</button>`;
         }).join('');
 
         let precioMayorista = obtenerPrecioMayorista(producto.modelo);
@@ -71,29 +74,29 @@ function cargarProductos() {
                 </div>
                 <div class="info-prod">
                     <div class="titulo">${producto.modelo}</div>
-                    
-                    <div style="font-size: 20px; font-weight: bold; color: #111; margin-bottom: 2px;">
+                    <div style="font-size: 20px; font-weight: bold; color: #111; margin-top: 2px; margin-bottom: 2px;">
                         $${PRECIO_MINORISTA.toLocaleString('es-AR')}
                     </div>
-                    <div style="font-size: 12px; color: #28a745; margin-bottom: 15px; font-weight: bold;">
+                    <div style="font-size: 12px; color: #28a745; margin-bottom: 6px; font-weight: bold;">
                         Llevando 5 o más: $${precioMayorista.toLocaleString('es-AR')}
                     </div>
                     
-                    <select id="select-${index}" onchange="actualizarUIStock(${index})">
-                        <option value="" disabled selected>Elegí tu talle...</option>
-                        ${opcionesTalles}
-                    </select>
-                    
-                    <div class="fila-cantidad">
-                        <div class="control-cant">
-                            <button class="btn-qty" onclick="cambiarCantidad(${index}, -1)" id="btn-menos-${index}" disabled>-</button>
-                            <span class="num-qty" id="cant-${index}">1</span>
-                            <button class="btn-qty" onclick="cambiarCantidad(${index}, 1)" id="btn-mas-${index}" disabled>+</button>
-                        </div>
-                        <span id="label-stock-${index}" class="stock-disponible"></span>
+                    <div class="talles-grid-container" id="talles-container-${index}">
+                        ${botonesTalles}
                     </div>
+                    
+                    <div style="margin-top: auto;">
+                        <div class="fila-cantidad">
+                            <div class="control-cant">
+                                <button class="btn-qty" onclick="cambiarCantidad(${index}, -1)" id="btn-menos-${index}" disabled>-</button>
+                                <span class="num-qty" id="cant-${index}">1</span>
+                                <button class="btn-qty" onclick="cambiarCantidad(${index}, 1)" id="btn-mas-${index}" disabled>+</button>
+                            </div>
+                            <span id="label-stock-${index}" class="stock-disponible">Elegí talle</span>
+                        </div>
 
-                    <button id="btn-${index}" class="add-btn" onclick="agregarAlCarrito(${index})" disabled>Seleccionar Talle</button>
+                        <button id="btn-${index}" class="add-btn" onclick="agregarAlCarrito(${index})" disabled>Seleccionar Talle</button>
+                    </div>
                 </div>
             </div>
         `;
@@ -114,37 +117,37 @@ function filtrarCatalogo() {
     });
 }
 
-function actualizarUIStock(index) {
-    const select = document.getElementById(`select-${index}`);
-    const labelStock = document.getElementById(`label-stock-${index}`);
+function seleccionarTalle(index, talle, stockMax, elementoBtn) {
+    const contenedor = document.getElementById(`talles-container-${index}`);
+    contenedor.querySelectorAll('.talle-cuadro').forEach(b => b.classList.remove('seleccionado'));
+    elementoBtn.classList.add('seleccionado');
+
+    contenedor.setAttribute('data-talle-seleccionado', talle);
+    contenedor.setAttribute('data-stock-max', stockMax);
+
     const btn = document.getElementById(`btn-${index}`);
-    const btnMenos = document.getElementById(`btn-menos-${index}`);
-    const btnMas = document.getElementById(`btn-mas-${index}`);
     const displayCant = document.getElementById(`cant-${index}`);
     
-    const opcionSeleccionada = select.options[select.selectedIndex];
-    const stockMax = parseInt(opcionSeleccionada.getAttribute('data-stock'));
-
     displayCant.textContent = "1";
-    btnMenos.disabled = true; 
-    btnMas.disabled = (stockMax <= 1);
+    document.getElementById(`btn-menos-${index}`).disabled = true;
+    document.getElementById(`btn-mas-${index}`).disabled = (stockMax <= 1);
     
     btn.disabled = false;
     btn.textContent = "Agregar al Pedido";
 
+    const labelStock = document.getElementById(`label-stock-${index}`);
     if (stockMax >= 99) {
-        labelStock.textContent = "¡Stock Disponible!";
+        labelStock.textContent = "¡Disponible!";
         labelStock.className = "stock-disponible sobra";
     } else {
-        labelStock.textContent = `Quedan ${stockMax} pares`;
+        labelStock.textContent = `Quedan ${stockMax}`;
         labelStock.className = "stock-disponible";
     }
 }
 
 function cambiarCantidad(index, cambio) {
-    const select = document.getElementById(`select-${index}`);
-    const opcionSeleccionada = select.options[select.selectedIndex];
-    const stockMax = parseInt(opcionSeleccionada.getAttribute('data-stock'));
+    const contenedor = document.getElementById(`talles-container-${index}`);
+    const stockMax = parseInt(contenedor.getAttribute('data-stock-max')) || 99;
     
     const displayCant = document.getElementById(`cant-${index}`);
     let cantActual = parseInt(displayCant.textContent);
@@ -159,14 +162,21 @@ function cambiarCantidad(index, cambio) {
 }
 
 function agregarAlCarrito(indexProd) {
-    const select = document.getElementById(`select-${indexProd}`);
-    const opcionSeleccionada = select.options[select.selectedIndex];
-    const talleElegido = parseInt(opcionSeleccionada.value); 
-    const stockMax = parseInt(opcionSeleccionada.getAttribute('data-stock'));
+    const contenedor = document.getElementById(`talles-container-${indexProd}`);
+    const talleElegido = contenedor.getAttribute('data-talle-seleccionado');
+    
+    if (!talleElegido) {
+        alert("Por favor, elegí un talle primero.");
+        return;
+    }
+
+    const stockMax = parseInt(contenedor.getAttribute('data-stock-max'));
     const cantidadDeseada = parseInt(document.getElementById(`cant-${indexProd}`).textContent);
 
     const prod = stock_actualizado[indexProd];
-    const itemExistente = carrito.find(item => item.modelo === prod.modelo && item.talle === talleElegido);
+    const talleNumero = isNaN(talleElegido) ? talleElegido : parseInt(talleElegido);
+    
+    const itemExistente = carrito.find(item => item.modelo === prod.modelo && item.talle === talleNumero);
     
     if (itemExistente) {
         if (itemExistente.cantidad + cantidadDeseada > stockMax) {
@@ -177,7 +187,7 @@ function agregarAlCarrito(indexProd) {
     } else {
         carrito.push({
             modelo: prod.modelo,
-            talle: talleElegido,
+            talle: talleNumero,
             cantidad: cantidadDeseada
         });
     }
