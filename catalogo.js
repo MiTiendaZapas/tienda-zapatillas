@@ -38,7 +38,7 @@ const stock_actualizado = [
   { modelo: 'Jordan 1 verniz', talles: [{"talle": 36, "stock": 1}, {"talle": 39, "stock": 1}, {"talle": 43, "stock": 1}, {"talle": 44, "stock": 1}], foto: 'Fotos/Jordan 1 verniz.jpeg' },
   { modelo: 'Shox black', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 3}, {"talle": 40, "stock": 4}, {"talle": 41, "stock": 5}, {"talle": 42, "stock": 5}, {"talle": 43, "stock": 3}, {"talle": 44, "stock": 2}], foto: 'Fotos/Shox black.jpeg' },
   { modelo: 'Air force 1 blanca /pipa gris', talles: [{"talle": 36, "stock": 2}, {"talle": 40, "stock": 2}, {"talle": 42, "stock": 1}], foto: 'Fotos/Air force 1 blanca pipa gris.jpeg' },
-  { modelo: 'Jordan retro 4 panda', talles: [{"talle": 39, "stock": 3}, {"talle": 40, "stock": 5}, {"talle": 41, "stock": 5}, {"talle": 42, "stock": 1}, {"talle": 43, "stock": 3}, {"talle": 44, "stock": 1}], foto: 'Fotos/Jordan retro 4 panda.jpeg' },
+  { modelo: 'Jordan retro 4 panda', talles: [{"talle": 39, "stock": 2}, {"talle": 40, "stock": 5}, {"talle": 41, "stock": 5}, {"talle": 42, "stock": 1}, {"talle": 43, "stock": 3}, {"talle": 44, "stock": 1}], foto: 'Fotos/Jordan retro 4 panda.jpeg' },
   { modelo: 'Jordan low 1 DIAMOND', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 2}], foto: 'Fotos/Jordan low 1 DIAMOND.jpeg' },
   { modelo: 'Samba Classic', talles: [{"talle": 41, "stock": 1}, {"talle": 43, "stock": 3}, {"talle": 44, "stock": 1}], foto: 'Fotos/Samba Classic.jpeg' },
   { modelo: 'Vans haylan black', talles: [{"talle": 36, "stock": 1}], foto: 'Fotos/Vans haylan black.jpeg' },
