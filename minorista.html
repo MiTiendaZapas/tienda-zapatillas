@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo Minorista</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>Mi Tienda Zapas - Minorista</h1>
+        <button class="carrito-btn" onclick="abrirCarrito()">
+            🛒 <span class="badge" id="contador-carrito">0</span>
+        </button>
+    </header>
+
+    <div class="buscador-container">
+        <input type="text" id="buscador" placeholder="🔍 Buscar modelo..." onkeyup="filtrarCatalogo()">
+    </div>
+
+    <div class="container">
+        <div class="grid-productos" id="grid-productos"></div>
+    </div>
+
+    <div class="modal-overlay" id="modal-carrito">
+        <div class="modal-carrito">
+            <div class="header-modal">
+                <h2>Tu Pedido Minorista</h2>
+                <button class="close-btn" onclick="cerrarCarrito()">✖</button>
+            </div>
+            
+            <ul class="lista-carrito" id="lista-carrito"></ul>
+            
+            <div id="footer-opciones" class="footer-modal"></div>
+        </div>
+    </div>
+
+    <script src="catalogo.js"></script>
+    <script src="minorista.js"></script>
+</body>
+</html>
