@@ -4,13 +4,73 @@ let carrito = [];
 function obtenerPrecioMinorista(nombreProducto) {
     const nombre = nombreProducto.toLowerCase();
 
-    // PRECIOS MINORISTAS (Basados en tu tabla para 2 unidades o menos)
-    if (nombre.includes("adidas 2000") || nombre.includes("air forcé con medias") || nombre.includes("air force con medias") || nombre.includes("puma 180") || nombre.includes("shox") || nombre.includes("haylan") || nombre.includes("vans haylan")) return 60000;
+    // 1. PRECIOS DE $60.000
+    if (nombre.includes("adidas 2000") || 
+        nombre.includes("air forcé con medias") || 
+        nombre.includes("air force con medias") || 
+        nombre.includes("puma 180") || 
+        nombre.includes("shox") || 
+        nombre.includes("haylan") || 
+        nombre.includes("vans haylan")) {
+        return 60000;
+    }
+
+    // 2. PRECIOS DE $55.000
+    if (nombre.includes("retro 4") || 
+        nombre.includes("retro 1") || 
+        nombre.includes("jordan") || 
+        nombre.includes("abzorb") || 
+        nombre.includes("9060") || 
+        nombre.includes("running") || 
+        nombre.includes("nova") || 
+        nombre.includes("new balance")) {
+        return 55000;
+    }
+
+    // 3. PRECIOS DE $50.000 (Dunk, Forum, Vans clásicas, FIT, Fila, Air force, Súper star, Puma BMW, etc.)
+    return 50000;
+}
+
+function obtenerPrecioMayorista(nombreProducto) {
+    const nombre = nombreProducto.toLowerCase();
+
+    // 1. PRECIOS ESPECÍFICOS (Modelos exactos con tarifas diferenciadas)
+    if (nombre.includes("samba classic")) return 39000;
+    if (nombre.includes("samba total black")) return 37000;
+    if (nombre.includes("adidas boas")) return 37000;
+    if (nombre.includes("botitas vans")) return 37000;
+    if (nombre.includes("botitas jordan niño")) return 30000;
+    if (nombre.includes("glister beige pipa marrón")) return 37000;
     
-    if (nombre.includes("retro 4") || nombre.includes("retro 1") || nombre.includes("botitas") || nombre.includes("jordan") || nombre.includes("530") || nombre.includes("9060") || nombre.includes("abzorb") || nombre.includes("running") || nombre.includes("mind") || nombre.includes("new balance")) return 55000;
+    // 2. CATEGORÍAS GENERALES
+    if (nombre.includes("exclusivas white")) return 41000;
+    if (nombre.includes("negras medias") || nombre.includes("air forcé con medias") || nombre.includes("air force con medias")) return 41000;
+    if (nombre.includes("air forcé") || nombre.includes("air force")) return 37000;
+
+    if (nombre.includes("adidas 2000")) return 42000;
+    if (nombre.includes("forum") || nombre.includes("fórum")) return 37000;
+
+    if (nombre.includes("super star") || nombre.includes("súper star")) return 37000;
+
+    if (nombre.includes("glistter") || nombre.includes("glitter") || nombre.includes("glister") || nombre.includes("dunk pombo") || nombre.includes("dunk total black") || nombre.includes("combinada celeste") || nombre.includes("sb dunk")) return 37000;
+    if (nombre.includes("dunk")) return 37000;
+
+    if (nombre.includes("jordan") || nombre.includes("retro 4") || nombre.includes("botitas")) return 39000;
+
+    if (nombre.includes("530") || nombre.includes("9060") || nombre.includes("abzorb") || nombre.includes("running") || nombre.includes("mind")) return 39000;
+
+    if (nombre.includes("haylan")) return 42000;
+    if (nombre.includes("vans") || nombre.includes("knu")) return 37000;
+
+    if (nombre.includes("puma 180")) return 42000;
+    if (nombre.includes("puma")) return 37000;
+
+    if (nombre.includes("shox")) return 42000;
+
+    if (nombre.includes("deportivas fit")) return 37000;
     
-    // Por defecto para el resto (Dunk, Forum, Vans, Fila, Air Force, Super Star, Puma, etc.)
-    return 50000; 
+    // Precio por defecto si no encuentra coincidencia en mayorista
+    return 37000; 
 }
 
 function cargarProductos() {
@@ -34,7 +94,8 @@ function cargarProductos() {
             return `<button type="button" class="talle-cuadro ${sinStockClass}" data-talle="${numeroTalle}" data-stock="${cantidadStock}" ${disabledAttr} onclick="seleccionarTalle(${index}, '${numeroTalle}', ${cantidadStock}, this)">${numeroTalle}</button>`;
         }).join('');
 
-        let precioUnitario = obtenerPrecioMinorista(producto.modelo);
+        let precioMinorista = obtenerPrecioMinorista(producto.modelo);
+        let precioMayorista = obtenerPrecioMayorista(producto.modelo);
 
         grid.innerHTML += `
             <div class="producto-card" data-modelo="${producto.modelo.toLowerCase()}">
@@ -43,15 +104,16 @@ function cargarProductos() {
                     <div class="sin-foto">📸<br>Falta Imagen</div>
                 </div>
                 <div class="info-prod">
-                    <div>
-                        <div class="titulo">${producto.modelo}</div>
-                        <div style="font-size: 20px; font-weight: bold; color: #111; margin-top: 2px; margin-bottom: 12px;">
-                            $${precioUnitario.toLocaleString('es-AR')}
-                        </div>
-                        
-                        <div class="talles-grid-container" id="talles-container-${index}">
-                            ${botonesTalles}
-                        </div>
+                    <div class="titulo">${producto.modelo}</div>
+                    <div style="font-size: 20px; font-weight: bold; color: #111; margin-top: 2px; margin-bottom: 2px;">
+                        $${precioMinorista.toLocaleString('es-AR')}
+                    </div>
+                    <div style="font-size: 12px; color: #28a745; margin-bottom: 6px; font-weight: bold;">
+                        Llevando 5 o más: $${precioMayorista.toLocaleString('es-AR')}
+                    </div>
+                    
+                    <div class="talles-grid-container" id="talles-container-${index}">
+                        ${botonesTalles}
                     </div>
                     
                     <div style="margin-top: auto;">
@@ -196,16 +258,23 @@ function actualizarCarrito() {
 
     lista.innerHTML = '';
     let sumaPares = 0;
-    let precioTotal = 0;
+    let totalPrecioMinorista = 0;
+    let totalPrecioMayorista = 0;
 
     carrito.forEach(item => { sumaPares += item.cantidad; });
+    let esMayorista = (sumaPares >= 5);
 
     carrito.forEach((item, i) => {
         const prodRef = stock_actualizado.find(p => p.modelo === item.modelo);
         const foto = prodRef ? prodRef.foto : '';
-        const precioUnitario = obtenerPrecioMinorista(item.modelo);
-        let subtotal = precioUnitario * item.cantidad;
-        precioTotal += subtotal;
+
+        let precioMin = obtenerPrecioMinorista(item.modelo);
+        let precioMay = obtenerPrecioMayorista(item.modelo);
+
+        totalPrecioMinorista += precioMin * item.cantidad;
+        totalPrecioMayorista += precioMay * item.cantidad;
+
+        let subtotalMostrar = (esMayorista ? precioMay : precioMin) * item.cantidad;
 
         lista.innerHTML += `
             <li class="item-carrito">
@@ -214,7 +283,7 @@ function actualizarCarrito() {
                     <div class="item-info">
                         <div style="font-weight:bold; font-size:13px; line-height:1.2; margin-bottom:3px;">${item.modelo}</div>
                         <div style="font-size: 12px; color: #555;">
-                            <span class="badge-cant">${item.cantidad}x</span> Talle: ${item.talle} - $${subtotal.toLocaleString('es-AR')}
+                            <span class="badge-cant">${item.cantidad}x</span> Talle: ${item.talle} - $${subtotalMostrar.toLocaleString('es-AR')}
                         </div>
                     </div>
                 </div>
@@ -227,12 +296,36 @@ function actualizarCarrito() {
 
     if (sumaPares === 0) {
         footerOpciones.innerHTML = `<div style="text-align:center; padding: 20px; color: #666;">Tu carrito está vacío</div>`;
+    } else if (sumaPares < 5) {
+        footerOpciones.innerHTML = `
+            <div style="text-align:center; margin-bottom: 10px;">
+                <span style="font-size:16px; font-weight:bold;">Total: $${totalPrecioMinorista.toLocaleString('es-AR')}</span>
+                <div style="font-size:12px; color:#d9534f; margin-top:5px;">Agregá ${5 - sumaPares} par(es) más para acceder a precio mayorista.</div>
+            </div>
+            <button class="btn-whatsapp" onclick="enviarPedido(false)">Pedir por WhatsApp 📲</button>
+        `;
     } else {
         footerOpciones.innerHTML = `
-            <div style="text-align:center; margin-bottom: 12px;">
-                <span style="font-size:16px; font-weight:bold;">Total: $${precioTotal.toLocaleString('es-AR')}</span>
+            <div style="text-align:center; margin-bottom:10px;">
+                <span style="font-size:13px; color:#666;">¡Llegaste a los 5 pares! Elegí tu plan:</span>
             </div>
-            <button class="btn-whatsapp" onclick="enviarPedido()">Pedir por WhatsApp 📲</button>
+            
+            <div class="opcion-compra minorista">
+                <div class="detalle-opcion">
+                    <strong>Comprar Minorista (Con Cambio)</strong>
+                    <span class="precio-final">$${totalPrecioMinorista.toLocaleString('es-AR')}</span>
+                </div>
+                <button class="btn-whatsapp outline" onclick="enviarPedido(false)">Elegir Minorista</button>
+            </div>
+
+            <div class="opcion-compra mayorista">
+                <div class="detalle-opcion">
+                    <strong>Comprar Mayorista</strong>
+                    <span class="precio-final">$${totalPrecioMayorista.toLocaleString('es-AR')}</span>
+                    <span class="aviso-cambio">⚠️ SIN CAMBIO DE TALLE</span>
+                </div>
+                <button class="btn-whatsapp" onclick="enviarPedido(true)">Elegir Mayorista 📲</button>
+            </div>
         `;
     }
 }
@@ -240,14 +333,14 @@ function actualizarCarrito() {
 function abrirCarrito() { document.getElementById('modal-carrito').style.display = 'flex'; }
 function cerrarCarrito() { document.getElementById('modal-carrito').style.display = 'none'; }
 
-function enviarPedido() {
+function enviarPedido(esMayorista) {
     if(carrito.length === 0) return alert("No seleccionaste ningún modelo.");
 
-    let mensaje = "¡Hola! Quiero hacer el siguiente pedido minorista:%0A%0A";
+    let mensaje = "¡Hola! Quiero hacer el siguiente pedido del catálogo:%0A%0A";
+    
     let total = 0;
-
     carrito.forEach(item => {
-        let precio = obtenerPrecioMinorista(item.modelo);
+        let precio = esMayorista ? obtenerPrecioMayorista(item.modelo) : obtenerPrecioMinorista(item.modelo);
         let subtotal = precio * item.cantidad;
         total += subtotal;
 
@@ -258,7 +351,13 @@ function enviarPedido() {
         mensaje += "%0A";
     });
 
-    mensaje += `%0ATotal: $${total.toLocaleString('es-AR')}`;
+    mensaje += `%0ATotal: $${total.toLocaleString('es-AR')}%0A`;
+    
+    if (esMayorista) {
+        mensaje += "Compra mayorista sin cambio";
+    } else {
+        mensaje += "Compra minorista con cambio";
+    }
 
     const url = `https://wa.me/${TU_NUMERO}?text=${mensaje}`;
     window.open(url, '_blank');
