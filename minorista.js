@@ -4,20 +4,35 @@ let carrito = [];
 function obtenerPrecioMinorista(nombreProducto) {
     const nombre = nombreProducto.toLowerCase();
 
-    // 1. PRECIOS DE $60.000
+    // 1. PRECIOS DE $60.000 
     if (nombre.includes("adidas 2000") || 
         nombre.includes("air forcé con medias") || 
         nombre.includes("air force con medias") || 
         nombre.includes("puma 180") || 
         nombre.includes("shox") || 
         nombre.includes("haylan") || 
-        nombre.includes("vans haylan")) {
+        nombre.includes("vans haylan") ||
+        nombre.includes("forum verde summer") ||
+        nombre.includes("jordan low 1 diamond") ||
+        nombre.includes("super star brillo") ||
+        nombre.includes("súper star brillo") ||
+        nombre.includes("super star brillo perla") ||
+        nombre.includes("súper star brillo perla") ||
+        nombre.includes("jordan diamond pipa blanca") ||
+        nombre.includes("jordan pink") ||
+        nombre.includes("negras medias") ||
+        nombre.includes("jordan 1 brillosa") || 
+        nombre.includes("exclusivas white")) {
         return 60000;
     }
 
     // 2. PRECIOS DE $55.000
-    if (nombre.includes("retro 4") || 
+    if (nombre.includes("jordan 11 suela azul") ||
+        nombre.includes("jordan 11 negra/blanca") ||
+        nombre.includes("jordan 11 negra blanca") || // Por si el catálogo lo pone sin la barra
+        nombre.includes("retro 4") || 
         nombre.includes("retro 1") || 
+        nombre.includes("jordan low glister") || 
         nombre.includes("jordan") || 
         nombre.includes("abzorb") || 
         nombre.includes("9060") || 
@@ -34,42 +49,73 @@ function obtenerPrecioMinorista(nombreProducto) {
 function obtenerPrecioMayorista(nombreProducto) {
     const nombre = nombreProducto.toLowerCase();
 
-    // 1. PRECIOS ESPECÍFICOS (Modelos exactos con tarifas diferenciadas)
-    if (nombre.includes("samba classic")) return 39000;
-    if (nombre.includes("samba total black")) return 37000;
-    if (nombre.includes("adidas boas")) return 37000;
-    if (nombre.includes("botitas vans")) return 37000;
+    // 1. EXCEPCIONES MUY ESPECÍFICAS (Se leen primero para no chocar con las categorías generales)
     if (nombre.includes("botitas jordan niño")) return 30000;
-    if (nombre.includes("glister beige pipa marrón")) return 37000;
+
+    // PRECIOS DE 50.000
+    if (nombre.includes("jordan 11 suela azul") ||
+        nombre.includes("jordan 11 negra/blanca") ||
+        nombre.includes("jordan 11 negra blanca")) {
+        return 50000;
+    }
+
+    // PRECIOS DE 42.000
+    if (nombre.includes("forum verde summer") || 
+        nombre.includes("jordan low 1 diamond") || 
+        nombre.includes("jordan diamond pipa blanca") || 
+        nombre.includes("jordan pink") || 
+        nombre.includes("jordan 1 brillosa") || 
+        nombre.includes("super star brillo") ||
+        nombre.includes("súper star brillo") ||
+        nombre.includes("super star brillo perla") ||
+        nombre.includes("súper star brillo perla") ||
+        nombre.includes("adidas 2000") || 
+        nombre.includes("puma 180") || 
+        nombre.includes("shox") ||
+        nombre.includes("haylan")) {
+        return 42000;
+    }
+
+    // PRECIOS DE 41.000
+    if (nombre.includes("exclusivas white") || 
+        nombre.includes("negras medias") || 
+        nombre.includes("air forcé con medias") || 
+        nombre.includes("air force con medias")) {
+        return 41000;
+    }
+
+    // PRECIOS DE 39.000
+    if (nombre.includes("samba classic") ||
+        nombre.includes("jordan low glister") ||
+        nombre.includes("jordan") || 
+        nombre.includes("retro 4") || 
+        nombre.includes("botitas") ||
+        nombre.includes("530") || 
+        nombre.includes("9060") || 
+        nombre.includes("abzorb") || 
+        nombre.includes("running") || 
+        nombre.includes("mind")) {
+        return 39000;
+    }
+
+    // 2. CATEGORÍAS GENERALES Y PRECIOS DE 37.000
+    if (nombre.includes("samba total black") || 
+        nombre.includes("adidas boas") || 
+        nombre.includes("botitas vans") || 
+        nombre.includes("glister beige pipa marrón") ||
+        nombre.includes("air forcé") || nombre.includes("air force") ||
+        nombre.includes("forum") || nombre.includes("fórum") ||
+        nombre.includes("super star") || nombre.includes("súper star") || // Entran las súper star comunes sin brillo
+        nombre.includes("glistter") || nombre.includes("glitter") || nombre.includes("glister") || 
+        nombre.includes("dunk pombo") || nombre.includes("dunk total black") || 
+        nombre.includes("combinada celeste") || nombre.includes("sb dunk") || nombre.includes("dunk") ||
+        nombre.includes("vans") || nombre.includes("knu") ||
+        nombre.includes("puma") ||
+        nombre.includes("deportivas fit")) {
+        return 37000;
+    }
     
-    // 2. CATEGORÍAS GENERALES
-    if (nombre.includes("exclusivas white")) return 41000;
-    if (nombre.includes("negras medias") || nombre.includes("air forcé con medias") || nombre.includes("air force con medias")) return 41000;
-    if (nombre.includes("air forcé") || nombre.includes("air force")) return 37000;
-
-    if (nombre.includes("adidas 2000")) return 42000;
-    if (nombre.includes("forum") || nombre.includes("fórum")) return 37000;
-
-    if (nombre.includes("super star") || nombre.includes("súper star")) return 37000;
-
-    if (nombre.includes("glistter") || nombre.includes("glitter") || nombre.includes("glister") || nombre.includes("dunk pombo") || nombre.includes("dunk total black") || nombre.includes("combinada celeste") || nombre.includes("sb dunk")) return 37000;
-    if (nombre.includes("dunk")) return 37000;
-
-    if (nombre.includes("jordan") || nombre.includes("retro 4") || nombre.includes("botitas")) return 39000;
-
-    if (nombre.includes("530") || nombre.includes("9060") || nombre.includes("abzorb") || nombre.includes("running") || nombre.includes("mind")) return 39000;
-
-    if (nombre.includes("haylan")) return 42000;
-    if (nombre.includes("vans") || nombre.includes("knu")) return 37000;
-
-    if (nombre.includes("puma 180")) return 42000;
-    if (nombre.includes("puma")) return 37000;
-
-    if (nombre.includes("shox")) return 42000;
-
-    if (nombre.includes("deportivas fit")) return 37000;
-    
-    // Precio por defecto si no encuentra coincidencia en mayorista
+    // Precio por defecto si un producto nuevo no entra en ninguna lista
     return 37000; 
 }
 
