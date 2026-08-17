@@ -88,7 +88,7 @@ const stock_actualizado = [
   { modelo: 'Adidas 2000 royal', talles: [{"talle": 41, "stock": 1}, {"talle": 43, "stock": 1}], foto: 'Fotos/Adidas 2000 royal.jpeg' },
   { modelo: 'Botitas niños azul', talles: [{"talle": 26, "stock": 2}, {"talle": 27, "stock": 1}, {"talle": 28, "stock": 1}, {"talle": 30, "stock": 2}, {"talle": 31, "stock": 2}, {"talle": 32, "stock": 2}, {"talle": 33, "stock": 1}], foto: 'Fotos/Botitas niños azul.jpeg' },
   { modelo: 'Vans Haylan marron', talles: [{"talle": 38, "stock": 2}], foto: 'Fotos/Vans Haylan marron.jpeg' },
-  { modelo: 'Jordan 11 negra/blanca', talles: [{"talle": 41, "stock": 2}, {"talle": 42, "stock": 1}], foto: 'Fotos/Jordan 11 negra blanca.jpeg' },
+  { modelo: 'Jordan 11 negra/blanca', talles: [{"talle": 41, "stock": 2}], foto: 'Fotos/Jordan 11 negra blanca.jpeg' },
   { modelo: 'New balance 530 marrones', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 1}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 3}], foto: 'Fotos/New balance 530 marrones.jpeg' },
   { modelo: 'Jordan 1 verde / naranja', talles: [{"talle": 41, "stock": 2}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Jordan 1 verde naranja.jpeg' },
   { modelo: 'Nike mind gris', talles: [{"talle": 40, "stock": 2}, {"talle": 41, "stock": 1}, {"talle": 43, "stock": 2}], foto: 'Fotos/Nike mind gris.jpeg' },
