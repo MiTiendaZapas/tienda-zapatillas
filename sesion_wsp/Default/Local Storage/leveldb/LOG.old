@@ -1,6 +1,2 @@
-2026/08/13-08:04:30.278 1c60 Reusing MANIFEST C:\Users\mateo\OneDrive\Escritorio\proyectos\TiendaZapasOficial\sesion_wsp\Default\Local Storage\leveldb/MANIFEST-000001
-2026/08/13-08:04:30.304 1c60 Recovering log #39
-2026/08/13-08:04:30.310 1c60 Reusing old log C:\Users\mateo\OneDrive\Escritorio\proyectos\TiendaZapasOficial\sesion_wsp\Default\Local Storage\leveldb/000039.log 
-2026/08/13-08:05:38.128 2558 Level-0 table #43: started
-2026/08/13-08:05:38.137 2558 Level-0 table #43: 15738 bytes OK
-2026/08/13-08:05:38.141 2558 Delete type=0 #39
+2026/08/17-12:51:12.185 31e4 Creating DB C:\Users\mateo\OneDrive\Escritorio\proyectos\TiendaZapasOficial\sesion_wsp\Default\Local Storage\leveldb since it was missing.
+2026/08/17-12:51:12.333 31e4 Reusing MANIFEST C:\Users\mateo\OneDrive\Escritorio\proyectos\TiendaZapasOficial\sesion_wsp\Default\Local Storage\leveldb/MANIFEST-000001

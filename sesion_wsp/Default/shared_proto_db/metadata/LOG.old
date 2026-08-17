@@ -1,3 +1,2 @@
-2026/08/13-08:04:30.018 6c8 Reusing MANIFEST C:\Users\mateo\OneDrive\Escritorio\proyectos\TiendaZapasOficial\sesion_wsp\Default\shared_proto_db\metadata/MANIFEST-000001
-2026/08/13-08:04:30.029 6c8 Recovering log #3
-2026/08/13-08:04:30.030 6c8 Reusing old log C:\Users\mateo\OneDrive\Escritorio\proyectos\TiendaZapasOficial\sesion_wsp\Default\shared_proto_db\metadata/000003.log 
+2026/08/17-12:51:11.996 327c Creating DB C:\Users\mateo\OneDrive\Escritorio\proyectos\TiendaZapasOficial\sesion_wsp\Default\shared_proto_db\metadata since it was missing.
+2026/08/17-12:51:12.120 327c Reusing MANIFEST C:\Users\mateo\OneDrive\Escritorio\proyectos\TiendaZapasOficial\sesion_wsp\Default\shared_proto_db\metadata/MANIFEST-000001
