@@ -201,10 +201,16 @@ def rutina_actualizacion():
     # --- AUTOMATIZACIÓN DE GITHUB CON AVISO CLARO ---
     try:
         hora_subida = time.strftime('%H:%M:%S')
+        
+        # 1. DESCARGA SILENCIOSA: Esto evita el error de "exit status 1"
+        subprocess.run(["git", "pull", "origin", "main"], check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+        # 2. AGREGA Y GUARDA EL CATÁLOGO
         subprocess.run(["git", "add", ARCHIVO_JS], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         
         resultado_commit = subprocess.run(["git", "commit", "-m", f"Stock actualizado a las {hora_subida}"], capture_output=True, text=True)
         
+        # 3. SUBE A LA NUBE
         if "nothing to commit" not in resultado_commit.stdout:
             subprocess.run(["git", "push", "origin", "main"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             print(f"[{hora_subida}] 🔄 HUBO CAMBIOS: El stock se actualizó y se subió a la web.")

@@ -1,6 +1,19 @@
 const TU_NUMERO = "5491153773771"; 
-const PRECIO_MINORISTA = 43000;
 let carrito = [];
+
+function obtenerPrecioMinorista(nombreProducto) {
+    const nombre = nombreProducto.toLowerCase();
+
+    // Excepciones de $55.000 por unidad
+    if (nombre.includes("jordan 11 suela azul") ||
+        nombre.includes("jordan 11 negra/blanca") ||
+        nombre.includes("jordan 11 negra blanca")) {
+        return 55000;
+    }
+
+    // Precio por defecto por unidad para el resto del catálogo
+    return 43000; 
+}
 
 function obtenerPrecioMayorista(nombreProducto) {
     const nombre = nombreProducto.toLowerCase();
@@ -96,6 +109,7 @@ function cargarProductos() {
             return `<button type="button" class="talle-cuadro ${sinStockClass}" data-talle="${numeroTalle}" data-stock="${cantidadStock}" ${disabledAttr} onclick="seleccionarTalle(${index}, '${numeroTalle}', ${cantidadStock}, this)">${numeroTalle}</button>`;
         }).join('');
 
+        let precioMinorista = obtenerPrecioMinorista(producto.modelo);
         let precioMayorista = obtenerPrecioMayorista(producto.modelo);
 
         grid.innerHTML += `
@@ -107,7 +121,7 @@ function cargarProductos() {
                 <div class="info-prod">
                     <div class="titulo">${producto.modelo}</div>
                     <div style="font-size: 20px; font-weight: bold; color: #111; margin-top: 2px; margin-bottom: 2px;">
-                        $${PRECIO_MINORISTA.toLocaleString('es-AR')}
+                        $${precioMinorista.toLocaleString('es-AR')}
                     </div>
                     <div style="font-size: 12px; color: #28a745; margin-bottom: 6px; font-weight: bold;">
                         Llevando 5 o más: $${precioMayorista.toLocaleString('es-AR')}
@@ -269,7 +283,7 @@ function actualizarCarrito() {
         const prodRef = stock_actualizado.find(p => p.modelo === item.modelo);
         const foto = prodRef ? prodRef.foto : '';
 
-        let precioMin = PRECIO_MINORISTA;
+        let precioMin = obtenerPrecioMinorista(item.modelo);
         let precioMay = obtenerPrecioMayorista(item.modelo);
 
         totalPrecioMinorista += precioMin * item.cantidad;
@@ -341,7 +355,7 @@ function enviarPedido(esMayorista) {
     
     let total = 0;
     carrito.forEach(item => {
-        let precio = esMayorista ? obtenerPrecioMayorista(item.modelo) : PRECIO_MINORISTA;
+        let precio = esMayorista ? obtenerPrecioMayorista(item.modelo) : obtenerPrecioMinorista(item.modelo);
         let subtotal = precio * item.cantidad;
         total += subtotal;
 
