@@ -4,6 +4,11 @@ let carrito = [];
 function obtenerPrecioMinorista(nombreProducto) {
     const nombre = nombreProducto.toLowerCase();
 
+    // EXCEPCIÓN DE NIÑO POR UNIDAD ($35.000)
+    if (nombre.includes("niño") || nombre.includes("niños")) {
+        return 35000;
+    }
+
     // Excepciones de $55.000 por unidad
     if (nombre.includes("jordan 11 suela azul") ||
         nombre.includes("jordan 11 negra/blanca") ||
@@ -19,7 +24,9 @@ function obtenerPrecioMayorista(nombreProducto) {
     const nombre = nombreProducto.toLowerCase();
 
     // 1. EXCEPCIONES MUY ESPECÍFICAS (Se leen primero para no chocar con las categorías generales)
-    if (nombre.includes("botitas jordan niño")) return 30000;
+    if (nombre.includes("botitas jordan niño") || nombre.includes("niño") || nombre.includes("niños")) {
+        return 30000;
+    }
 
     // PRECIOS DE 50.000
     if (nombre.includes("jordan 11 suela azul") ||
@@ -74,7 +81,7 @@ function obtenerPrecioMayorista(nombreProducto) {
         nombre.includes("glister beige pipa marrón") ||
         nombre.includes("air forcé") || nombre.includes("air force") ||
         nombre.includes("forum") || nombre.includes("fórum") ||
-        nombre.includes("super star") || nombre.includes("súper star") || // Entran las súper star comunes sin brillo
+        nombre.includes("super star") || nombre.includes("súper star") || 
         nombre.includes("glistter") || nombre.includes("glitter") || nombre.includes("glister") || 
         nombre.includes("dunk pombo") || nombre.includes("dunk total black") || 
         nombre.includes("combinada celeste") || nombre.includes("sb dunk") || nombre.includes("dunk") ||

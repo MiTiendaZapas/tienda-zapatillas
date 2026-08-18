@@ -4,7 +4,12 @@ let carrito = [];
 function obtenerPrecioMinorista(nombreProducto) {
     const nombre = nombreProducto.toLowerCase();
 
-    // 1. PRECIOS DE $60.000 (Se agregaron las Jordan 11)
+    // EXCEPCIÓN DE NIÑO POR UNIDAD ($40.000)
+    if (nombre.includes("niño") || nombre.includes("niños")) {
+        return 40000;
+    }
+
+    // 1. PRECIOS DE $60.000
     if (nombre.includes("adidas 2000") || 
         nombre.includes("air forcé con medias") || 
         nombre.includes("air force con medias") || 
@@ -22,9 +27,9 @@ function obtenerPrecioMinorista(nombreProducto) {
         nombre.includes("jordan pink") ||
         nombre.includes("negras medias") ||
         nombre.includes("jordan 1 brillosa") || 
-        nombre.includes("jordan 11 suela azul") ||     // <- AGREGADO
-        nombre.includes("jordan 11 negra/blanca") ||   // <- AGREGADO
-        nombre.includes("jordan 11 negra blanca") ||   // <- AGREGADO
+        nombre.includes("jordan 11 suela azul") ||
+        nombre.includes("jordan 11 negra/blanca") ||
+        nombre.includes("jordan 11 negra blanca") ||
         nombre.includes("exclusivas white")) {
         return 60000;
     }
@@ -42,15 +47,17 @@ function obtenerPrecioMinorista(nombreProducto) {
         return 55000;
     }
 
-    // 3. PRECIOS DE $50.000 (Dunk, Forum, Vans clásicas, FIT, Fila, Air force, Súper star, Puma BMW, etc.)
+    // 3. PRECIOS DE $50.000 (Por defecto para el resto)
     return 50000;
 }
 
 function obtenerPrecioMayorista(nombreProducto) {
     const nombre = nombreProducto.toLowerCase();
 
-    // 1. EXCEPCIONES MUY ESPECÍFICAS (Se leen primero para no chocar con las categorías generales)
-    if (nombre.includes("botitas jordan niño")) return 30000;
+    // 1. EXCEPCIONES MUY ESPECÍFICAS (Niños a $30.000 por mayor)
+    if (nombre.includes("botitas jordan niño") || nombre.includes("niño") || nombre.includes("niños")) {
+        return 30000;
+    }
 
     // PRECIOS DE 50.000
     if (nombre.includes("jordan 11 suela azul") ||
@@ -105,7 +112,7 @@ function obtenerPrecioMayorista(nombreProducto) {
         nombre.includes("glister beige pipa marrón") ||
         nombre.includes("air forcé") || nombre.includes("air force") ||
         nombre.includes("forum") || nombre.includes("fórum") ||
-        nombre.includes("super star") || nombre.includes("súper star") || // Entran las súper star comunes sin brillo
+        nombre.includes("super star") || nombre.includes("súper star") || 
         nombre.includes("glistter") || nombre.includes("glitter") || nombre.includes("glister") || 
         nombre.includes("dunk pombo") || nombre.includes("dunk total black") || 
         nombre.includes("combinada celeste") || nombre.includes("sb dunk") || nombre.includes("dunk") ||
