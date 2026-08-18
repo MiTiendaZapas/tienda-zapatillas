@@ -4,7 +4,7 @@ let carrito = [];
 function obtenerPrecioMinorista(nombreProducto) {
     const nombre = nombreProducto.toLowerCase();
 
-    // 1. PRECIOS DE $60.000 
+    // 1. PRECIOS DE $60.000 (Se agregaron las Jordan 11)
     if (nombre.includes("adidas 2000") || 
         nombre.includes("air forcé con medias") || 
         nombre.includes("air force con medias") || 
@@ -22,15 +22,15 @@ function obtenerPrecioMinorista(nombreProducto) {
         nombre.includes("jordan pink") ||
         nombre.includes("negras medias") ||
         nombre.includes("jordan 1 brillosa") || 
+        nombre.includes("jordan 11 suela azul") ||     // <- AGREGADO
+        nombre.includes("jordan 11 negra/blanca") ||   // <- AGREGADO
+        nombre.includes("jordan 11 negra blanca") ||   // <- AGREGADO
         nombre.includes("exclusivas white")) {
         return 60000;
     }
 
     // 2. PRECIOS DE $55.000
-    if (nombre.includes("jordan 11 suela azul") ||
-        nombre.includes("jordan 11 negra/blanca") ||
-        nombre.includes("jordan 11 negra blanca") || // Por si el catálogo lo pone sin la barra
-        nombre.includes("retro 4") || 
+    if (nombre.includes("retro 4") || 
         nombre.includes("retro 1") || 
         nombre.includes("jordan low glister") || 
         nombre.includes("jordan") || 
