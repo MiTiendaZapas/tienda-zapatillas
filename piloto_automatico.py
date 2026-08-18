@@ -12,7 +12,7 @@ URL_LISTADO = "https://vestitepiola.mitiendanube.com/productos/?order=best-selli
 CARPETA_FOTOS = "Fotos"
 ARCHIVO_JS = "catalogo.js"
 MAX_SCROLLS = 200
-ESTABLE_LIMITE = 3
+ESTABLE_LIMITE = 5 # Subimos la tolerancia a 5
 TIMEOUT_PRODUCTO_MS = 15000
 # ---------------------
 
@@ -25,25 +25,35 @@ def limpiar_nombre_archivo(nombre):
 def cargar_listado_completo(page):
     estable = 0
     anterior = -1
+    
     for _ in range(MAX_SCROLLS):
-        page.mouse.wheel(0, 4000)
-        page.wait_for_timeout(700)
+        # 1. Bajar hasta el mismísimo final de la página
+        page.evaluate("window.scrollTo(0, document.body.scrollHeight);")
+        page.wait_for_timeout(1000) # Le damos 1 segundo a la web para reaccionar
+
         boton = page.locator(".js-load-more")
         if boton.count() > 0:
             style = (boton.first.get_attribute("style") or "").replace(" ", "")
             if "display:none" not in style:
                 try:
-                    boton.first.click(timeout=2000)
-                    page.wait_for_timeout(900)
+                    # 2. Subimos un poquitito por si un banner fijo de cookies tapa el botón
+                    page.evaluate("window.scrollBy(0, -150);")
+                    boton.first.click(timeout=3000)
+                    # 3. TIEMPO CLAVE: Le damos 2.5 segundos para que descargue las fotos nuevas
+                    page.wait_for_timeout(2500) 
                 except:
                     pass
-        actual = page.locator(".js-quickshop-modal-open").count()
+        
+        # 4. Contamos las tarjetas reales de producto
+        actual = page.locator('.js-item-product, .product-container').count()
+        
         if actual == anterior:
             estable += 1
-            if estable >= ESTABLE_LIMITE:
+            if estable >= ESTABLE_LIMITE: 
                 break
         else:
             estable = 0
+            
         anterior = actual
 
 def extraer_productos(page):
