@@ -95,7 +95,7 @@ const stock_actualizado = [
   { modelo: 'Jordan 1 verde / naranja', talles: [{"talle": 41, "stock": 2}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Jordan 1 verde naranja.jpeg' },
   { modelo: 'Nike mind gris', talles: [{"talle": 40, "stock": 2}, {"talle": 41, "stock": 1}, {"talle": 43, "stock": 2}], foto: 'Fotos/Nike mind gris.jpeg' },
   { modelo: 'Sb Dunk VINO', talles: [{"talle": 39, "stock": 1}, {"talle": 40, "stock": 1}, {"talle": 42, "stock": 3}], foto: 'Fotos/Sb Dunk VINO.jpeg' },
-  { modelo: 'Jordan 11 suela azul', talles: [{"talle": 40, "stock": 2}, {"talle": 42, "stock": 3}, {"talle": 43, "stock": 1}], foto: 'Fotos/Jordan 11 suela azul.jpeg' },
+  { modelo: 'Jordan 11 suela azul', talles: [{"talle": 40, "stock": 1}, {"talle": 42, "stock": 3}, {"talle": 43, "stock": 1}], foto: 'Fotos/Jordan 11 suela azul.jpeg' },
   { modelo: 'Botita niño panda', talles: [{"talle": 26, "stock": 1}, {"talle": 27, "stock": 3}, {"talle": 28, "stock": 1}, {"talle": 29, "stock": 3}, {"talle": 31, "stock": 3}, {"talle": 33, "stock": 3}], foto: 'Fotos/Botita niño panda.jpeg' },
   { modelo: 'Jordan 1 brillosa', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 1}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 1}, {"talle": 40, "stock": 1}], foto: 'Fotos/Jordan 1 brillosa.jpeg' },
   { modelo: 'Nb ABZORB white', talles: [{"talle": 35, "stock": 2}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 2}], foto: 'Fotos/Nb ABZORB white.jpeg' },
