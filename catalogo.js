@@ -63,7 +63,7 @@ const stock_actualizado = [
   { modelo: 'Vans Haylan bonitas', talles: [{"talle": 35, "stock": 1}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 4}, {"talle": 40, "stock": 1}], foto: 'Fotos/Vans Haylan bonitas.jpeg' },
   { modelo: 'Jordan low brillo', talles: [{"talle": 36, "stock": 1}, {"talle": 40, "stock": 1}], foto: 'Fotos/Jordan low brillo.jpeg' },
   { modelo: 'Shox preto/prata', talles: [{"talle": 44, "stock": 1}], foto: 'Fotos/Shox preto prata.jpeg' },
-  { modelo: 'Súper star brillo perla', talles: [{"talle": 37, "stock": 2}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 2}], foto: 'Fotos/Súper star brillo perla.jpeg' },
+  { modelo: 'Súper star brillo perla', talles: [{"talle": 37, "stock": 1}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 2}], foto: 'Fotos/Súper star brillo perla.jpeg' },
   { modelo: 'Puma bmw', talles: [{"talle": 35, "stock": 1}], foto: 'Fotos/Puma bmw.jpeg' },
   { modelo: 'Botitas Vans', talles: [{"talle": 35, "stock": 1}, {"talle": 39, "stock": 1}, {"talle": 40, "stock": 1}], foto: 'Fotos/Botitas Vans.jpeg' },
   { modelo: 'Dunk blanco/marinho', talles: [{"talle": 43, "stock": 1}], foto: 'Fotos/Dunk blanco marinho.jpeg' },
