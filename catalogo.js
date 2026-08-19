@@ -57,7 +57,7 @@ const stock_actualizado = [
   { modelo: 'Adidas boas negra', talles: [{"talle": 36, "stock": 2}, {"talle": 37, "stock": 2}, {"talle": 39, "stock": 1}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Adidas boas negra.jpeg' },
   { modelo: 'Jordan botitas charol', talles: [{"talle": 44, "stock": 1}], foto: 'Fotos/Jordan botitas charol.jpeg' },
   { modelo: 'Dunk combinada celeste', talles: [{"talle": 39, "stock": 1}, {"talle": 43, "stock": 3}], foto: 'Fotos/Dunk combinada celeste.jpeg' },
-  { modelo: 'Nike Jordan Pink', talles: [{"talle": 34, "stock": 1}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 3}], foto: 'Fotos/Nike Jordan Pink.jpeg' },
+  { modelo: 'Nike Jordan Pink', talles: [{"talle": 34, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 3}], foto: 'Fotos/Nike Jordan Pink.jpeg' },
   { modelo: 'Shox tapón rojo', talles: [{"talle": 39, "stock": 3}, {"talle": 40, "stock": 6}, {"talle": 41, "stock": 8}, {"talle": 42, "stock": 8}, {"talle": 43, "stock": 8}, {"talle": 44, "stock": 3}], foto: 'Fotos/Shox tapón rojo.jpeg' },
   { modelo: 'Sb dunk platino', talles: [{"talle": 36, "stock": 2}, {"talle": 37, "stock": 1}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 1}, {"talle": 40, "stock": 1}], foto: 'Fotos/Sb dunk platino.jpeg' },
   { modelo: 'Vans Haylan bonitas', talles: [{"talle": 35, "stock": 1}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 4}, {"talle": 40, "stock": 1}], foto: 'Fotos/Vans Haylan bonitas.jpeg' },
