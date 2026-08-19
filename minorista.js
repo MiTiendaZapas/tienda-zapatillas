@@ -4,9 +4,14 @@ let carrito = [];
 function obtenerPrecioMinorista(nombreProducto) {
     const nombre = nombreProducto.toLowerCase();
 
-    // EXCEPCIÓN DE NIÑO POR UNIDAD ($40.000)
-    if (nombre.includes("niño") || nombre.includes("niños")) {
+    // EXCEPCIÓN DE OJOTAS LOUIS VUITTON NEGRAS ($40.000 por unidad)
+    if (nombre.includes("ojotas louis vuitton negras") || nombre.includes("louis vuitton negras")) {
         return 40000;
+    }
+
+    // EXCEPCIÓN DE NIÑO POR UNIDAD ($35.000)
+    if (nombre.includes("niño") || nombre.includes("niños")) {
+        return 35000;
     }
 
     // 1. PRECIOS DE $60.000
@@ -54,7 +59,11 @@ function obtenerPrecioMinorista(nombreProducto) {
 function obtenerPrecioMayorista(nombreProducto) {
     const nombre = nombreProducto.toLowerCase();
 
-    // 1. EXCEPCIONES MUY ESPECÍFICAS (Niños a $30.000 por mayor)
+    // 1. EXCEPCIONES MUY ESPECÍFICAS
+    if (nombre.includes("ojotas louis vuitton negras") || nombre.includes("louis vuitton negras")) {
+        return 31000;
+    }
+
     if (nombre.includes("botitas jordan niño") || nombre.includes("niño") || nombre.includes("niños")) {
         return 30000;
     }
