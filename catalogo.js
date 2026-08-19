@@ -102,7 +102,7 @@ const stock_actualizado = [
   { modelo: 'Dunk marinho red', talles: [{"talle": 39, "stock": 1}, {"talle": 41, "stock": 2}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 2}], foto: 'Fotos/Dunk marinho red.jpeg' },
   { modelo: 'Dunk preto/blanco', talles: [{"talle": 40, "stock": 1}, {"talle": 41, "stock": 2}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Dunk preto blanco.jpeg' },
   { modelo: 'Vans Haylan azul luxo', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 1}, {"talle": 40, "stock": 1}], foto: 'Fotos/Vans Haylan azul luxo.jpeg' },
-  { modelo: 'Air forcé black brillo', talles: [{"talle": 35, "stock": 2}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 2}], foto: 'Fotos/Air forcé black brillo.jpeg' },
+  { modelo: 'Air forcé black brillo', talles: [{"talle": 35, "stock": 2}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 2}], foto: 'Fotos/Air forcé black brillo.jpeg' },
   { modelo: 'NB celeste 9060', talles: [{"talle": 35, "stock": 1}], foto: 'Fotos/NB celeste 9060.jpeg' },
   { modelo: 'Shox tapón dorada', talles: [{"talle": 40, "stock": 1}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 3}, {"talle": 43, "stock": 2}], foto: 'Fotos/Shox tapón dorada.jpeg' },
   { modelo: 'Vans Haylan black luxo', talles: [{"talle": 40, "stock": 1}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 1}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Vans Haylan black luxo.jpeg' },
