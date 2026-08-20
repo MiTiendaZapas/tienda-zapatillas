@@ -51,7 +51,7 @@ const stock_actualizado = [
   { modelo: 'Súper star brillo', talles: [{"talle": 38, "stock": 1}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 1}, {"talle": 41, "stock": 2}], foto: 'Fotos/Súper star brillo.jpeg' },
   { modelo: 'Sb dunk cinza/preto', talles: [{"talle": 44, "stock": 2}], foto: 'Fotos/Sb dunk cinza preto.jpeg' },
   { modelo: 'Jordan 1 branco / pink', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 1}, {"talle": 38, "stock": 2}], foto: 'Fotos/Jordan 1 branco pink.jpeg' },
-  { modelo: 'ABZORB marrones', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 5}, {"talle": 36, "stock": 8}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 1}], foto: 'Fotos/ABZORB marrones.jpeg' },
+  { modelo: 'ABZORB marrones', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 5}, {"talle": 36, "stock": 8}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 3}], foto: 'Fotos/ABZORB marrones.jpeg' },
   { modelo: 'Jordan low pombo', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 1}], foto: 'Fotos/Jordan low pombo.jpeg' },
   { modelo: 'Adidas boas negra', talles: [{"talle": 36, "stock": 2}, {"talle": 37, "stock": 2}, {"talle": 39, "stock": 1}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Adidas boas negra.jpeg' },
   { modelo: 'Jordan botitas charol', talles: [{"talle": 44, "stock": 1}], foto: 'Fotos/Jordan botitas charol.jpeg' },
