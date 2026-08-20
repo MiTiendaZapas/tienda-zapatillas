@@ -1,6 +1,6 @@
-2026/08/19-14:57:37.182 3334 Reusing MANIFEST C:\Users\mateo\OneDrive\Escritorio\proyectos\TiendaZapasOficial\sesion_wsp\Default\Local Storage\leveldb/MANIFEST-000001
-2026/08/19-14:57:37.222 3334 Recovering log #7
-2026/08/19-14:57:37.230 3334 Reusing old log C:\Users\mateo\OneDrive\Escritorio\proyectos\TiendaZapasOficial\sesion_wsp\Default\Local Storage\leveldb/000007.log 
-2026/08/19-14:58:37.308 3334 Level-0 table #11: started
-2026/08/19-14:58:37.339 3334 Level-0 table #11: 15233 bytes OK
-2026/08/19-14:58:37.345 3334 Delete type=0 #7
+2026/08/19-22:15:29.927 22ac Reusing MANIFEST C:\Users\mateo\OneDrive\Escritorio\proyectos\TiendaZapasOficial\sesion_wsp\Default\Local Storage\leveldb/MANIFEST-000001
+2026/08/19-22:15:29.986 22ac Recovering log #10
+2026/08/19-22:15:29.996 22ac Reusing old log C:\Users\mateo\OneDrive\Escritorio\proyectos\TiendaZapasOficial\sesion_wsp\Default\Local Storage\leveldb/000010.log 
+2026/08/19-22:45:08.557 22ac Level-0 table #14: started
+2026/08/19-22:45:08.624 22ac Level-0 table #14: 16363 bytes OK
+2026/08/19-22:45:08.683 22ac Delete type=0 #10
