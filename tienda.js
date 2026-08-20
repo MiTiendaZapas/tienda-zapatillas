@@ -4,14 +4,29 @@ let carrito = [];
 function obtenerPrecioMinorista(nombreProducto) {
     const nombre = nombreProducto.toLowerCase();
 
-    // EXCEPCIÓN DE OJOTAS LOUIS VUITTON NEGRAS ($35.000 por unidad)
-    if (nombre.includes("ojotas louis vuitton negras") || nombre.includes("louis vuitton negras")) {
+    // EXCEPCIÓN DE TODAS LAS OJOTAS ($35.000 por unidad)
+    if (nombre.includes("ojotas")) {
         return 35000;
     }
 
     // EXCEPCIÓN DE NIÑO POR UNIDAD ($35.000)
     if (nombre.includes("niño") || nombre.includes("niños")) {
         return 35000;
+    }
+
+    // JORDAN LOW PINK ($43.000 por unidad)
+    if (nombre.includes("jordan low pink") || nombre.includes("jordan pink low")) {
+        return 43000;
+    }
+
+    // MODELOS ESPECÍFICOS A $43.000 POR UNIDAD
+    if (nombre.includes("nike v5 blancas") || 
+        nombre.includes("nike v5 negras") || 
+        nombre.includes("air jordan pipa gris") || 
+        nombre.includes("air jordan black") || 
+        nombre.includes("new balance 4000 negra") ||
+        nombre.includes("nb 4000 negra")) {
+        return 43000;
     }
 
     // Excepciones de $55.000 por unidad
@@ -29,12 +44,26 @@ function obtenerPrecioMayorista(nombreProducto) {
     const nombre = nombreProducto.toLowerCase();
 
     // 1. EXCEPCIONES MUY ESPECÍFICAS (Se leen primero para no chocar con las categorías generales)
-    if (nombre.includes("ojotas louis vuitton negras") || nombre.includes("louis vuitton negras")) {
+    if (nombre.includes("ojotas")) {
         return 31000;
     }
 
     if (nombre.includes("botitas jordan niño") || nombre.includes("niño") || nombre.includes("niños")) {
         return 30000;
+    }
+
+    if (nombre.includes("jordan low pink") || nombre.includes("jordan pink low")) {
+        return 39000;
+    }
+
+    // MODELOS ESPECÍFICOS A $42.000 POR MAYOR
+    if (nombre.includes("nike v5 blancas") || 
+        nombre.includes("nike v5 negras") || 
+        nombre.includes("air jordan pipa gris") || 
+        nombre.includes("air jordan black") || 
+        nombre.includes("new balance 4000 negra") ||
+        nombre.includes("nb 4000 negra")) {
+        return 42000;
     }
 
     // PRECIOS DE 50.000
@@ -104,6 +133,22 @@ function obtenerPrecioMayorista(nombreProducto) {
     return 37000; 
 }
 
+function procesarTallesOjota(tallesArray) {
+    if (!tallesArray || tallesArray.length === 0) return [];
+    let tallesProcesados = [];
+    let numeros = tallesArray.map(t => parseInt(t.talle !== undefined ? t.talle : t)).filter(n => !isNaN(n));
+    numeros.sort((a, b) => a - b);
+
+    for (let i = 0; i < numeros.length; i += 2) {
+        if (i + 1 < numeros.length) {
+            tallesProcesados.push({ talle: `${numeros[i]}/${numeros[i+1]}`, stock: 99 });
+        } else {
+            tallesProcesados.push({ talle: `${numeros[i]}`, stock: 99 });
+        }
+    }
+    return tallesProcesados;
+}
+
 function cargarProductos() {
     const grid = document.getElementById('grid-productos');
     grid.innerHTML = '';
@@ -116,7 +161,11 @@ function cargarProductos() {
     stock_actualizado.forEach((producto, index) => {
         if(!producto.talles || producto.talles.length === 0) return;
 
-        let botonesTalles = producto.talles.map(t => {
+        let listaTallesFinal = producto.modelo.toLowerCase().includes("ojotas") 
+            ? procesarTallesOjota(producto.talles) 
+            : producto.talles;
+
+        let botonesTalles = listaTallesFinal.map(t => {
             let numeroTalle = t.talle !== undefined ? t.talle : t;
             let cantidadStock = t.stock !== undefined ? t.stock : 99;
             let sinStockClass = cantidadStock <= 0 ? 'disabled' : '';
@@ -236,7 +285,7 @@ function agregarAlCarrito(indexProd) {
     const cantidadDeseada = parseInt(document.getElementById(`cant-${indexProd}`).textContent);
 
     const prod = stock_actualizado[indexProd];
-    const talleNumero = isNaN(talleElegido) ? talleElegido : parseInt(talleElegido);
+    const talleNumero = talleElegido; 
     
     const itemExistente = carrito.find(item => item.modelo === prod.modelo && item.talle === talleNumero);
     
@@ -257,7 +306,7 @@ function agregarAlCarrito(indexProd) {
     carrito.sort((a, b) => {
         if (a.modelo < b.modelo) return -1;
         if (a.modelo > b.modelo) return 1;
-        return a.talle - b.talle;
+        return String(a.talle).localeCompare(String(b.talle));
     });
 
     actualizarCarrito();
