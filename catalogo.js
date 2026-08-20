@@ -1,5 +1,5 @@
 const stock_actualizado = [
-  { modelo: 'Air forcé 1 blancas', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 4}, {"talle": 39, "stock": 3}, {"talle": 40, "stock": 10}, {"talle": 41, "stock": 12}, {"talle": 42, "stock": 9}, {"talle": 43, "stock": 4}, {"talle": 44, "stock": 3}], foto: 'Fotos/Air forcé 1 blancas.jpeg' },
+  { modelo: 'Air forcé 1 blancas', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 4}, {"talle": 39, "stock": 3}, {"talle": 40, "stock": 10}, {"talle": 41, "stock": 12}, {"talle": 42, "stock": 8}, {"talle": 43, "stock": 4}, {"talle": 44, "stock": 3}], foto: 'Fotos/Air forcé 1 blancas.jpeg' },
   { modelo: 'Vans KNU clasicas', talles: [{"talle": 34, "stock": 6}, {"talle": 35, "stock": 3}, {"talle": 36, "stock": 4}, {"talle": 37, "stock": 6}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 1}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 1}], foto: 'Fotos/Vans KNU clasicas.jpeg' },
   { modelo: 'Panda sb dunk', talles: [{"talle": 35, "stock": 2}, {"talle": 37, "stock": 5}, {"talle": 43, "stock": 15}], foto: 'Fotos/Panda sb dunk.jpeg' },
   { modelo: 'Adidas forum blancas', talles: [{"talle": 36, "stock": 2}, {"talle": 37, "stock": 2}, {"talle": 39, "stock": 1}, {"talle": 40, "stock": 4}, {"talle": 43, "stock": 2}], foto: 'Fotos/Adidas forum blancas.jpeg' },
@@ -85,7 +85,7 @@ const stock_actualizado = [
   { modelo: 'New balance 530 marrones', talles: [{"talle": 35, "stock": 1}, {"talle": 38, "stock": 1}, {"talle": 39, "stock": 2}], foto: 'Fotos/New balance 530 marrones.jpeg' },
   { modelo: 'Vans Haylan pink', talles: [{"talle": 36, "stock": 2}, {"talle": 37, "stock": 5}, {"talle": 38, "stock": 9}, {"talle": 39, "stock": 4}, {"talle": 40, "stock": 2}], foto: 'Fotos/Vans Haylan pink.jpeg' },
   { modelo: 'Adidas 2000 BLACK', talles: [{"talle": 44, "stock": 1}], foto: 'Fotos/Adidas 2000 BLACK.jpeg' },
-  { modelo: 'Ojotas total black', talles: [{"talle": 37, "stock": 3}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 9}, {"talle": 40, "stock": 9}, {"talle": 41, "stock": 9}, {"talle": 42, "stock": 9}, {"talle": 43, "stock": 4}, {"talle": 44, "stock": 4}], foto: 'Fotos/Ojotas total black.jpeg' },
+  { modelo: 'Ojotas total black', talles: [{"talle": 37, "stock": 2}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 9}, {"talle": 40, "stock": 9}, {"talle": 41, "stock": 9}, {"talle": 42, "stock": 9}, {"talle": 43, "stock": 4}, {"talle": 44, "stock": 4}], foto: 'Fotos/Ojotas total black.jpeg' },
   { modelo: 'ABZORB negras', talles: [{"talle": 35, "stock": 1}], foto: 'Fotos/ABZORB negras.jpeg' },
   { modelo: 'Retro 4 gelo', talles: [{"talle": 43, "stock": 1}], foto: 'Fotos/Retro 4 gelo.jpeg' },
   { modelo: 'Vans Haylan grafite', talles: [{"talle": 43, "stock": 2}], foto: 'Fotos/Vans Haylan grafite.jpeg' },
