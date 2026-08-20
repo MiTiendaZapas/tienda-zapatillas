@@ -46,7 +46,7 @@ const stock_actualizado = [
   { modelo: 'Samba Classic', talles: [{"talle": 43, "stock": 3}, {"talle": 44, "stock": 1}], foto: 'Fotos/Samba Classic.jpeg' },
   { modelo: 'Vans haylan black', talles: [{"talle": 36, "stock": 1}], foto: 'Fotos/Vans haylan black.jpeg' },
   { modelo: 'Super star rosa', talles: [{"talle": 40, "stock": 1}], foto: 'Fotos/Super star rosa.jpeg' },
-  { modelo: 'New balance ABZORB BEGE', talles: [{"talle": 34, "stock": 2}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 1}, {"talle": 38, "stock": 1}], foto: 'Fotos/New balance ABZORB BEGE.jpeg' },
+  { modelo: 'New balance ABZORB BEGE', talles: [{"talle": 34, "stock": 2}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 1}, {"talle": 38, "stock": 1}], foto: 'Fotos/New balance ABZORB BEGE.jpeg' },
   { modelo: 'Vans Haylan beige', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 1}, {"talle": 38, "stock": 1}, {"talle": 39, "stock": 4}, {"talle": 40, "stock": 9}, {"talle": 41, "stock": 6}, {"talle": 42, "stock": 8}, {"talle": 43, "stock": 5}], foto: 'Fotos/Vans Haylan beige.jpeg' },
   { modelo: 'Jordan low VERNIZ /AZUL', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 2}], foto: 'Fotos/Jordan low VERNIZ AZUL.jpeg' },
   { modelo: 'Súper star brillo', talles: [{"talle": 38, "stock": 3}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 1}, {"talle": 41, "stock": 2}], foto: 'Fotos/Súper star brillo.jpeg' },
