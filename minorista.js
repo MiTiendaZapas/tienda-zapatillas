@@ -24,6 +24,11 @@ function obtenerPrecioMinorista(nombreProducto) {
         return 65000;
     }
 
+    // JORDAN 11 SUELA CELESTE ($65.000 por unidad)
+    if (nombre.includes("jordan 11 suela celeste")) {
+        return 65000;
+    }
+
     // RETRO 11 PANDA Y JORDAN 11 SUELA BLANCA ($65.000 por unidad)
     if (nombre.includes("retro 11 panda") || nombre.includes("jordan 11 suela blanca")) {
         return 65000;
@@ -100,6 +105,11 @@ function obtenerPrecioMayorista(nombreProducto) {
 
     // RETRO 11 PANDA Y JORDAN 11 SUELA BLANCA POR MAYOR ($50.000)
     if (nombre.includes("retro 11 panda") || nombre.includes("jordan 11 suela blanca")) {
+        return 50000;
+    }
+
+    // JORDAN 11 SUELA CELESTE POR MAYOR ($50.000)
+    if (nombre.includes("jordan 11 suela celeste")) {
         return 50000;
     }
 
