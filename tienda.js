@@ -24,6 +24,11 @@ function obtenerPrecioMinorista(nombreProducto) {
         return 55000;
     }
 
+    // JORDAN 11 SUELA CELESTE ($55.000 por unidad)
+    if (nombre.includes("jordan 11 suela celeste")) {
+        return 55000;
+    }
+
     // MODELOS ESPECÍFICOS A $43.000 POR UNIDAD
     if (nombre.includes("nike v5 blancas") || 
         nombre.includes("nike v5 negras") || 
@@ -49,7 +54,7 @@ function obtenerPrecioMinorista(nombreProducto) {
 function obtenerPrecioMayorista(nombreProducto) {
     const nombre = nombreProducto.toLowerCase();
 
-    // 1. EXCEPCIONES MUY ESPECÍFICAS (Se leen primero para no chocar con las categorías generales)
+    // 1. EXCEPCIONES MUY ESPECÍfICAS (Se leen primero para no chocar con las categorías generales)
     if (nombre.includes("ojotas")) {
         return 31000;
     }
@@ -64,6 +69,11 @@ function obtenerPrecioMayorista(nombreProducto) {
 
     // RETRO 11 PANDA Y JORDAN 11 SUELA BLANCA POR MAYOR ($50.000)
     if (nombre.includes("retro 11 panda") || nombre.includes("jordan 11 suela blanca")) {
+        return 50000;
+    }
+
+    // JORDAN 11 SUELA CELESTE POR MAYOR ($50.000)
+    if (nombre.includes("jordan 11 suela celeste")) {
         return 50000;
     }
 
@@ -297,7 +307,7 @@ function agregarAlCarrito(indexProd) {
     const cantidadDeseada = parseInt(document.getElementById(`cant-${indexProd}`).textContent);
 
     const prod = stock_actualizado[indexProd];
-    const talleNumero = talleElegido; // Soportar formatos bi-numerales de texto como "37/38"
+    const talleNumero = talleElegido; 
     
     const itemExistente = carrito.find(item => item.modelo === prod.modelo && item.talle === talleNumero);
     
