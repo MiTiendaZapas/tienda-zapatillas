@@ -19,9 +19,15 @@ function obtenerPrecioMinorista(nombreProducto) {
         return 55000;
     }
 
-    // MODELOS ESPECÍFICOS A $60.000 POR UNIDAD
+    // JORDAN 11 SUELA AZUL ($65.000 por unidad)
+    if (nombre.includes("jordan 11 suela azul")) {
+        return 65000;
+    }
+
+    // MODELOS ESPECÍFICOS A $60.000 POR UNIDAD (Incluyendo Nike V5 rosa)
     if (nombre.includes("nike v5 blancas") || 
         nombre.includes("nike v5 negras") || 
+        nombre.includes("nike v5 rosa") ||
         nombre.includes("air jordan pipa gris") || 
         nombre.includes("air jordan black") || 
         nombre.includes("new balance 4000") ||
@@ -47,15 +53,15 @@ function obtenerPrecioMinorista(nombreProducto) {
         nombre.includes("jordan pink") ||
         nombre.includes("negras medias") ||
         nombre.includes("jordan 1 brillosa") || 
-        nombre.includes("jordan 11 suela azul") ||
         nombre.includes("jordan 11 negra/blanca") ||
         nombre.includes("jordan 11 negra blanca") ||
         nombre.includes("exclusivas white")) {
         return 60000;
     }
 
-    // 2. PRECIOS DE $55.000
-    if (nombre.includes("retro 4") || 
+    // 2. PRECIOS DE $55.000 (Incluyendo todas las NB 530)
+    if (nombre.includes("530") ||
+        nombre.includes("retro 4") || 
         nombre.includes("retro 1") || 
         nombre.includes("jordan low glister") || 
         nombre.includes("jordan") || 
@@ -90,6 +96,7 @@ function obtenerPrecioMayorista(nombreProducto) {
     // MODELOS ESPECÍFICOS A $42.000 POR MAYOR
     if (nombre.includes("nike v5 blancas") || 
         nombre.includes("nike v5 negras") || 
+        nombre.includes("nike v5 rosa") ||
         nombre.includes("air jordan pipa gris") || 
         nombre.includes("air jordan black") || 
         nombre.includes("new balance 4000") ||
