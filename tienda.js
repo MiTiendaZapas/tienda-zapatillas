@@ -22,6 +22,7 @@ function obtenerPrecioMinorista(nombreProducto) {
     // MODELOS ESPECÍFICOS A $43.000 POR UNIDAD
     if (nombre.includes("nike v5 blancas") || 
         nombre.includes("nike v5 negras") || 
+        nombre.includes("nike v5 rosa") ||
         nombre.includes("air jordan pipa gris") || 
         nombre.includes("air jordan black") || 
         nombre.includes("new balance 4000 negra") ||
@@ -56,9 +57,10 @@ function obtenerPrecioMayorista(nombreProducto) {
         return 39000;
     }
 
-    // MODELOS ESPECÍFICOS A $42.000 POR MAYOR
+    // MODELOS ESPECÍFICOS A $42.000 POR MAYOR (Incluyendo Nike V5 rosa)
     if (nombre.includes("nike v5 blancas") || 
         nombre.includes("nike v5 negras") || 
+        nombre.includes("nike v5 rosa") ||
         nombre.includes("air jordan pipa gris") || 
         nombre.includes("air jordan black") || 
         nombre.includes("new balance 4000 negra") ||
