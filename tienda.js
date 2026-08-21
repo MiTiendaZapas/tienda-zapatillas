@@ -4,6 +4,14 @@ let carrito = [];
 function obtenerPrecioMinorista(nombreProducto) {
     const nombre = nombreProducto.toLowerCase();
 
+    // EXCEPCIÓN DE INDUMENTARIA (Precio por unidad)
+    if (nombre.includes("remera")) {
+        return 17000;
+    }
+    if (nombre.includes("baggy nk")) {
+        return 24000;
+    }
+
     // EXCEPCIÓN DE TODAS LAS OJOTAS ($35.000 por unidad)
     if (nombre.includes("ojotas")) {
         return 35000;
@@ -197,7 +205,16 @@ function cargarProductos() {
         }).join('');
 
         let precioMinorista = obtenerPrecioMinorista(producto.modelo);
-        let precioMayorista = obtenerPrecioMayorista(producto.modelo);
+        let esIndumentaria = producto.modelo.toLowerCase().includes("remera") || producto.modelo.toLowerCase().includes("baggy nk");
+        let textoMayoristaHtml = "";
+
+        if (esIndumentaria) {
+            let precioMayInd = producto.modelo.toLowerCase().includes("remera") ? 15000 : 22000;
+            textoMayoristaHtml = `<div style="font-size: 12px; color: #28a745; margin-bottom: 6px; font-weight: bold;">Llevando 10 o más: $${precioMayInd.toLocaleString('es-AR')}</div>`;
+        } else {
+            let precioMayorista = obtenerPrecioMayorista(producto.modelo);
+            textoMayoristaHtml = `<div style="font-size: 12px; color: #28a745; margin-bottom: 6px; font-weight: bold;">Llevando 5 o más: $${precioMayorista.toLocaleString('es-AR')}</div>`;
+        }
 
         grid.innerHTML += `
             <div class="producto-card" data-modelo="${producto.modelo.toLowerCase()}">
@@ -210,9 +227,7 @@ function cargarProductos() {
                     <div style="font-size: 20px; font-weight: bold; color: #111; margin-top: 2px; margin-bottom: 2px;">
                         $${precioMinorista.toLocaleString('es-AR')}
                     </div>
-                    <div style="font-size: 12px; color: #28a745; margin-bottom: 6px; font-weight: bold;">
-                        Llevando 5 o más: $${precioMayorista.toLocaleString('es-AR')}
-                    </div>
+                    ${textoMayoristaHtml}
                     
                     <div class="talles-grid-container" id="talles-container-${index}">
                         ${botonesTalles}
@@ -359,24 +374,51 @@ function actualizarCarrito() {
     const footerOpciones = document.getElementById('footer-opciones');
 
     lista.innerHTML = '';
-    let sumaPares = 0;
-    let totalPrecioMinorista = 0;
-    let totalPrecioMayorista = 0;
+    
+    let sumaParesZapas = 0;
+    let cantRemeraBlanca = 0;
+    let cantRemeraNegra = 0;
+    let cantBaggyGris = 0;
+    let cantBaggyNegro = 0;
 
-    carrito.forEach(item => { sumaPares += item.cantidad; });
-    let esMayorista = (sumaPares >= 5);
+    carrito.forEach(item => {
+        let m = item.modelo.toLowerCase();
+        if (m.includes("remera adidas blanca")) cantRemeraBlanca += item.cantidad;
+        else if (m.includes("remera adidas negra")) cantRemeraNegra += item.cantidad;
+        else if (m.includes("baggy nk") && m.includes("gris")) cantBaggyGris += item.cantidad;
+        else if (m.includes("baggy nk") && m.includes("negro")) cantBaggyNegro += item.cantidad;
+        else sumaParesZapas += item.cantidad;
+    });
+
+    let esMayoristaZapas = (sumaParesZapas >= 5);
+    let totalPrecio = 0;
 
     carrito.forEach((item, i) => {
         const prodRef = stock_actualizado.find(p => p.modelo === item.modelo);
         const foto = prodRef ? prodRef.foto : '';
+        let m = item.modelo.toLowerCase();
 
         let precioMin = obtenerPrecioMinorista(item.modelo);
-        let precioMay = obtenerPrecioMayorista(item.modelo);
+        let subtotalMostrar = 0;
 
-        totalPrecioMinorista += precioMin * item.cantidad;
-        totalPrecioMayorista += precioMay * item.cantidad;
+        if (m.includes("remera adidas blanca")) {
+            let precioRemeraBlanca = (cantRemeraBlanca >= 10) ? 15000 : 17000;
+            subtotalMostrar = precioRemeraBlanca * item.cantidad;
+        } else if (m.includes("remera adidas negra")) {
+            let precioRemeraNegra = (cantRemeraNegra >= 10) ? 15000 : 17000;
+            subtotalMostrar = precioRemeraNegra * item.cantidad;
+        } else if (m.includes("baggy nk") && m.includes("gris")) {
+            let precioBaggyGris = (cantBaggyGris >= 10) ? 22000 : 24000;
+            subtotalMostrar = precioBaggyGris * item.cantidad;
+        } else if (m.includes("baggy nk") && m.includes("negro")) {
+            let precioBaggyNegro = (cantBaggyNegro >= 10) ? 22000 : 24000;
+            subtotalMostrar = precioBaggyNegro * item.cantidad;
+        } else {
+            let precioZapa = esMayoristaZapas ? obtenerPrecioMayorista(item.modelo) : precioMin;
+            subtotalMostrar = precioZapa * item.cantidad;
+        }
 
-        let subtotalMostrar = (esMayorista ? precioMay : precioMin) * item.cantidad;
+        totalPrecio += subtotalMostrar;
 
         lista.innerHTML += `
             <li class="item-carrito">
@@ -394,40 +436,17 @@ function actualizarCarrito() {
         `;
     });
 
-    contador.textContent = sumaPares;
+    let sumaTotalItems = carrito.reduce((acc, item) => acc + item.cantidad, 0);
+    contador.textContent = sumaTotalItems;
 
-    if (sumaPares === 0) {
+    if (sumaTotalItems === 0) {
         footerOpciones.innerHTML = `<div style="text-align:center; padding: 20px; color: #666;">Tu carrito está vacío</div>`;
-    } else if (sumaPares < 5) {
-        footerOpciones.innerHTML = `
-            <div style="text-align:center; margin-bottom: 10px;">
-                <span style="font-size:16px; font-weight:bold;">Total: $${totalPrecioMinorista.toLocaleString('es-AR')}</span>
-                <div style="font-size:12px; color:#d9534f; margin-top:5px;">Agregá ${5 - sumaPares} par(es) más para acceder a precio mayorista.</div>
-            </div>
-            <button class="btn-whatsapp" onclick="enviarPedido(false)">Pedir por WhatsApp 📲</button>
-        `;
     } else {
         footerOpciones.innerHTML = `
-            <div style="text-align:center; margin-bottom:10px;">
-                <span style="font-size:13px; color:#666;">¡Llegaste a los 5 pares! Elegí tu plan:</span>
+            <div style="text-align:center; margin-bottom: 10px;">
+                <span style="font-size:16px; font-weight:bold;">Total: $${totalPrecio.toLocaleString('es-AR')}</span>
             </div>
-            
-            <div class="opcion-compra minorista">
-                <div class="detalle-opcion">
-                    <strong>Comprar Minorista (Con Cambio)</strong>
-                    <span class="precio-final">$${totalPrecioMinorista.toLocaleString('es-AR')}</span>
-                </div>
-                <button class="btn-whatsapp outline" onclick="enviarPedido(false)">Elegir Minorista</button>
-            </div>
-
-            <div class="opcion-compra mayorista">
-                <div class="detalle-opcion">
-                    <strong>Comprar Mayorista</strong>
-                    <span class="precio-final">$${totalPrecioMayorista.toLocaleString('es-AR')}</span>
-                    <span class="aviso-cambio">⚠️ SIN CAMBIO DE TALLE</span>
-                </div>
-                <button class="btn-whatsapp" onclick="enviarPedido(true)">Elegir Mayorista 📲</button>
-            </div>
+            <button class="btn-whatsapp" onclick="enviarPedido()">Pedir por WhatsApp 📲</button>
         `;
     }
 }
@@ -435,14 +454,46 @@ function actualizarCarrito() {
 function abrirCarrito() { document.getElementById('modal-carrito').style.display = 'flex'; }
 function cerrarCarrito() { document.getElementById('modal-carrito').style.display = 'none'; }
 
-function enviarPedido(esMayorista) {
+function enviarPedido() {
     if(carrito.length === 0) return alert("No seleccionaste ningún modelo.");
 
     let mensaje = "¡Hola! Quiero hacer el siguiente pedido del catálogo:%0A%0A";
     
-    let total = 0;
+    let sumaParesZapas = 0;
+    let cantRemeraBlanca = 0;
+    let cantRemeraNegra = 0;
+    let cantBaggyGris = 0;
+    let cantBaggyNegro = 0;
+
     carrito.forEach(item => {
-        let precio = esMayorista ? obtenerPrecioMayorista(item.modelo) : obtenerPrecioMinorista(item.modelo);
+        let m = item.modelo.toLowerCase();
+        if (m.includes("remera adidas blanca")) cantRemeraBlanca += item.cantidad;
+        else if (m.includes("remera adidas negra")) cantRemeraNegra += item.cantidad;
+        else if (m.includes("baggy nk") && m.includes("gris")) cantBaggyGris += item.cantidad;
+        else if (m.includes("baggy nk") && m.includes("negro")) cantBaggyNegro += item.cantidad;
+        else sumaParesZapas += item.cantidad;
+    });
+
+    let esMayoristaZapas = (sumaParesZapas >= 5);
+    let total = 0;
+
+    carrito.forEach(item => {
+        let m = item.modelo.toLowerCase();
+        let precioMin = obtenerPrecioMinorista(item.modelo);
+        let precio = precioMin;
+
+        if (m.includes("remera adidas blanca")) {
+            precio = (cantRemeraBlanca >= 10) ? 15000 : 17000;
+        } else if (m.includes("remera adidas negra")) {
+            precio = (cantRemeraNegra >= 10) ? 15000 : 17000;
+        } else if (m.includes("baggy nk") && m.includes("gris")) {
+            precio = (cantBaggyGris >= 10) ? 22000 : 24000;
+        } else if (m.includes("baggy nk") && m.includes("negro")) {
+            precio = (cantBaggyNegro >= 10) ? 22000 : 24000;
+        } else {
+            precio = esMayoristaZapas ? obtenerPrecioMayorista(item.modelo) : precioMin;
+        }
+
         let subtotal = precio * item.cantidad;
         total += subtotal;
 
@@ -454,12 +505,6 @@ function enviarPedido(esMayorista) {
     });
 
     mensaje += `%0ATotal: $${total.toLocaleString('es-AR')}%0A`;
-    
-    if (esMayorista) {
-        mensaje += "Compra mayorista sin cambio";
-    } else {
-        mensaje += "Compra minorista con cambio";
-    }
 
     const url = `https://wa.me/${TU_NUMERO}?text=${mensaje}`;
     window.open(url, '_blank');
