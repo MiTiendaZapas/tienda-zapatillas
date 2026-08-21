@@ -19,6 +19,11 @@ function obtenerPrecioMinorista(nombreProducto) {
         return 43000;
     }
 
+    // RETRO 11 PANDA Y JORDAN 11 SUELA BLANCA ($55.000 por unidad)
+    if (nombre.includes("retro 11 panda") || nombre.includes("jordan 11 suela blanca")) {
+        return 55000;
+    }
+
     // MODELOS ESPECÍFICOS A $43.000 POR UNIDAD
     if (nombre.includes("nike v5 blancas") || 
         nombre.includes("nike v5 negras") || 
@@ -55,6 +60,11 @@ function obtenerPrecioMayorista(nombreProducto) {
 
     if (nombre.includes("jordan low pink") || nombre.includes("jordan pink low")) {
         return 39000;
+    }
+
+    // RETRO 11 PANDA Y JORDAN 11 SUELA BLANCA POR MAYOR ($50.000)
+    if (nombre.includes("retro 11 panda") || nombre.includes("jordan 11 suela blanca")) {
+        return 50000;
     }
 
     // MODELOS ESPECÍFICOS A $42.000 POR MAYOR (Incluyendo Nike V5 rosa)
@@ -287,7 +297,7 @@ function agregarAlCarrito(indexProd) {
     const cantidadDeseada = parseInt(document.getElementById(`cant-${indexProd}`).textContent);
 
     const prod = stock_actualizado[indexProd];
-    const talleNumero = talleElegido; 
+    const talleNumero = talleElegido; // Soportar formatos bi-numerales de texto como "37/38"
     
     const itemExistente = carrito.find(item => item.modelo === prod.modelo && item.talle === talleNumero);
     
