@@ -1,7 +1,7 @@
 const stock_actualizado = [
   { modelo: 'Air forcé 1 blancas', talles: [{"talle": 36, "stock": 2}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 1}, {"talle": 39, "stock": 1}, {"talle": 40, "stock": 8}, {"talle": 41, "stock": 12}, {"talle": 42, "stock": 8}, {"talle": 43, "stock": 4}, {"talle": 44, "stock": 3}], foto: 'Fotos/Air forcé 1 blancas.jpeg' },
   { modelo: 'Vans KNU clasicas', talles: [{"talle": 34, "stock": 6}, {"talle": 35, "stock": 3}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 4}, {"talle": 40, "stock": 1}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 1}], foto: 'Fotos/Vans KNU clasicas.jpeg' },
-  { modelo: 'Panda sb dunk', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 5}, {"talle": 41, "stock": 4}, {"talle": 43, "stock": 8}], foto: 'Fotos/Panda sb dunk.jpeg' },
+  { modelo: 'Panda sb dunk', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 5}, {"talle": 41, "stock": 4}, {"talle": 43, "stock": 8}], foto: 'Fotos/Panda sb dunk.jpeg' },
   { modelo: 'Adidas forum blancas', talles: [{"talle": 36, "stock": 1}, {"talle": 40, "stock": 4}, {"talle": 43, "stock": 1}], foto: 'Fotos/Adidas forum blancas.jpeg' },
   { modelo: 'New balance 530 running', talles: [{"talle": 36, "stock": 1}, {"talle": 37, "stock": 1}, {"talle": 38, "stock": 1}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 1}, {"talle": 42, "stock": 1}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}, {"talle": 45, "stock": 2}], foto: 'Fotos/New balance 530 running.jpeg' },
   { modelo: 'Super star black', talles: [{"talle": 34, "stock": 2}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 5}, {"talle": 42, "stock": 7}, {"talle": 43, "stock": 3}, {"talle": 44, "stock": 2}], foto: 'Fotos/Super star black.jpeg' },
@@ -86,7 +86,7 @@ const stock_actualizado = [
   { modelo: 'Shox tapón rosa', talles: [{"talle": 37, "stock": 1}], foto: 'Fotos/Shox tapón rosa.jpeg' },
   { modelo: 'Botitas Jordan niño', talles: [{"talle": 26, "stock": 1}], foto: 'Fotos/Botitas Jordan niño.jpeg' },
   { modelo: 'New balance 4000 negra', talles: [{"talle": 35, "stock": 2}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 1}, {"talle": 38, "stock": 1}, {"talle": 39, "stock": 3}], foto: 'Fotos/New balance 4000 negra.jpeg' },
-  { modelo: 'Botitas negras niño', talles: [{"talle": 27, "stock": 1}, {"talle": 28, "stock": 2}, {"talle": 29, "stock": 2}], foto: 'Fotos/Botitas negras niño.jpeg' },
+  { modelo: 'Botitas negras niño', talles: [{"talle": 28, "stock": 2}, {"talle": 29, "stock": 1}], foto: 'Fotos/Botitas negras niño.jpeg' },
   { modelo: 'Vans Haylan pink', talles: [{"talle": 37, "stock": 4}, {"talle": 38, "stock": 9}, {"talle": 39, "stock": 4}, {"talle": 40, "stock": 2}], foto: 'Fotos/Vans Haylan pink.jpeg' },
   { modelo: 'Air Jordan black', talles: [{"talle": 39, "stock": 3}, {"talle": 40, "stock": 6}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 1}], foto: 'Fotos/Air Jordan black.jpeg' },
   { modelo: 'Jordan 11 suela azul', talles: [{"talle": 39, "stock": 2}, {"talle": 40, "stock": 4}, {"talle": 41, "stock": 6}, {"talle": 42, "stock": 7}, {"talle": 43, "stock": 3}, {"talle": 44, "stock": 2}], foto: 'Fotos/Jordan 11 suela azul.jpeg' },
