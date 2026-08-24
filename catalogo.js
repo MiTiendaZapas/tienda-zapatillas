@@ -90,7 +90,7 @@ const stock_actualizado = [
   { modelo: 'Air Jordan black', talles: [{"talle": 39, "stock": 3}, {"talle": 40, "stock": 5}, {"talle": 41, "stock": 2}], foto: 'Fotos/Air Jordan black.jpeg' },
   { modelo: 'Botitas negras niño', talles: [{"talle": 28, "stock": 2}, {"talle": 29, "stock": 1}], foto: 'Fotos/Botitas negras niño.jpeg' },
   { modelo: 'Vans Haylan pink', talles: [{"talle": 37, "stock": 4}, {"talle": 38, "stock": 9}, {"talle": 39, "stock": 4}, {"talle": 40, "stock": 2}], foto: 'Fotos/Vans Haylan pink.jpeg' },
-  { modelo: 'Jordan 11 suela azul', talles: [{"talle": 39, "stock": 2}, {"talle": 40, "stock": 4}, {"talle": 41, "stock": 6}, {"talle": 42, "stock": 7}, {"talle": 43, "stock": 3}, {"talle": 44, "stock": 2}], foto: 'Fotos/Jordan 11 suela azul.jpeg' },
+  { modelo: 'Jordan 11 suela azul', talles: [{"talle": 39, "stock": 1}, {"talle": 40, "stock": 4}, {"talle": 41, "stock": 6}, {"talle": 42, "stock": 7}, {"talle": 43, "stock": 3}, {"talle": 44, "stock": 2}], foto: 'Fotos/Jordan 11 suela azul.jpeg' },
   { modelo: 'Samba total black', talles: [{"talle": 36, "stock": 2}], foto: 'Fotos/Samba total black.jpeg' },
   { modelo: 'Sb dunk polar', talles: [{"talle": 36, "stock": 2}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 3}], foto: 'Fotos/Sb dunk polar.jpeg' },
   { modelo: 'New balance 530 marrones', talles: [{"talle": 35, "stock": 1}, {"talle": 39, "stock": 2}], foto: 'Fotos/New balance 530 marrones.jpeg' },
