@@ -1,8 +1,4 @@
-const stock_actualizado = [
-  { modelo: 'Remera adidas blanca', talles: [{"talle": "S", "stock": 0}, {"talle": "M", "stock": 0}, {"talle": "L", "stock": 0}, {"talle": "XL", "stock": 0}, {"talle": "XXL", "stock": 0}], foto: 'Fotos/Remera adidas blanca.jpeg' },
-  { modelo: 'Remera adidas negra', talles: [{"talle": "S", "stock": 0}, {"talle": "M", "stock": 0}, {"talle": "L", "stock": 0}, {"talle": "XL", "stock": 0}, {"talle": "XXL", "stock": 0}], foto: 'Fotos/Remera adidas negra.jpeg' },
-  { modelo: 'baggy NK BORDADO gris', talles: [{"talle": "S", "stock": 0}, {"talle": "M", "stock": 0}, {"talle": "L", "stock": 0}, {"talle": "XL", "stock": 0}, {"talle": "XXL", "stock": 0}], foto: 'Fotos/baggy NK BORDADO gris.jpeg' },
-  { modelo: 'baggy NK BORDADO negro', talles: [{"talle": "S", "stock": 0}, {"talle": "M", "stock": 0}, {"talle": "L", "stock": 0}, {"talle": "XL", "stock": 0}, {"talle": "XXL", "stock": 0}], foto: 'Fotos/baggy NK BORDADO negro.jpeg' },
+const stock_zapatillas = [
   { modelo: 'Air forcé 1 blancas', talles: [{"talle": 36, "stock": 1}, {"talle": 37, "stock": 3}, {"talle": 40, "stock": 8}, {"talle": 41, "stock": 12}, {"talle": 42, "stock": 8}, {"talle": 43, "stock": 4}, {"talle": 44, "stock": 3}], foto: 'Fotos/Air forcé 1 blancas.jpeg' },
   { modelo: 'Vans KNU clasicas', talles: [{"talle": 34, "stock": 6}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 4}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 1}], foto: 'Fotos/Vans KNU clasicas.jpeg' },
   { modelo: 'Panda sb dunk', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 4}, {"talle": 41, "stock": 4}, {"talle": 43, "stock": 8}], foto: 'Fotos/Panda sb dunk.jpeg' },
