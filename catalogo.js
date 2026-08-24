@@ -58,7 +58,7 @@ const stock_actualizado = [
   { modelo: 'ABZORB marrones', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 4}, {"talle": 36, "stock": 8}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 3}], foto: 'Fotos/ABZORB marrones.jpeg' },
   { modelo: 'Ojotas Louis Vuitton negras', talles: [{"talle": 41, "stock": 4}, {"talle": 42, "stock": 4}], foto: 'Fotos/Ojotas Louis Vuitton negras.jpeg' },
   { modelo: 'Adidas boas negra', talles: [{"talle": 36, "stock": 2}, {"talle": 37, "stock": 1}, {"talle": 39, "stock": 1}, {"talle": 40, "stock": 1}, {"talle": 41, "stock": 2}, {"talle": 42, "stock": 1}, {"talle": 43, "stock": 1}], foto: 'Fotos/Adidas boas negra.jpeg' },
-  { modelo: 'Jordan low pombo', talles: [{"talle": 36, "stock": 1}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 1}], foto: 'Fotos/Jordan low pombo.jpeg' },
+  { modelo: 'Jordan low pombo', talles: [{"talle": 36, "stock": 1}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 1}, {"talle": 39, "stock": 1}], foto: 'Fotos/Jordan low pombo.jpeg' },
   { modelo: 'Nike Jordan Pink', talles: [{"talle": 37, "stock": 1}], foto: 'Fotos/Nike Jordan Pink.jpeg' },
   { modelo: 'Shox tapón rojo', talles: [{"talle": 39, "stock": 3}, {"talle": 40, "stock": 4}, {"talle": 41, "stock": 7}, {"talle": 42, "stock": 8}, {"talle": 43, "stock": 8}, {"talle": 44, "stock": 2}], foto: 'Fotos/Shox tapón rojo.jpeg' },
   { modelo: 'Dunk combinada celeste', talles: [{"talle": 39, "stock": 1}, {"talle": 43, "stock": 3}], foto: 'Fotos/Dunk combinada celeste.jpeg' },
