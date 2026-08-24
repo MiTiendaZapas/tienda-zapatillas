@@ -37,8 +37,10 @@
         </div>
     </div>
 
-    <!-- 1. Indumentaria: stock cargado a mano. Para modificar talles/stock, editar indumentaria.js -->
-    <script src="indumentaria.js"></script>
+    <!-- 1. Indumentaria: stock cargado a mano. Para modificar talles/stock, editar indumentaria.js (anti-caché) -->
+    <script>
+        document.write('<script src="indumentaria.js?v=' + Math.random() + '"><\/script>');
+    </script>
 
     <!-- 2. Zapatillas: catálogo que actualiza el bot automáticamente (con anti-caché) -->
     <script>
