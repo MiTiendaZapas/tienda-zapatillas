@@ -1,4 +1,4 @@
-const stock_zapatillas = [
+const stock_actualizado = [
   { modelo: 'Remera adidas blanca', talles: [{"talle": "S", "stock": 0}, {"talle": "M", "stock": 0}, {"talle": "L", "stock": 0}, {"talle": "XL", "stock": 0}, {"talle": "XXL", "stock": 0}], foto: 'Fotos/Remera adidas blanca.jpeg' },
   { modelo: 'Remera adidas negra', talles: [{"talle": "S", "stock": 0}, {"talle": "M", "stock": 0}, {"talle": "L", "stock": 0}, {"talle": "XL", "stock": 0}, {"talle": "XXL", "stock": 0}], foto: 'Fotos/Remera adidas negra.jpeg' },
   { modelo: 'baggy NK BORDADO gris', talles: [{"talle": "S", "stock": 0}, {"talle": "M", "stock": 0}, {"talle": "L", "stock": 0}, {"talle": "XL", "stock": 0}, {"talle": "XXL", "stock": 0}], foto: 'Fotos/baggy NK BORDADO gris.jpeg' },
@@ -18,7 +18,7 @@ const stock_zapatillas = [
   { modelo: 'Dunk pombo', talles: [{"talle": 41, "stock": 2}, {"talle": 42, "stock": 6}, {"talle": 43, "stock": 8}, {"talle": 44, "stock": 3}], foto: 'Fotos/Dunk pombo.jpeg' },
   { modelo: 'Forum adidas celeste', talles: [{"talle": 34, "stock": 2}, {"talle": 35, "stock": 1}, {"talle": 36, "stock": 4}, {"talle": 37, "stock": 6}, {"talle": 38, "stock": 4}, {"talle": 39, "stock": 2}], foto: 'Fotos/Forum adidas celeste.jpeg' },
   { modelo: 'Adidas forum blanco Preto', talles: [{"talle": 39, "stock": 4}, {"talle": 40, "stock": 8}, {"talle": 41, "stock": 4}, {"talle": 43, "stock": 1}], foto: 'Fotos/Adidas forum blanco Preto.jpeg' },
-  { modelo: 'Jordan retro 4 pintita', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 1}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 1}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 3}], foto: 'Fotos/Jordan retro 4 pintita.jpeg' },
+  { modelo: 'Jordan retro 4 pintita', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 1}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 1}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 3}], foto: 'Fotos/Jordan retro 4 pintita.jpeg' },
   { modelo: 'Jordan 1 botitas pink', talles: [{"talle": 36, "stock": 1}, {"talle": 37, "stock": 9}, {"talle": 38, "stock": 9}, {"talle": 39, "stock": 7}, {"talle": 40, "stock": 10}], foto: 'Fotos/Jordan 1 botitas pink.jpeg' },
   { modelo: 'Air forcé exclusivas white', talles: [{"talle": 39, "stock": 1}, {"talle": 41, "stock": 3}, {"talle": 43, "stock": 9}, {"talle": 44, "stock": 2}], foto: 'Fotos/Air forcé exclusivas white.jpeg' },
   { modelo: 'Air forcé 1 total black', talles: [{"talle": 34, "stock": 1}, {"talle": 37, "stock": 1}, {"talle": 38, "stock": 2}], foto: 'Fotos/Air forcé 1 total black.jpeg' },
@@ -56,7 +56,7 @@ const stock_zapatillas = [
   { modelo: 'Sb dunk cinza/preto', talles: [{"talle": 44, "stock": 2}], foto: 'Fotos/Sb dunk cinza preto.jpeg' },
   { modelo: 'Jordan 1 branco / pink', talles: [{"talle": 38, "stock": 2}], foto: 'Fotos/Jordan 1 branco pink.jpeg' },
   { modelo: 'ABZORB marrones', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 3}, {"talle": 36, "stock": 8}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 2}], foto: 'Fotos/ABZORB marrones.jpeg' },
-  { modelo: 'Ojotas Louis Vuitton negras', talles: [{"talle": 41, "stock": 3}, {"talle": 42, "stock": 3}], foto: 'Fotos/Ojotas Louis Vuitton negras.jpeg' },
+  { modelo: 'Ojotas Louis Vuitton negras', talles: [{"talle": 41, "stock": 1}, {"talle": 42, "stock": 1}], foto: 'Fotos/Ojotas Louis Vuitton negras.jpeg' },
   { modelo: 'Adidas boas negra', talles: [{"talle": 36, "stock": 2}, {"talle": 37, "stock": 1}, {"talle": 39, "stock": 1}, {"talle": 40, "stock": 1}, {"talle": 41, "stock": 2}, {"talle": 42, "stock": 1}, {"talle": 43, "stock": 1}], foto: 'Fotos/Adidas boas negra.jpeg' },
   { modelo: 'Jordan low pombo', talles: [{"talle": 36, "stock": 1}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 1}, {"talle": 39, "stock": 1}], foto: 'Fotos/Jordan low pombo.jpeg' },
   { modelo: 'Shox tapón rojo', talles: [{"talle": 39, "stock": 3}, {"talle": 40, "stock": 4}, {"talle": 41, "stock": 7}, {"talle": 42, "stock": 8}, {"talle": 43, "stock": 8}, {"talle": 44, "stock": 2}], foto: 'Fotos/Shox tapón rojo.jpeg' },
