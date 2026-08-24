@@ -35,7 +35,7 @@ const stock_actualizado = [
   { modelo: 'NB 530 blanca/negro', talles: [{"talle": 34, "stock": 3}, {"talle": 35, "stock": 6}, {"talle": 36, "stock": 4}, {"talle": 37, "stock": 7}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 1}, {"talle": 40, "stock": 3}], foto: 'Fotos/NB 530 blanca negro.jpeg' },
   { modelo: 'Sb dunk pipa negra', talles: [{"talle": 36, "stock": 1}, {"talle": 37, "stock": 1}, {"talle": 43, "stock": 2}], foto: 'Fotos/Sb dunk pipa negra.jpeg' },
   { modelo: 'Dunk glitter rosa', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 2}], foto: 'Fotos/Dunk glitter rosa.jpeg' },
-  { modelo: 'Shox black', talles: [{"talle": 35, "stock": 1}, {"talle": 40, "stock": 4}, {"talle": 41, "stock": 6}, {"talle": 42, "stock": 8}, {"talle": 43, "stock": 7}], foto: 'Fotos/Shox black.jpeg' },
+  { modelo: 'Shox black', talles: [{"talle": 35, "stock": 1}, {"talle": 40, "stock": 4}, {"talle": 41, "stock": 6}, {"talle": 42, "stock": 7}, {"talle": 43, "stock": 7}], foto: 'Fotos/Shox black.jpeg' },
   { modelo: 'Nike shox white', talles: [{"talle": 39, "stock": 2}, {"talle": 40, "stock": 1}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 8}, {"talle": 43, "stock": 10}], foto: 'Fotos/Nike shox white.jpeg' },
   { modelo: 'Sb dunk glitter beige', talles: [{"talle": 37, "stock": 2}, {"talle": 38, "stock": 2}], foto: 'Fotos/Sb dunk glitter beige.jpeg' },
   { modelo: 'Jordan retro 4 panda', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 2}, {"talle": 40, "stock": 2}, {"talle": 42, "stock": 1}], foto: 'Fotos/Jordan retro 4 panda.jpeg' },
