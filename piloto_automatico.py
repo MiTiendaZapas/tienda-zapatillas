@@ -11,9 +11,15 @@ from playwright.sync_api import sync_playwright
 URL_LISTADO = "https://vestitepiola.mitiendanube.com/productos/?order=best-selling"
 CARPETA_FOTOS = "Fotos"
 ARCHIVO_JS = "catalogo.js"
+ARCHIVO_INDUMENTARIA = "indumentaria.js"
 MAX_SCROLLS = 200
-ESTABLE_LIMITE = 5 # Subimos la tolerancia a 5
+ESTABLE_LIMITE = 5
 TIMEOUT_PRODUCTO_MS = 15000
+
+# Palabras clave para blindar el catálogo de zapatillas: si algún producto de
+# la tienda online contiene alguna de estas palabras, se descarta siempre,
+# aunque aparezca con stock. Así nunca se mezcla indumentaria en catalogo.js.
+PALABRAS_INDUMENTARIA = ["remera", "baggy"]
 # ---------------------
 
 def limpiar_nombre_archivo(nombre):
@@ -27,24 +33,20 @@ def cargar_listado_completo(page):
     anterior = -1
     
     for _ in range(MAX_SCROLLS):
-        # 1. Bajar hasta el mismísimo final de la página
         page.evaluate("window.scrollTo(0, document.body.scrollHeight);")
-        page.wait_for_timeout(1000) # Le damos 1 segundo a la web para reaccionar
+        page.wait_for_timeout(1000)
 
         boton = page.locator(".js-load-more")
         if boton.count() > 0:
             style = (boton.first.get_attribute("style") or "").replace(" ", "")
             if "display:none" not in style:
                 try:
-                    # 2. Subimos un poquitito por si un banner fijo de cookies tapa el botón
                     page.evaluate("window.scrollBy(0, -150);")
                     boton.first.click(timeout=3000)
-                    # 3. TIEMPO CLAVE: Le damos 2.5 segundos para que descargue las fotos nuevas
                     page.wait_for_timeout(2500) 
                 except:
                     pass
         
-        # 4. Contamos las tarjetas reales de producto
         actual = page.locator('.js-item-product, .product-container').count()
         
         if actual == anterior:
@@ -73,7 +75,14 @@ def extraer_productos(page):
             
             if not href or not nombre or href in vistos:
                 continue
-                
+
+            # Blindaje: si el nombre del producto coincide con indumentaria,
+            # se ignora siempre. Esta lista se maneja aparte, a mano, en
+            # indumentaria.js y nunca debe mezclarse acá.
+            nombre_lower = nombre.lower()
+            if any(palabra in nombre_lower for palabra in PALABRAS_INDUMENTARIA):
+                continue
+
             texto_tarjeta = tarjeta.inner_text().lower()
             if "sin stock" in texto_tarjeta or "agotado" in texto_tarjeta:
                 continue
@@ -143,7 +152,7 @@ def talles_disponibles_en_producto(page, url):
     return [{"talle": k, "stock": v} for k, v in sorted(disponibles.items())]
 
 def rutina_actualizacion():
-    print("\n--- INICIANDO ESCANEO DE STOCK ---")
+    print("\n--- INICIANDO ESCANEO DE STOCK (ZAPATILLAS) ---")
     productos_finales = []
     
     with sync_playwright() as p:
@@ -183,47 +192,46 @@ def rutina_actualizacion():
                         "talles": talles_datos,
                         "foto": ruta_foto_final
                     })
-                else:
-                    pass
             except:
                 continue
                 
         browser.close()
 
-    # Guarda el archivo local
+    # Guarda únicamente las zapatillas como stock_zapatillas en catalogo.js
     with open(ARCHIVO_JS, "w", encoding="utf-8") as f:
-        f.write("const stock_actualizado = [\n")
+        f.write("const stock_zapatillas = [\n")
         for p in productos_finales:
             talles_json = json.dumps(p['talles'])
             f.write(f"  {{ modelo: '{p['modelo']}', talles: {talles_json}, foto: '{p['foto']}' }},\n")
         f.write("];\n")
 
-    # --- AUTOMATIZACIÓN DE GITHUB CON AVISO CLARO ---
+    # --- AUTOMATIZACIÓN DE GITHUB ---
+    # Sube catalogo.js (zapatillas, generado acá) Y también indumentaria.js
+    # (que vos editás a mano), para que ninguno de los dos quede desactualizado
+    # en la web publicada.
     try:
         hora_subida = time.strftime('%H:%M:%S')
-        
-        # 1. DESCARGA SILENCIOSA: Esto evita el error de "exit status 1"
         subprocess.run(["git", "pull", "origin", "main"], check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-        # 2. AGREGA Y GUARDA EL CATÁLOGO
-        subprocess.run(["git", "add", ARCHIVO_JS], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        archivos_a_subir = [ARCHIVO_JS]
+        if os.path.exists(ARCHIVO_INDUMENTARIA):
+            archivos_a_subir.append(ARCHIVO_INDUMENTARIA)
+
+        subprocess.run(["git", "add"] + archivos_a_subir, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+        resultado_commit = subprocess.run(["git", "commit", "-m", f"Stock actualizado (zapatillas + indumentaria) a las {hora_subida}"], capture_output=True, text=True)
         
-        resultado_commit = subprocess.run(["git", "commit", "-m", f"Stock actualizado a las {hora_subida}"], capture_output=True, text=True)
-        
-        # 3. SUBE A LA NUBE
         if "nothing to commit" not in resultado_commit.stdout:
             subprocess.run(["git", "push", "origin", "main"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            print(f"[{hora_subida}] 🔄 HUBO CAMBIOS: El stock se actualizó y se subió a la web.")
+            print(f"[{hora_subida}] 🔄 HUBO CAMBIOS: Se actualizó la web (zapatillas y/o indumentaria).")
         else:
-            print(f"[{hora_subida}] ⏸️ NO HUBO CAMBIOS: El stock sigue exactamente igual.")
+            print(f"[{hora_subida}] ⏸️ NO HUBO CAMBIOS: El stock sigue igual.")
             
     except Exception as e:
         print(f"⚠️ Error al verificar o subir a GitHub: {e}")
 
 def main():
-    print("🤖 PILOTO AUTOMÁTICO VINCULADO A INTERNET")
-    print("El sistema actualizará tu web pública periódicamente. Podés minimizar esta ventana.\n")
-    
+    print("🤖 PILOTO AUTOMÁTICO DE ZAPATILLAS")
     while True:
         try:
             rutina_actualizacion()
@@ -231,7 +239,7 @@ def main():
             print(f"\n❌ Hubo un error inesperado: {e}")
         
         minutos_espera = random.uniform(14, 18)
-        print(f"\n[{time.strftime('%H:%M:%S')}] Misión cumplida. Durmiendo... Próximo escaneo en {minutos_espera:.1f} minutos.\n")
+        print(f"\n[{time.strftime('%H:%M:%S')}] Durmiendo... Próximo escaneo en {minutos_espera:.1f} minutos.\n")
         time.sleep(int(minutos_espera * 60))
 
 if __name__ == "__main__":

@@ -1,3 +1,15 @@
-2026/08/21-12:51:32.743 3384 Reusing MANIFEST C:\Users\mateo\OneDrive\Escritorio\proyectos\TiendaZapasOficial\sesion_wsp\Default\Local Storage\leveldb/MANIFEST-000001
-2026/08/21-12:51:32.846 3384 Recovering log #23
-2026/08/21-12:51:32.856 3384 Reusing old log C:\Users\mateo\OneDrive\Escritorio\proyectos\TiendaZapasOficial\sesion_wsp\Default\Local Storage\leveldb/000023.log 
+2026/08/24-08:01:05.523 1358 Reusing MANIFEST C:\Users\mateo\OneDrive\Escritorio\proyectos\TiendaZapasOficial\sesion_wsp\Default\Local Storage\leveldb/MANIFEST-000001
+2026/08/24-08:01:05.558 1358 Recovering log #29
+2026/08/24-08:01:05.563 1358 Reusing old log C:\Users\mateo\OneDrive\Escritorio\proyectos\TiendaZapasOficial\sesion_wsp\Default\Local Storage\leveldb/000029.log 
+2026/08/24-08:13:06.898 89c Level-0 table #33: started
+2026/08/24-08:13:06.908 89c Level-0 table #33: 14836 bytes OK
+2026/08/24-08:13:06.913 89c Delete type=0 #29
+2026/08/24-08:13:06.914 1358 Compacting 4@0 + 1@1 files
+2026/08/24-08:13:06.922 1358 Generated table #34@0: 107 keys, 7399 bytes
+2026/08/24-08:13:06.922 1358 Compacted 4@0 + 1@1 files => 7399 bytes
+2026/08/24-08:13:06.923 1358 compacted to: files[ 0 1 1 0 0 0 0 ]
+2026/08/24-08:13:06.924 1358 Delete type=2 #21
+2026/08/24-08:13:06.924 1358 Delete type=2 #24
+2026/08/24-08:13:06.924 1358 Delete type=2 #27
+2026/08/24-08:13:06.925 1358 Delete type=2 #30
+2026/08/24-08:13:06.925 1358 Delete type=2 #33

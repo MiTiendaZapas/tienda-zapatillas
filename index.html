@@ -37,9 +37,19 @@
         </div>
     </div>
 
+    <!-- 1. Indumentaria: stock cargado a mano. Para modificar talles/stock, editar indumentaria.js -->
+    <script src="indumentaria.js"></script>
+
+    <!-- 2. Zapatillas: catálogo que actualiza el bot automáticamente (con anti-caché) -->
     <script>
         document.write('<script src="catalogo.js?v=' + Math.random() + '"><\/script>');
     </script>
+
+    <!-- 3. Unimos: indumentaria PRIMERO, zapatillas DESPUÉS -->
+    <script>
+        const stock_actualizado = [...stock_indumentaria, ...(typeof stock_zapatillas !== 'undefined' ? stock_zapatillas : [])];
+    </script>
+
     <script src="tienda.js"></script>
 </body>
-</html>>
+</html>

@@ -1,32 +1,32 @@
 Air forcé 1 blancas
-36 al 44
+36, 37, 40 al 44
 
 Vans KNU clasicas
-34 al 40, 42, 43
+34 al 37, 40, 42, 43
 
 Panda sb dunk
-35, 37, 43
+35, 36, 37, 41, 43
 
 Adidas forum blancas
-36, 37, 39, 40, 43
+36, 40, 43
 
 New balance 530 running
-36 al 40, 43, 44, 45
+36 al 40, 42 al 45
 
 Super star black
-34, 35, 40 al 44
+34, 40 al 44
 
 Puma 180 WHITE
 34
 
 Adidas forum Gelo
-38 al 43
+39 al 43
 
 Sb dunk gris
-35 al 39, 43
+35 al 40, 42, 43
 
 Super star clásic
-34, 35, 37 al 44
+34, 35, 40, 42, 43, 44
 
 Dunk bordo
 35 al 40
@@ -44,85 +44,79 @@ Adidas forum blanco Preto
 39, 40, 41, 43
 
 Jordan retro 4 pintita
-35 al 40, 43, 44
+35 al 39, 43, 44
 
 Jordan 1 botitas pink
-35 al 40
+36 al 40
 
 Air forcé exclusivas white
-39, 41 al 44
+37, 39, 41 al 44
 
 Puma 180 flamingo
 34, 35, 36
 
 Air forcé 1 total black
-34 al 38
+34, 36, 37, 38
 
 Jordan retro 4 pink
-35, 37 al 40
+35, 38, 39, 40
 
 Jordan retro 4 /total black
 35 al 44
 
 NB 530 blanca /azul
-34 al 37, 41 al 44
-
-Dunk total black
-42, 43, 44
+34, 35, 36, 41 al 44
 
 Deportivas fit black
-35, 36, 38, 40 al 44
+35 al 39, 44
+
+Dunk total black
+43, 44
 
 Dunk glistter celeste
-35 al 38, 40
+35 al 39
 
 New balance 9060 suela rosa
 34 al 37, 39
 
-Jordan low CHAROL
-43
-
 Vans Haylan 01
-35 al 39
-
-Vans HAYLAN NOVA
-36
-
-Dunk glitter rosa
-35 al 39
-
-Sb dunk pipa negra
-36, 43
-
-Jordan 1 verniz
-34 al 44
+35, 36, 37
 
 NB 530 blanca/negro
 34 al 40
 
-Sb dunk glitter beige
-37, 38
+Jordan 1 verniz
+34, 36 al 44
+
+Sb dunk pipa negra
+36, 37, 43
+
+Dunk glitter rosa
+35 al 39
 
 Shox black
-35, 40 al 44
+35, 40 al 43
+
+Sb dunk glitter beige
+37, 38
 
 Nike shox white
 39 al 43
 
 Jordan retro 4 panda
-35, 39, 40, 41
+35, 36, 37, 40, 42
 
 Dunk látex negra
-39 al 44
+40 al 44
+
+Jordan low 1 DIAMOND
+38, 40
 
 Adidas fórum verde summer
 35, 40
 
-Jordan low 1 DIAMOND
-37 al 40
-
 Puma 180 nova costura
-38 al 43
+39 al 43
 
 Air force 1 blanca /pipa gris
 42
@@ -140,16 +134,16 @@ Air forcé blanca pipa negra
 34 al 43
 
 Vans Haylan beige
-35 al 43
+36, 37, 39 al 43
 
 Super star rosa
 40
 
 New balance ABZORB BEGE
-34, 35
+34, 35, 39
 
 Jordan low VERNIZ /AZUL
-35, 36
+36, 37, 38, 40
 
 Súper star brillo
 36 al 41
@@ -158,22 +152,22 @@ Sb dunk cinza/preto
 44
 
 Jordan 1 branco / pink
-35, 37, 38
+36, 37, 38
 
 ABZORB marrones
 34 al 38
 
-Jordan low pombo
-35 al 39
+Ojotas Louis Vuitton negras
+41, 42
 
 Adidas boas negra
 36, 37, 39 al 43
 
-Jordan botitas charol
-44
+Jordan low pombo
+36 al 39
 
 Nike Jordan Pink
-34
+37
 
 Shox tapón rojo
 39 al 44
@@ -182,10 +176,13 @@ Dunk combinada celeste
 39, 43
 
 Sb dunk platino
-36 al 40
+36, 38, 39, 40
 
 Vans Haylan bonitas
-35, 38, 39, 40
+38, 39
+
+Jordan Diamond pipa blanca
+35, 36, 38, 39
 
 Jordan low brillo
 40
@@ -196,14 +193,11 @@ Shox preto/prata
 Súper star brillo perla
 37 al 40
 
-Jordan Diamond pipa blanca
-35 al 39
-
 Puma bmw
 35
 
 Botitas Vans
-35, 39, 40
+35, 40
 
 Dunk blanco/marinho
 43
@@ -211,14 +205,23 @@ Dunk blanco/marinho
 Dunk black caramelo
 39 al 44
 
+Ojotas total black
+37 al 44
+
 Jordan 1 black/ vermelo
-35, 43
+41, 43
+
+Vans Haylan azul
+35 al 44
+
+Air Jordan pipa gris
+38, 39, 41, 43
 
 Dunk jean marrón
 39 al 43
 
-Vans Haylan azul
-35, 37
+Air forcé carbono
+35 al 38
 
 Air forcé negras medias
 37, 38, 42, 43, 44
@@ -230,34 +233,34 @@ Jordan low verniz
 35 al 39, 44
 
 Botitas niños azul
-26, 32
+32
+
+Botita niño panda
+28, 31
 
 ABZORB claritas
 34, 36
 
-Air forcé carbono
-35 al 40
+New balance 4000 negra
+35, 36, 38, 39
 
-Ojotas Louis Vuitton negras
-39 al 42
-
-Shox tapón rosa
-37
+Shox tapón celeste
+36, 38, 39, 43
 
 Botitas Jordan niño
 26
 
-Ojotas total black
-37 al 44
-
-Shox tapón celeste
-35, 36, 38, 39, 43
-
-Botita niño panda
-27, 28, 31
+Botitas negras niño
+28, 29
 
 Vans Haylan pink
 37 al 40
+
+Air Jordan black
+39 al 42
+
+Jordan 11 suela azul
+39 al 44
 
 Samba total black
 36
@@ -266,16 +269,13 @@ Sb dunk polar
 36 al 39
 
 New balance 530 marrones
-35, 38, 39
+35, 39
 
 Adidas 2000 BLACK
 44
 
-Jordan 11 suela azul
-39 al 44
-
-Botitas negras niño
-26 al 29, 31
+Air forcé black brillo
+38, 39
 
 ABZORB negras
 35
@@ -286,38 +286,35 @@ Retro 4 gelo
 Vans Haylan grafite
 43
 
-Air forcé charol brillante
-44
+Jordan low pink
+40
+
+Nb ABZORB white
+35
 
 Adidas 2000 royal
 41, 43
 
-New balance 4000 negra
-35 al 40
-
 Dunk marinho red
 39, 41, 43
 
-Air forcé black brillo
-37, 38
+Dunk preto/blanco
+42
 
 Vans Haylan marron
 38
 
+Jordan 1 verde / naranja
+41, 43, 44
+
 Puma 180 White/gris
 40, 42
 
-Air Jordan pipa gris
-35 al 43
+Jordan 1 brillosa
+35, 36, 38, 40
 
-Dunk preto/blanco
-40, 42, 43, 44
-
-Nb ABZORB white
-35, 36, 37
-
-Jordan 1 verde / naranja
-41, 43, 44
+Vans Haylan azul luxo
+35 al 38, 43, 44
 
 Nike mind gris
 40, 41, 43
@@ -325,35 +322,35 @@ Nike mind gris
 Sb Dunk VINO
 39, 40, 42
 
-Jordan 1 brillosa
-35, 36, 38, 39, 40
+Shox tapón azul
+39 al 44
 
-Vans Haylan azul luxo
-35 al 38
-
-Air Jordan black
-39 al 42
-
-Jordan low pink
-35, 37 al 40
+Shox negra tapón rojo
+41 al 44
 
 Shox tapón dorada
 40 al 43
 
+Dunk gris gamusa
+39, 40, 42, 43, 44
+
+Nike V5 negras
+40 al 44
+
 Vans Haylan black luxo
 40, 41, 43, 44
-
-Dunk gris gamusa
-39 al 44
 
 NB celeste 9060
 35
 
-Shox negra tapón rojo
-40 al 44
+Jordan 11 suela celeste
+40 al 43
 
-Nike V5 negras
-39 al 44
+Retro 11 panda
+35 al 40
+
+Nike V5 rosa
+35 al 39
 
 Jordan low glister
 34 al 39
@@ -361,29 +358,23 @@ Jordan low glister
 Dunk verde oliva
 41 al 45
 
-Jordan 1 celeste / verniz
-34 al 38
-
-Shox tapón azul
-39 al 44
-
-Retro 11 panda
-35 al 40
-
-Jordan 11 suela blanca
-35 al 40
-
 Nike FIT negra/ rosa
 34 al 39
 
-Nike V5 rosa
+Jordan 1 celeste / verniz
+34 al 38
+
+Air forcé blanca brillo
 35 al 40
 
+Jordan 11 suela blanca
+35 al 39
+
 Nike zoom
-39 al 44
+35 al 40
 
 Nike V5 blancas
-39 al 44
+39 al 43
 
 Jordan 1 beige tornasol
 34 al 39
