@@ -20,7 +20,7 @@ const stock_zapatillas = [
   { modelo: 'Air forcé 1 total black', talles: [{"talle": 34, "stock": 1}, {"talle": 38, "stock": 1}], foto: 'Fotos/Air forcé 1 total black.jpeg' },
   { modelo: 'Puma 180 flamingo', talles: [{"talle": 34, "stock": 5}, {"talle": 35, "stock": 5}], foto: 'Fotos/Puma 180 flamingo.jpeg' },
   { modelo: 'Jordan retro 4 /total black', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 4}, {"talle": 39, "stock": 3}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 1}, {"talle": 42, "stock": 4}, {"talle": 43, "stock": 3}, {"talle": 44, "stock": 4}], foto: 'Fotos/Jordan retro 4 total black.jpeg' },
-  { modelo: 'Jordan retro 4 pink', talles: [{"talle": 35, "stock": 1}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 5}, {"talle": 40, "stock": 1}], foto: 'Fotos/Jordan retro 4 pink.jpeg' },
+  { modelo: 'Jordan retro 4 pink', talles: [{"talle": 35, "stock": 1}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 4}, {"talle": 40, "stock": 1}], foto: 'Fotos/Jordan retro 4 pink.jpeg' },
   { modelo: 'NB 530 blanca /azul', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 3}, {"talle": 36, "stock": 4}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 3}, {"talle": 44, "stock": 2}], foto: 'Fotos/NB 530 blanca azul.jpeg' },
   { modelo: 'Deportivas fit black', talles: [{"talle": 35, "stock": 3}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 1}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 1}], foto: 'Fotos/Deportivas fit black.jpeg' },
   { modelo: 'Dunk total black', talles: [{"talle": 43, "stock": 6}], foto: 'Fotos/Dunk total black.jpeg' },
