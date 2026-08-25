@@ -51,6 +51,7 @@ const stock_zapatillas = [
   { modelo: 'New balance ABZORB BEGE', talles: [{"talle": 34, "stock": 2}, {"talle": 35, "stock": 2}, {"talle": 39, "stock": 1}], foto: 'Fotos/New balance ABZORB BEGE.jpeg' },
   { modelo: 'Jordan low VERNIZ /AZUL', talles: [{"talle": 36, "stock": 1}, {"talle": 37, "stock": 1}, {"talle": 38, "stock": 3}, {"talle": 40, "stock": 1}], foto: 'Fotos/Jordan low VERNIZ AZUL.jpeg' },
   { modelo: 'Súper star brillo', talles: [{"talle": 36, "stock": 1}, {"talle": 37, "stock": 1}, {"talle": 38, "stock": 1}, {"talle": 39, "stock": 12}, {"talle": 40, "stock": 7}, {"talle": 41, "stock": 5}], foto: 'Fotos/Súper star brillo.jpeg' },
+  { modelo: 'Jordan 1 azules', talles: [{"talle": 37, "stock": 1}], foto: 'Fotos/Jordan 1 azules.jpeg' },
   { modelo: 'Jordan 1 branco / pink', talles: [{"talle": 38, "stock": 1}], foto: 'Fotos/Jordan 1 branco pink.jpeg' },
   { modelo: 'Sb dunk cinza/preto', talles: [{"talle": 39, "stock": 1}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 2}, {"talle": 42, "stock": 3}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 3}], foto: 'Fotos/Sb dunk cinza preto.jpeg' },
   { modelo: 'Ojotas Louis Vuitton negras', talles: [{"talle": 37, "stock": 4}, {"talle": 38, "stock": 4}, {"talle": 39, "stock": 8}, {"talle": 40, "stock": 8}, {"talle": 41, "stock": 8}, {"talle": 42, "stock": 8}, {"talle": 43, "stock": 4}, {"talle": 44, "stock": 4}], foto: 'Fotos/Ojotas Louis Vuitton negras.jpeg' },
