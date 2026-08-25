@@ -1,7 +1,7 @@
 const stock_zapatillas = [
   { modelo: 'Air forcé 1 blancas', talles: [{"talle": 36, "stock": 1}, {"talle": 37, "stock": 3}, {"talle": 40, "stock": 8}, {"talle": 41, "stock": 12}, {"talle": 42, "stock": 8}, {"talle": 43, "stock": 4}, {"talle": 44, "stock": 3}], foto: 'Fotos/Air forcé 1 blancas.jpeg' },
   { modelo: 'Vans KNU clasicas', talles: [{"talle": 34, "stock": 6}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 2}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 1}], foto: 'Fotos/Vans KNU clasicas.jpeg' },
-  { modelo: 'Panda sb dunk', talles: [{"talle": 36, "stock": 1}, {"talle": 37, "stock": 4}, {"talle": 41, "stock": 4}, {"talle": 43, "stock": 8}], foto: 'Fotos/Panda sb dunk.jpeg' },
+  { modelo: 'Panda sb dunk', talles: [{"talle": 37, "stock": 4}, {"talle": 41, "stock": 4}, {"talle": 43, "stock": 8}], foto: 'Fotos/Panda sb dunk.jpeg' },
   { modelo: 'Adidas forum blancas', talles: [{"talle": 36, "stock": 1}, {"talle": 40, "stock": 4}, {"talle": 43, "stock": 1}], foto: 'Fotos/Adidas forum blancas.jpeg' },
   { modelo: 'New balance 530 running', talles: [{"talle": 37, "stock": 1}, {"talle": 43, "stock": 2}, {"talle": 45, "stock": 1}], foto: 'Fotos/New balance 530 running.jpeg' },
   { modelo: 'Super star black', talles: [{"talle": 34, "stock": 2}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 6}, {"talle": 43, "stock": 3}, {"talle": 44, "stock": 1}], foto: 'Fotos/Super star black.jpeg' },
