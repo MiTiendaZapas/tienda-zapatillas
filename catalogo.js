@@ -1,6 +1,6 @@
 const stock_zapatillas = [
   { modelo: 'Air forcé 1 blancas', talles: [{"talle": 36, "stock": 1}, {"talle": 37, "stock": 3}, {"talle": 40, "stock": 8}, {"talle": 41, "stock": 12}, {"talle": 42, "stock": 8}, {"talle": 43, "stock": 4}, {"talle": 44, "stock": 3}], foto: 'Fotos/Air forcé 1 blancas.jpeg' },
-  { modelo: 'Vans KNU clasicas', talles: [{"talle": 34, "stock": 6}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 3}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 1}], foto: 'Fotos/Vans KNU clasicas.jpeg' },
+  { modelo: 'Vans KNU clasicas', talles: [{"talle": 34, "stock": 6}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 2}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 1}], foto: 'Fotos/Vans KNU clasicas.jpeg' },
   { modelo: 'Panda sb dunk', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 4}, {"talle": 41, "stock": 4}, {"talle": 43, "stock": 8}], foto: 'Fotos/Panda sb dunk.jpeg' },
   { modelo: 'Adidas forum blancas', talles: [{"talle": 36, "stock": 1}, {"talle": 40, "stock": 4}, {"talle": 43, "stock": 1}], foto: 'Fotos/Adidas forum blancas.jpeg' },
   { modelo: 'New balance 530 running', talles: [{"talle": 36, "stock": 1}, {"talle": 37, "stock": 1}, {"talle": 43, "stock": 2}, {"talle": 45, "stock": 2}], foto: 'Fotos/New balance 530 running.jpeg' },
@@ -8,7 +8,7 @@ const stock_zapatillas = [
   { modelo: 'Puma 180 WHITE', talles: [{"talle": 34, "stock": 5}], foto: 'Fotos/Puma 180 WHITE.jpeg' },
   { modelo: 'Adidas forum Gelo', talles: [{"talle": 39, "stock": 1}, {"talle": 40, "stock": 8}, {"talle": 41, "stock": 5}, {"talle": 42, "stock": 2}], foto: 'Fotos/Adidas forum Gelo.jpeg' },
   { modelo: 'Sb dunk gris', talles: [{"talle": 35, "stock": 1}, {"talle": 37, "stock": 2}, {"talle": 39, "stock": 1}, {"talle": 40, "stock": 1}, {"talle": 42, "stock": 1}, {"talle": 43, "stock": 3}], foto: 'Fotos/Sb dunk gris.jpeg' },
-  { modelo: 'Super star clásic', talles: [{"talle": 34, "stock": 3}, {"talle": 35, "stock": 3}, {"talle": 40, "stock": 1}, {"talle": 42, "stock": 6}, {"talle": 43, "stock": 5}, {"talle": 44, "stock": 2}], foto: 'Fotos/Super star clásic.jpeg' },
+  { modelo: 'Super star clásic', talles: [{"talle": 34, "stock": 3}, {"talle": 35, "stock": 3}, {"talle": 42, "stock": 6}, {"talle": 43, "stock": 5}, {"talle": 44, "stock": 2}], foto: 'Fotos/Super star clásic.jpeg' },
   { modelo: 'Dunk bordo', talles: [{"talle": 35, "stock": 2}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 6}, {"talle": 39, "stock": 4}, {"talle": 40, "stock": 1}], foto: 'Fotos/Dunk bordo.jpeg' },
   { modelo: 'Jordan botitas 1 vermelho', talles: [{"talle": 43, "stock": 1}], foto: 'Fotos/Jordan botitas 1 vermelho.jpeg' },
   { modelo: 'Dunk pombo', talles: [{"talle": 41, "stock": 2}, {"talle": 42, "stock": 6}, {"talle": 43, "stock": 8}, {"talle": 44, "stock": 3}], foto: 'Fotos/Dunk pombo.jpeg' },
