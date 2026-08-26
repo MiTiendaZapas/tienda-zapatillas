@@ -1,5 +1,5 @@
 const stock_zapatillas = [
-  { modelo: 'Air forcé 1 blancas', talles: [{"talle": 36, "stock": 1}, {"talle": 37, "stock": 2}, {"talle": 40, "stock": 7}, {"talle": 41, "stock": 12}, {"talle": 42, "stock": 6}, {"talle": 43, "stock": 4}, {"talle": 44, "stock": 3}], foto: 'Fotos/Air forcé 1 blancas.jpeg' },
+  { modelo: 'Air forcé 1 blancas', talles: [{"talle": 36, "stock": 1}, {"talle": 37, "stock": 2}, {"talle": 40, "stock": 6}, {"talle": 41, "stock": 12}, {"talle": 42, "stock": 6}, {"talle": 43, "stock": 4}, {"talle": 44, "stock": 3}], foto: 'Fotos/Air forcé 1 blancas.jpeg' },
   { modelo: 'Vans KNU clasicas', talles: [{"talle": 34, "stock": 7}, {"talle": 35, "stock": 4}, {"talle": 36, "stock": 6}, {"talle": 37, "stock": 5}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 1}], foto: 'Fotos/Vans KNU clasicas.jpeg' },
   { modelo: 'Panda sb dunk', talles: [{"talle": 37, "stock": 4}, {"talle": 41, "stock": 4}, {"talle": 43, "stock": 8}], foto: 'Fotos/Panda sb dunk.jpeg' },
   { modelo: 'Adidas forum blancas', talles: [{"talle": 36, "stock": 1}, {"talle": 40, "stock": 4}, {"talle": 43, "stock": 1}], foto: 'Fotos/Adidas forum blancas.jpeg' },
@@ -43,7 +43,7 @@ const stock_zapatillas = [
   { modelo: 'Puma 180 nova costura', talles: [{"talle": 39, "stock": 2}, {"talle": 40, "stock": 3}, {"talle": 41, "stock": 2}, {"talle": 42, "stock": 2}], foto: 'Fotos/Puma 180 nova costura.jpeg' },
   { modelo: 'Air force 1 blanca /pipa gris', talles: [{"talle": 38, "stock": 1}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 3}, {"talle": 43, "stock": 1}], foto: 'Fotos/Air force 1 blanca pipa gris.jpeg' },
   { modelo: 'Vans haylan black', talles: [{"talle": 35, "stock": 2}, {"talle": 36, "stock": 4}, {"talle": 37, "stock": 6}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 4}, {"talle": 40, "stock": 4}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 1}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Vans haylan black.jpeg' },
-  { modelo: 'Samba Classic', talles: [{"talle": 43, "stock": 3}, {"talle": 44, "stock": 1}], foto: 'Fotos/Samba Classic.jpeg' },
+  { modelo: 'Samba Classic', talles: [{"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Samba Classic.jpeg' },
   { modelo: 'Deportivas fit white', talles: [{"talle": 35, "stock": 2}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 4}, {"talle": 38, "stock": 4}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 1}], foto: 'Fotos/Deportivas fit white.jpeg' },
   { modelo: 'Air forcé blanca pipa negra', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 3}, {"talle": 36, "stock": 5}, {"talle": 37, "stock": 5}, {"talle": 38, "stock": 5}, {"talle": 39, "stock": 3}, {"talle": 40, "stock": 3}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 2}], foto: 'Fotos/Air forcé blanca pipa negra.jpeg' },
   { modelo: 'Vans Haylan beige', talles: [{"talle": 37, "stock": 1}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 10}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 7}, {"talle": 43, "stock": 4}], foto: 'Fotos/Vans Haylan beige.jpeg' },
