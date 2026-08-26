@@ -121,7 +121,6 @@ const stock_zapatillas = [
   { modelo: 'Jordan 11 suela blanca', talles: [{"talle": 36, "stock": 2}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 1}], foto: 'Fotos/Jordan 11 suela blanca.jpeg' },
   { modelo: 'Nike V5 rosa', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 2}], foto: 'Fotos/Nike V5 rosa.jpeg' },
   { modelo: 'Dunk verde oliva', talles: [{"talle": 41, "stock": 1}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 3}, {"talle": 44, "stock": 2}, {"talle": 45, "stock": 1}], foto: 'Fotos/Dunk verde oliva.jpeg' },
-  { modelo: 'Jordan 1 celeste / verniz', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 3}], foto: 'Fotos/Jordan 1 celeste verniz.jpeg' },
   { modelo: 'Nike V5 blancas', talles: [{"talle": 39, "stock": 1}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 2}], foto: 'Fotos/Nike V5 blancas.jpeg' },
   { modelo: 'Air forcé blanca brillo', talles: [{"talle": 35, "stock": 2}, {"talle": 36, "stock": 4}, {"talle": 37, "stock": 5}, {"talle": 38, "stock": 6}, {"talle": 39, "stock": 4}, {"talle": 40, "stock": 2}], foto: 'Fotos/Air forcé blanca brillo.jpeg' },
   { modelo: 'Nike zoom', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 1}], foto: 'Fotos/Nike zoom.jpeg' },
