@@ -87,7 +87,10 @@ header h1 { font-size: 20px; text-transform: uppercase; letter-spacing: 2px; }
 }
 
 /* Estilo exclusivo para los cuadros de talles de ojotas para que entre bien el texto bi-numeral (ej: 37/38) */
-.producto-card[data-modelo*="ojotas"] .talle-cuadro {
+.producto-card[data-modelo*="ojotas"] .talle-cuadro,
+.producto-card[data-modelo="mind beige"] .talle-cuadro,
+.producto-card[data-modelo="mind gris"] .talle-cuadro,
+.producto-card[data-modelo="mind negras"] .talle-cuadro {
     font-size: 8.5px;
     letter-spacing: -0.5px;
 }
