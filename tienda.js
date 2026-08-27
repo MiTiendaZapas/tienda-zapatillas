@@ -15,10 +15,19 @@ let carrito = [];
 // un poco cada vez, no uses este diccionario: agregá una regla de palabras
 // combinadas más abajo, como la de "NB 9060 nuevas brillo" (9060 + brillo).
 const PRECIOS_ESPECIFICOS = {
-    "mind beige":  { unidad: 40000, mayor: 35000 },
-    "mind gris":   { unidad: 40000, mayor: 35000 },
-    "mind negras": { unidad: 40000, mayor: 35000 },
+    "mind beige":  { unidad: 37000, mayor: 35000 },
+    "mind gris":   { unidad: 37000, mayor: 35000 },
+    "mind negras": { unidad: 37000, mayor: 35000 },
 };
+
+// Modelos que, aunque no tengan la palabra "ojotas" en el nombre, se
+// venden y se muestran como ojotas (talles bi-numerales tipo 39/40, 41/42).
+const MODELOS_OJOTAS_BINUMERAL = ["mind beige", "mind gris", "mind negras"];
+
+function esModeloOjota(modelo) {
+    const m = modelo.toLowerCase().trim();
+    return m.includes("ojotas") || MODELOS_OJOTAS_BINUMERAL.includes(m);
+}
 
 function obtenerPrecioMinorista(nombreProducto) {
     const nombre = nombreProducto.toLowerCase().trim();
@@ -224,7 +233,7 @@ function cargarProductos() {
     stock_actualizado.forEach((producto, index) => {
         if(!producto.talles || producto.talles.length === 0) return;
 
-        let listaTallesFinal = producto.modelo.toLowerCase().includes("ojotas") 
+        let listaTallesFinal = esModeloOjota(producto.modelo) 
             ? procesarTallesOjota(producto.talles) 
             : producto.talles;
 
