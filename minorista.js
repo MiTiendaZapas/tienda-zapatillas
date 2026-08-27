@@ -1,8 +1,31 @@
 const TU_NUMERO = "5491153773771"; 
 let carrito = [];
 
+// ============================================================
+// PRECIOS ESPECÍFICOS POR MODELO
+// ============================================================
+// Para sumar un producto NUEVO con precio propio (uno que vos nombrás
+// siempre exactamente igual, ej. en indumentaria.js), agregá UNA línea acá.
+// La clave es el nombre EXACTO del modelo, en minúsculas. Se compara
+// completo (no por substring), así nunca puede chocar con otro modelo
+// que contenga las mismas palabras sueltas (ej: "mind gris" acá adentro
+// nunca matchea con "Nike mind gris", porque el string completo es distinto).
+//
+// Si en cambio el producto viene del bot scraper y el nombre puede variar
+// un poco cada vez, no uses este diccionario: agregá una regla de palabras
+// combinadas más abajo, como la de "NB 9060 nuevas brillo" (9060 + brillo).
+const PRECIOS_ESPECIFICOS = {
+    "mind beige":  { unidad: 50000, mayor: 35000 },
+    "mind gris":   { unidad: 50000, mayor: 35000 },
+    "mind negras": { unidad: 50000, mayor: 35000 },
+};
+
 function obtenerPrecioMinorista(nombreProducto) {
-    const nombre = nombreProducto.toLowerCase();
+    const nombre = nombreProducto.toLowerCase().trim();
+
+    if (PRECIOS_ESPECIFICOS[nombre]) {
+        return PRECIOS_ESPECIFICOS[nombre].unidad;
+    }
 
     // EXCEPCIÓN DE INDUMENTARIA (Precio por unidad)
     if (nombre.includes("remera")) {
@@ -77,6 +100,12 @@ function obtenerPrecioMinorista(nombreProducto) {
         return 60000;
     }
 
+    // NB 9060 NUEVAS BRILLO ($60.000 unidad minorista) - antes de la regla
+    // genérica de "9060" para no pisar otros modelos 9060 (suela rosa, celeste).
+    if (nombre.includes("9060") && nombre.includes("brillo")) {
+        return 60000;
+    }
+
     // 2. PRECIOS DE $55.000 (Incluyendo todas las NB 530)
     if (nombre.includes("530") ||
         nombre.includes("retro 4") || 
@@ -96,7 +125,11 @@ function obtenerPrecioMinorista(nombreProducto) {
 }
 
 function obtenerPrecioMayorista(nombreProducto) {
-    const nombre = nombreProducto.toLowerCase();
+    const nombre = nombreProducto.toLowerCase().trim();
+
+    if (PRECIOS_ESPECIFICOS[nombre]) {
+        return PRECIOS_ESPECIFICOS[nombre].mayor;
+    }
 
     // 1. EXCEPCIONES MUY ESPECÍFICAS
     if (nombre.includes("ojotas")) {
@@ -162,6 +195,12 @@ function obtenerPrecioMayorista(nombreProducto) {
         nombre.includes("air forcé con medias") || 
         nombre.includes("air force con medias")) {
         return 41000;
+    }
+
+    // NB 9060 NUEVAS BRILLO ($42.000 por mayor) - va antes de la regla
+    // genérica de "9060" para no pisar otros modelos 9060 (suela rosa, celeste).
+    if (nombre.includes("9060") && nombre.includes("brillo")) {
+        return 42000;
     }
 
     // PRECIOS DE 39.000
