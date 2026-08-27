@@ -1,15 +1,15 @@
-2026/08/24-08:01:05.523 1358 Reusing MANIFEST C:\Users\mateo\OneDrive\Escritorio\proyectos\TiendaZapasOficial\sesion_wsp\Default\Local Storage\leveldb/MANIFEST-000001
-2026/08/24-08:01:05.558 1358 Recovering log #29
-2026/08/24-08:01:05.563 1358 Reusing old log C:\Users\mateo\OneDrive\Escritorio\proyectos\TiendaZapasOficial\sesion_wsp\Default\Local Storage\leveldb/000029.log 
-2026/08/24-08:13:06.898 89c Level-0 table #33: started
-2026/08/24-08:13:06.908 89c Level-0 table #33: 14836 bytes OK
-2026/08/24-08:13:06.913 89c Delete type=0 #29
-2026/08/24-08:13:06.914 1358 Compacting 4@0 + 1@1 files
-2026/08/24-08:13:06.922 1358 Generated table #34@0: 107 keys, 7399 bytes
-2026/08/24-08:13:06.922 1358 Compacted 4@0 + 1@1 files => 7399 bytes
-2026/08/24-08:13:06.923 1358 compacted to: files[ 0 1 1 0 0 0 0 ]
-2026/08/24-08:13:06.924 1358 Delete type=2 #21
-2026/08/24-08:13:06.924 1358 Delete type=2 #24
-2026/08/24-08:13:06.924 1358 Delete type=2 #27
-2026/08/24-08:13:06.925 1358 Delete type=2 #30
-2026/08/24-08:13:06.925 1358 Delete type=2 #33
+2026/08/26-22:12:14.570 1b14 Reusing MANIFEST C:\Users\mateo\OneDrive\Escritorio\proyectos\TiendaZapasOficial\sesion_wsp\Default\Local Storage\leveldb/MANIFEST-000001
+2026/08/26-22:12:14.593 1b14 Recovering log #42
+2026/08/26-22:12:14.609 1b14 Reusing old log C:\Users\mateo\OneDrive\Escritorio\proyectos\TiendaZapasOficial\sesion_wsp\Default\Local Storage\leveldb/000042.log 
+2026/08/26-22:13:14.659 161c Level-0 table #46: started
+2026/08/26-22:13:14.670 161c Level-0 table #46: 15642 bytes OK
+2026/08/26-22:13:14.673 161c Delete type=0 #42
+2026/08/26-22:13:14.674 1b14 Compacting 4@0 + 1@1 files
+2026/08/26-22:13:14.685 1b14 Generated table #47@0: 137 keys, 8881 bytes
+2026/08/26-22:13:14.685 1b14 Compacted 4@0 + 1@1 files => 8881 bytes
+2026/08/26-22:13:14.686 1b14 compacted to: files[ 0 1 1 0 0 0 0 ]
+2026/08/26-22:13:14.688 1b14 Delete type=2 #34
+2026/08/26-22:13:14.688 1b14 Delete type=2 #37
+2026/08/26-22:13:14.688 1b14 Delete type=2 #40
+2026/08/26-22:13:14.688 1b14 Delete type=2 #43
+2026/08/26-22:13:14.688 1b14 Delete type=2 #46
