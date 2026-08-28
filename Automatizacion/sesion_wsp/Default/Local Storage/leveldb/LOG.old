@@ -1,0 +1,21 @@
+2026/08/27-17:48:08.826 3d84 Reusing MANIFEST C:\Users\mateo\OneDrive\Escritorio\proyectos\TiendaZapasOficial\sesion_wsp\Default\Local Storage\leveldb/MANIFEST-000001
+2026/08/27-17:48:08.903 3d84 Recovering log #52
+2026/08/27-17:48:08.930 3d84 Reusing old log C:\Users\mateo\OneDrive\Escritorio\proyectos\TiendaZapasOficial\sesion_wsp\Default\Local Storage\leveldb/000052.log 
+2026/08/27-18:38:17.358 3d84 Level-0 table #56: started
+2026/08/27-18:38:17.371 3d84 Level-0 table #56: 15905 bytes OK
+2026/08/27-18:38:17.377 3d84 Delete type=0 #52
+2026/08/27-20:48:22.138 3bb4 Level-0 table #58: started
+2026/08/27-20:48:22.149 3bb4 Level-0 table #58: 15531 bytes OK
+2026/08/27-20:48:22.153 3bb4 Delete type=0 #55
+2026/08/27-20:48:22.155 3bb4 Compacting 4@0 + 1@1 files
+2026/08/27-20:48:22.166 3bb4 Generated table #59@0: 159 keys, 10173 bytes
+2026/08/27-20:48:22.166 3bb4 Compacted 4@0 + 1@1 files => 10173 bytes
+2026/08/27-20:48:22.167 3bb4 compacted to: files[ 0 1 1 0 0 0 0 ]
+2026/08/27-20:48:22.168 3bb4 Delete type=2 #47
+2026/08/27-20:48:22.170 3bb4 Delete type=2 #50
+2026/08/27-20:48:22.170 3bb4 Delete type=2 #53
+2026/08/27-20:48:22.171 3bb4 Delete type=2 #56
+2026/08/27-20:48:22.171 3bb4 Delete type=2 #58
+2026/08/27-23:08:29.238 3bb4 Level-0 table #61: started
+2026/08/27-23:08:29.251 3bb4 Level-0 table #61: 14534 bytes OK
+2026/08/27-23:08:29.258 3bb4 Delete type=0 #57

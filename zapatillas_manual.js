@@ -1,0 +1,9 @@
+// Stock de zapatillas que NO se sacan de la tienda online (piloto_automatico.py
+// nunca escribe ni pisa este archivo). Para agregar un modelo nuevo, copiá una
+// línea, cambiá el modelo, los talles/stock, y la ruta de la foto.
+//
+// Formato de cada talle: {"talle": NUMERO, "stock": CANTIDAD}
+
+const stock_zapatillas_manual = [
+    { modelo: 'Nike super star', talles: [{"talle": 38, "stock": 1}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 3}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 1}, {"talle": 43, "stock": 1}], foto: 'Fotos/Nike super star.jpeg' },
+];
