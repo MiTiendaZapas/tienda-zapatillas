@@ -23,7 +23,7 @@ const PRECIOS_ESPECIFICOS = {
 
 // Modelos que, aunque no tengan la palabra "ojotas" en el nombre, se
 // venden y se muestran como ojotas (talles bi-numerales tipo 39/40, 41/42).
-const MODELOS_OJOTAS_BINUMERAL = ["mind beige", "mind gris", "mind negras"];
+const MODELOS_OJOTAS_BINUMERAL = ["mind beige", "mind gris", "mind negras","mind blancas"];
 
 function esModeloOjota(modelo) {
     const m = modelo.toLowerCase().trim();
