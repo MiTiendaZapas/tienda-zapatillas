@@ -70,7 +70,6 @@ const stock_zapatillas = [
   { modelo: 'Shox preto/prata', talles: [{"talle": 44, "stock": 1}], foto: 'Fotos/Shox preto prata.jpeg' },
   { modelo: 'Jordan low verniz', talles: [{"talle": 35, "stock": 2}, {"talle": 37, "stock": 3}, {"talle": 44, "stock": 1}], foto: 'Fotos/Jordan low verniz.jpeg' },
   { modelo: 'Dunk jean marrón', talles: [{"talle": 39, "stock": 1}, {"talle": 41, "stock": 3}, {"talle": 43, "stock": 4}], foto: 'Fotos/Dunk jean marrón.jpeg' },
-  { modelo: 'Vans Haylan azul', talles: [{"talle": 35, "stock": 2}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 6}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 4}, {"talle": 40, "stock": 5}, {"talle": 41, "stock": 2}, {"talle": 42, "stock": 6}, {"talle": 43, "stock": 3}, {"talle": 44, "stock": 3}], foto: 'Fotos/Vans Haylan azul.jpeg' },
   { modelo: 'Dunk black caramelo', talles: [{"talle": 39, "stock": 1}, {"talle": 40, "stock": 1}, {"talle": 41, "stock": 2}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Dunk black caramelo.jpeg' },
   { modelo: 'Puma bmw', talles: [{"talle": 35, "stock": 1}], foto: 'Fotos/Puma bmw.jpeg' },
   { modelo: 'Botitas Vans', talles: [{"talle": 40, "stock": 1}], foto: 'Fotos/Botitas Vans.jpeg' },
