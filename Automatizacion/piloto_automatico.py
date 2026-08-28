@@ -12,6 +12,7 @@ URL_LISTADO = "https://vestitepiola.mitiendanube.com/productos/?order=best-selli
 CARPETA_FOTOS = "Fotos"
 ARCHIVO_JS = "catalogo.js"
 ARCHIVO_INDUMENTARIA = "indumentaria.js"
+ARCHIVO_ZAPATILLAS_MANUAL = "zapatillas_manual.js"
 MAX_SCROLLS = 200
 ESTABLE_LIMITE = 5
 TIMEOUT_PRODUCTO_MS = 15000
@@ -216,6 +217,8 @@ def rutina_actualizacion():
         archivos_a_subir = [ARCHIVO_JS]
         if os.path.exists(ARCHIVO_INDUMENTARIA):
             archivos_a_subir.append(ARCHIVO_INDUMENTARIA)
+        if os.path.exists(ARCHIVO_ZAPATILLAS_MANUAL):
+            archivos_a_subir.append(ARCHIVO_ZAPATILLAS_MANUAL)
 
         subprocess.run(["git", "add"] + archivos_a_subir, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 

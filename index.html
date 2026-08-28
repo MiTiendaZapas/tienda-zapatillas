@@ -42,14 +42,23 @@
         document.write('<script src="indumentaria.js?v=' + Math.random() + '"><\/script>');
     </script>
 
-    <!-- 2. Zapatillas: catálogo que actualiza el bot automáticamente (con anti-caché) -->
+    <!-- 2. Zapatillas cargadas a mano (no vienen de la tienda online). Editar zapatillas_manual.js (anti-caché) -->
+    <script>
+        document.write('<script src="zapatillas_manual.js?v=' + Math.random() + '"><\/script>');
+    </script>
+
+    <!-- 3. Zapatillas: catálogo que actualiza el bot automáticamente (con anti-caché) -->
     <script>
         document.write('<script src="catalogo.js?v=' + Math.random() + '"><\/script>');
     </script>
 
-    <!-- 3. Unimos: indumentaria PRIMERO, zapatillas DESPUÉS -->
+    <!-- 4. Unimos: indumentaria, zapatillas manuales, zapatillas del bot -->
     <script>
-        const stock_actualizado = [...stock_indumentaria, ...(typeof stock_zapatillas !== 'undefined' ? stock_zapatillas : [])];
+        const stock_actualizado = [
+            ...stock_indumentaria,
+            ...(typeof stock_zapatillas_manual !== 'undefined' ? stock_zapatillas_manual : []),
+            ...(typeof stock_zapatillas !== 'undefined' ? stock_zapatillas : [])
+        ];
     </script>
 
     <script src="tienda.js"></script>

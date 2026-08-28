@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo Minorista</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../style.css">
 </head>
 <body>
 
@@ -41,16 +41,25 @@
         document.write('<script src="indumentaria.js?v=' + Math.random() + '"><\/script>');
     </script>
 
-    <!-- 2. Cargamos el catálogo de zapatillas del bot con anti-caché -->
+    <!-- 2. Zapatillas cargadas a mano (no vienen de la tienda online). Editar zapatillas_manual.js (anti-caché) -->
+    <script>
+        document.write('<script src="zapatillas_manual.js?v=' + Math.random() + '"><\/script>');
+    </script>
+
+    <!-- 3. Cargamos el catálogo de zapatillas del bot con anti-caché -->
     <script>
         document.write('<script src="catalogo.js?v=' + Math.random() + '"><\/script>');
     </script>
 
-    <!-- 3. Unimos ambas listas bajo la variable que lee minorista.js -->
+    <!-- 4. Unimos: indumentaria, zapatillas manuales, zapatillas del bot -->
     <script>
-        const stock_actualizado = [...stock_indumentaria, ...(typeof stock_zapatillas !== 'undefined' ? stock_zapatillas : [])];
+        const stock_actualizado = [
+            ...stock_indumentaria,
+            ...(typeof stock_zapatillas_manual !== 'undefined' ? stock_zapatillas_manual : []),
+            ...(typeof stock_zapatillas !== 'undefined' ? stock_zapatillas : [])
+        ];
     </script>
 
     <script src="minorista.js"></script>
 </body>
-</html>>
+</html>
