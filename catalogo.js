@@ -47,7 +47,7 @@ const stock_zapatillas = [
   { modelo: 'Air forcé blanca pipa negra', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 3}, {"talle": 36, "stock": 5}, {"talle": 37, "stock": 4}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 2}, {"talle": 42, "stock": 2}], foto: 'Fotos/Air forcé blanca pipa negra.jpeg' },
   { modelo: 'Deportivas fit white', talles: [{"talle": 35, "stock": 2}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 4}, {"talle": 38, "stock": 4}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 1}], foto: 'Fotos/Deportivas fit white.jpeg' },
   { modelo: 'Vans Haylan beige', talles: [{"talle": 40, "stock": 7}, {"talle": 41, "stock": 1}, {"talle": 42, "stock": 6}, {"talle": 43, "stock": 4}], foto: 'Fotos/Vans Haylan beige.jpeg' },
-  { modelo: 'New balance ABZORB BEGE', talles: [{"talle": 34, "stock": 3}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 2}], foto: 'Fotos/New balance ABZORB BEGE.jpeg' },
+  { modelo: 'New balance ABZORB BEGE', talles: [{"talle": 34, "stock": 3}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 1}], foto: 'Fotos/New balance ABZORB BEGE.jpeg' },
   { modelo: 'Jordan 1 café flamingo', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 1}, {"talle": 40, "stock": 1}], foto: 'Fotos/Jordan 1 café flamingo.jpeg' },
   { modelo: 'Super star rosa', talles: [{"talle": 40, "stock": 1}], foto: 'Fotos/Super star rosa.jpeg' },
   { modelo: 'Jordan low VERNIZ /AZUL', talles: [{"talle": 38, "stock": 1}], foto: 'Fotos/Jordan low VERNIZ AZUL.jpeg' },
