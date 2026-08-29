@@ -116,6 +116,7 @@ const stock_zapatillas = [
   { modelo: 'Puma 180 White/gris', talles: [{"talle": 40, "stock": 2}, {"talle": 42, "stock": 1}], foto: 'Fotos/Puma 180 White gris.jpeg' },
   { modelo: 'Mind gris', talles: [{"talle": 39, "stock": 2}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 8}, {"talle": 42, "stock": 8}, {"talle": 43, "stock": 7}, {"talle": 44, "stock": 7}], foto: 'Fotos/Mind gris.jpeg' },
   { modelo: 'Shox tapón azul', talles: [{"talle": 39, "stock": 1}, {"talle": 40, "stock": 3}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 5}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 2}], foto: 'Fotos/Shox tapón azul.jpeg' },
+  { modelo: 'Nike FIT negra/ rosa', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 1}, {"talle": 38, "stock": 1}], foto: 'Fotos/Nike FIT negra rosa.jpeg' },
   { modelo: 'Nike V5 rosa', talles: [{"talle": 35, "stock": 2}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 5}, {"talle": 38, "stock": 4}, {"talle": 39, "stock": 3}, {"talle": 40, "stock": 1}], foto: 'Fotos/Nike V5 rosa.jpeg' },
   { modelo: 'Jordan 1 verde / naranja', talles: [{"talle": 41, "stock": 1}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Jordan 1 verde naranja.jpeg' },
   { modelo: 'Nike mind gris', talles: [{"talle": 40, "stock": 1}, {"talle": 41, "stock": 1}, {"talle": 43, "stock": 2}], foto: 'Fotos/Nike mind gris.jpeg' },
