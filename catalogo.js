@@ -61,7 +61,7 @@ const stock_zapatillas = [
   { modelo: 'Air Jordan Pink', talles: [{"talle": 34, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 2}], foto: 'Fotos/Air Jordan Pink.jpeg' },
   { modelo: 'Jordan low pombo', talles: [{"talle": 38, "stock": 1}], foto: 'Fotos/Jordan low pombo.jpeg' },
   { modelo: 'Adidas boas negra', talles: [{"talle": 36, "stock": 2}, {"talle": 39, "stock": 1}, {"talle": 41, "stock": 1}, {"talle": 43, "stock": 1}], foto: 'Fotos/Adidas boas negra.jpeg' },
-  { modelo: 'Jordan low brillo', talles: [{"talle": 35, "stock": 1}, {"talle": 37, "stock": 2}], foto: 'Fotos/Jordan low brillo.jpeg' },
+  { modelo: 'Jordan low brillo', talles: [{"talle": 35, "stock": 1}, {"talle": 37, "stock": 1}], foto: 'Fotos/Jordan low brillo.jpeg' },
   { modelo: 'Shox tapón rojo', talles: [{"talle": 39, "stock": 4}, {"talle": 40, "stock": 6}, {"talle": 41, "stock": 10}, {"talle": 42, "stock": 7}, {"talle": 43, "stock": 9}, {"talle": 44, "stock": 1}], foto: 'Fotos/Shox tapón rojo.jpeg' },
   { modelo: 'Air forcé stussy', talles: [{"talle": 40, "stock": 2}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 3}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Air forcé stussy.jpeg' },
   { modelo: 'Air Jordan pipa gris', talles: [{"talle": 39, "stock": 1}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 2}], foto: 'Fotos/Air Jordan pipa gris.jpeg' },
