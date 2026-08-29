@@ -19,12 +19,11 @@ const PRECIOS_ESPECIFICOS = {
     "mind gris":   { unidad: 37000, mayor: 35000 },
     "mind negras": { unidad: 37000, mayor: 35000 },
     "tl1 negras":  { unidad: 43000, mayor: 42000 },  // mismo precio que shox
-    "mind blancas": {unidad: 37000, mayor: 35000 },
 };
 
 // Modelos que, aunque no tengan la palabra "ojotas" en el nombre, se
 // venden y se muestran como ojotas (talles bi-numerales tipo 39/40, 41/42).
-const MODELOS_OJOTAS_BINUMERAL = ["mind beige", "mind gris", "mind negras","mind blancas"];
+const MODELOS_OJOTAS_BINUMERAL = ["mind beige", "mind gris", "mind negras"];
 
 function esModeloOjota(modelo) {
     const m = modelo.toLowerCase().trim();
@@ -105,6 +104,11 @@ function obtenerPrecioMayorista(nombreProducto) {
         return 31000;
     }
 
+    // CUALQUIER MODELO CON "BRILLO" EN EL NOMBRE ($42.000 por mayor)
+    if (nombre.includes("brillo")) {
+        return 42000;
+    }
+
     if (nombre.includes("botitas jordan niño") || nombre.includes("niño") || nombre.includes("niños")) {
         return 30000;
     }
@@ -146,11 +150,6 @@ function obtenerPrecioMayorista(nombreProducto) {
         nombre.includes("jordan low 1 diamond") || 
         nombre.includes("jordan diamond pipa blanca") || 
         nombre.includes("jordan pink") || 
-        nombre.includes("jordan 1 brillosa") || 
-        nombre.includes("super star brillo") ||
-        nombre.includes("súper star brillo") ||
-        nombre.includes("super star brillo perla") ||
-        nombre.includes("súper star brillo perla") ||
         nombre.includes("adidas 2000") || 
         nombre.includes("puma 180") || 
         nombre.includes("shox") ||
@@ -164,12 +163,6 @@ function obtenerPrecioMayorista(nombreProducto) {
         nombre.includes("air forcé con medias") || 
         nombre.includes("air force con medias")) {
         return 41000;
-    }
-
-    // NB 9060 NUEVAS BRILLO ($42.000 por mayor) - va antes de la regla
-    // genérica de "9060" para no pisar otros modelos 9060 (suela rosa, celeste).
-    if (nombre.includes("9060") && nombre.includes("brillo")) {
-        return 42000;
     }
 
     // PRECIOS DE 39.000
