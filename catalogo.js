@@ -38,7 +38,7 @@ const stock_zapatillas = [
   { modelo: 'Sb dunk glitter beige', talles: [{"talle": 36, "stock": 1}, {"talle": 38, "stock": 1}, {"talle": 39, "stock": 1}, {"talle": 40, "stock": 1}], foto: 'Fotos/Sb dunk glitter beige.jpeg' },
   { modelo: 'Jordan retro 4 panda', talles: [{"talle": 40, "stock": 3}, {"talle": 41, "stock": 1}], foto: 'Fotos/Jordan retro 4 panda.jpeg' },
   { modelo: 'Dunk látex negra', talles: [{"talle": 40, "stock": 2}, {"talle": 42, "stock": 2}], foto: 'Fotos/Dunk látex negra.jpeg' },
-  { modelo: 'Jordan low 1 DIAMOND', talles: [{"talle": 38, "stock": 7}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 3}], foto: 'Fotos/Jordan low 1 DIAMOND.jpeg' },
+  { modelo: 'Jordan low 1 DIAMOND', talles: [{"talle": 38, "stock": 6}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 3}], foto: 'Fotos/Jordan low 1 DIAMOND.jpeg' },
   { modelo: 'Adidas fórum verde summer', talles: [{"talle": 35, "stock": 1}, {"talle": 37, "stock": 1}], foto: 'Fotos/Adidas fórum verde summer.jpeg' },
   { modelo: 'Puma 180 nova costura', talles: [{"talle": 40, "stock": 2}], foto: 'Fotos/Puma 180 nova costura.jpeg' },
   { modelo: 'Air force 1 blanca /pipa gris', talles: [{"talle": 39, "stock": 1}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 2}], foto: 'Fotos/Air force 1 blanca pipa gris.jpeg' },
