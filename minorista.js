@@ -92,6 +92,7 @@ function obtenerPrecioMinorista(nombreProducto) {
         nombre.includes("air forcé con medias") || 
         nombre.includes("air force con medias") || 
         nombre.includes("puma 180") || 
+        nombre.includes("campus") || 
         nombre.includes("shox") || 
         nombre.includes("haylan") || 
         nombre.includes("vans haylan") ||
@@ -195,6 +196,7 @@ function obtenerPrecioMayorista(nombreProducto) {
         nombre.includes("jordan pink") || 
         nombre.includes("adidas 2000") || 
         nombre.includes("puma 180") || 
+        nombre.includes("campus") ||
         nombre.includes("shox") ||
         nombre.includes("haylan")) {
         return 42000;
