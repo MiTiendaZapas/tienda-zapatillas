@@ -54,7 +54,14 @@ function obtenerPrecioMayorista(nombreProducto) {
         return 29000;
     }
 
-    // CUALQUIER MODELO CON "BRILLO" EN EL NOMBRE ($42.000 por mayor)
+    // EXCEPCIÓN: "air forcé/air force brillo" NO es $42.000 como el resto de
+    // los "brillo", en esta tienda vale lo mismo que el resto de los air force
+    // ($36.500). Va ANTES de la regla genérica de "brillo" para interceptarlo.
+    if ((nombre.includes("air forcé") || nombre.includes("air force")) && nombre.includes("brillo")) {
+        return 36500;
+    }
+
+    // CUALQUIER OTRO MODELO CON "BRILLO" EN EL NOMBRE ($42.000 por mayor)
     if (nombre.includes("brillo")) {
         return 42000;
     }
