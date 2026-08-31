@@ -337,6 +337,9 @@ Jordan 1 suela celeste
 Mind gris
 39 al 44
 
+Nike V5 rosa
+35, 37 al 40
+
 Dunk marinho red
 41, 43
 
@@ -351,9 +354,6 @@ Mind blancas
 
 Jordan 11 suela celeste
 40, 42, 43, 44
-
-Nike V5 rosa
-35 al 40
 
 Dunk preto/blanco
 42
@@ -400,6 +400,9 @@ Nike V5 negras
 Vans Haylan black luxo
 41, 43, 44
 
+Nb 4000 blancas
+35, 37 al 40
+
 Dunk verde oliva
 41 al 45
 
@@ -408,9 +411,6 @@ TL1 Negras
 
 Jordan low vérmelo
 36, 37, 38, 40
-
-Nb 4000 blancas
-35 al 40
 
 Nike zoom
 36 al 39

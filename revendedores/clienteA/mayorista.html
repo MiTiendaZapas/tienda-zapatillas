@@ -56,7 +56,6 @@
     <!-- 4. Unimos: indumentaria, zapatillas manuales, zapatillas del bot -->
     <script>
         const stock_actualizado = [
-            ...(typeof stock_zapatillas_manual !== 'undefined' ? stock_zapatillas_manual : []),
             ...(typeof stock_zapatillas !== 'undefined' ? stock_zapatillas : [])
         ];
     </script>

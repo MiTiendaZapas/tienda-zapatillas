@@ -15,15 +15,16 @@ let carrito = [];
 // un poco cada vez, no uses este diccionario: agregá una regla de palabras
 // combinadas más abajo, como la de "NB 9060 nuevas brillo" (9060 + brillo).
 const PRECIOS_ESPECIFICOS = {
-    "mind beige":  { unidad: 40000, mayor: 35000 },
-    "mind gris":   { unidad: 40000, mayor: 35000 },
-    "mind negras": { unidad: 40000, mayor: 35000 },
-    "tl1 negras":  { unidad: 60000, mayor: 42000 },  // mismo precio que shox
+    "mind beige":   { unidad: 40000, mayor: 35000 },
+    "mind gris":    { unidad: 40000, mayor: 35000 },
+    "mind negras":  { unidad: 40000, mayor: 35000 },
+    "mind blancas": { unidad: 40000, mayor: 35000 },
+    "tl1 negras":   { unidad: 60000, mayor: 42000 },  // mismo precio que shox
 };
 
 // Modelos que, aunque no tengan la palabra "ojotas" en el nombre, se
 // venden y se muestran como ojotas (talles bi-numerales tipo 39/40, 41/42).
-const MODELOS_OJOTAS_BINUMERAL = ["mind beige", "mind gris", "mind negras"];
+const MODELOS_OJOTAS_BINUMERAL = ["mind beige", "mind gris", "mind negras", "mind blancas"];
 
 function esModeloOjota(modelo) {
     const m = modelo.toLowerCase().trim();
