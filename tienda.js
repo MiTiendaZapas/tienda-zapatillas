@@ -429,8 +429,9 @@ function actualizarCarrito() {
         else sumaParesZapas += item.cantidad;
     });
 
-    let esMayoristaZapas = (sumaParesZapas >= 5);
-    let totalPrecio = 0;
+    let calificaMayorista = (sumaParesZapas >= 5);
+    let totalUnidad = 0;
+    let totalMayor = 0;
 
     carrito.forEach((item, i) => {
         const prodRef = stock_actualizado.find(p => p.modelo === item.modelo);
@@ -439,25 +440,31 @@ function actualizarCarrito() {
 
         let precioMin = obtenerPrecioMinorista(item.modelo);
         let subtotalMostrar = 0;
+        let subtotalMayor = 0;
 
         if (m.includes("remera adidas blanca")) {
             let precioRemeraBlanca = (cantRemeraBlanca >= 10) ? 15000 : 17000;
             subtotalMostrar = precioRemeraBlanca * item.cantidad;
+            subtotalMayor = subtotalMostrar;
         } else if (m.includes("remera adidas negra")) {
             let precioRemeraNegra = (cantRemeraNegra >= 10) ? 15000 : 17000;
             subtotalMostrar = precioRemeraNegra * item.cantidad;
+            subtotalMayor = subtotalMostrar;
         } else if (m.includes("baggy nk") && m.includes("gris")) {
             let precioBaggyGris = (cantBaggyGris >= 10) ? 22000 : 24000;
             subtotalMostrar = precioBaggyGris * item.cantidad;
+            subtotalMayor = subtotalMostrar;
         } else if (m.includes("baggy nk") && m.includes("negro")) {
             let precioBaggyNegro = (cantBaggyNegro >= 10) ? 22000 : 24000;
             subtotalMostrar = precioBaggyNegro * item.cantidad;
+            subtotalMayor = subtotalMostrar;
         } else {
-            let precioZapa = esMayoristaZapas ? obtenerPrecioMayorista(item.modelo) : precioMin;
-            subtotalMostrar = precioZapa * item.cantidad;
+            subtotalMostrar = precioMin * item.cantidad;
+            subtotalMayor = obtenerPrecioMayorista(item.modelo) * item.cantidad;
         }
 
-        totalPrecio += subtotalMostrar;
+        totalUnidad += subtotalMostrar;
+        totalMayor += subtotalMayor;
 
         lista.innerHTML += `
             <li class="item-carrito">
@@ -480,12 +487,31 @@ function actualizarCarrito() {
 
     if (sumaTotalItems === 0) {
         footerOpciones.innerHTML = `<div style="text-align:center; padding: 20px; color: #666;">Tu carrito está vacío</div>`;
+    } else if (calificaMayorista) {
+        footerOpciones.innerHTML = `
+            <div class="opcion-compra mayorista">
+                <div class="detalle-opcion">
+                    <strong>Comprando por mayor (5 pares o más)</strong>
+                    <span class="precio-final">$${totalMayor.toLocaleString('es-AR')}</span>
+                    <span class="aviso-cambio">Sin cambio de talle</span>
+                </div>
+                <button class="btn-whatsapp" onclick="enviarPedido('mayor')">Pedir por mayor 📲</button>
+            </div>
+            <div class="opcion-compra minorista">
+                <div class="detalle-opcion">
+                    <strong>Comprando por unidad</strong>
+                    <span class="precio-final">$${totalUnidad.toLocaleString('es-AR')}</span>
+                    <span class="aviso-cambio" style="color:#28a745;">Con cambio de talle</span>
+                </div>
+                <button class="btn-whatsapp outline" onclick="enviarPedido('unidad')">Pedir por unidad 📲</button>
+            </div>
+        `;
     } else {
         footerOpciones.innerHTML = `
             <div style="text-align:center; margin-bottom: 10px;">
-                <span style="font-size:16px; font-weight:bold;">Total: $${totalPrecio.toLocaleString('es-AR')}</span>
+                <span style="font-size:16px; font-weight:bold;">Total: $${totalUnidad.toLocaleString('es-AR')}</span>
             </div>
-            <button class="btn-whatsapp" onclick="enviarPedido()">Pedir por WhatsApp 📲</button>
+            <button class="btn-whatsapp" onclick="enviarPedido('unidad')">Pedir por WhatsApp 📲</button>
         `;
     }
 }
@@ -493,7 +519,7 @@ function actualizarCarrito() {
 function abrirCarrito() { document.getElementById('modal-carrito').style.display = 'flex'; }
 function cerrarCarrito() { document.getElementById('modal-carrito').style.display = 'none'; }
 
-function enviarPedido() {
+function enviarPedido(modoElegido) {
     if(carrito.length === 0) return alert("No seleccionaste ningún modelo.");
 
     let mensaje = "¡Hola! Quiero hacer el siguiente pedido del catálogo:%0A%0A";
@@ -513,7 +539,9 @@ function enviarPedido() {
         else sumaParesZapas += item.cantidad;
     });
 
-    let esMayoristaZapas = (sumaParesZapas >= 5);
+    let calificaMayorista = (sumaParesZapas >= 5);
+    let usarMayorista = calificaMayorista && (modoElegido === 'mayor');
+
     let total = 0;
 
     carrito.forEach(item => {
@@ -530,7 +558,7 @@ function enviarPedido() {
         } else if (m.includes("baggy nk") && m.includes("negro")) {
             precio = (cantBaggyNegro >= 10) ? 22000 : 24000;
         } else {
-            precio = esMayoristaZapas ? obtenerPrecioMayorista(item.modelo) : precioMin;
+            precio = usarMayorista ? obtenerPrecioMayorista(item.modelo) : precioMin;
         }
 
         let subtotal = precio * item.cantidad;
@@ -544,6 +572,14 @@ function enviarPedido() {
     });
 
     mensaje += `%0ATotal: $${total.toLocaleString('es-AR')}%0A`;
+
+    if (calificaMayorista) {
+        if (usarMayorista) {
+            mensaje += `%0ACompra por MAYOR (5 pares o más): SIN cambio de talle.%0A`;
+        } else {
+            mensaje += `%0ACompra por UNIDAD: CON posibilidad de cambio de talle.%0A`;
+        }
+    }
 
     const url = `https://wa.me/${TU_NUMERO}?text=${mensaje}`;
     window.open(url, '_blank');
