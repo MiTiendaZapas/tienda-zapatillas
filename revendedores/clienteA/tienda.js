@@ -152,7 +152,7 @@ function obtenerPrecioMayorista(nombreProducto) {
         nombre.includes("jordan pink") || 
         nombre.includes("adidas 2000") || 
         nombre.includes("puma 180") || 
-        nombre.includes("campus") ||
+        nombre.includes("nike zoom") ||
         nombre.includes("shox") ||
         nombre.includes("haylan")) {
         return 42000;
