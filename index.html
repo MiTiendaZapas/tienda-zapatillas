@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo Exclusivo</title>
+    <base href="../../">
+    <title>TIENDA F.O</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <header>
-        <h1>Mi Tienda Zapas</h1>
+        <h1>TIENDA F.O</h1>
         <button class="carrito-btn" onclick="abrirCarrito()">
             🛒 <span class="badge" id="contador-carrito">0</span>
         </button>
@@ -37,17 +38,17 @@
         </div>
     </div>
 
-    <!-- 1. Indumentaria: stock cargado a mano. Para modificar talles/stock, editar indumentaria.js (anti-caché) -->
+    <!-- 1. Indumentaria: COMPARTIDA (la resuelve el <base> de arriba) -->
     <script>
         document.write('<script src="indumentaria.js?v=' + Math.random() + '"><\/script>');
     </script>
 
-    <!-- 2. Zapatillas cargadas a mano (no vienen de la tienda online). Editar zapatillas_manual.js (anti-caché) -->
+    <!-- 2. Zapatillas manuales: COMPARTIDAS -->
     <script>
         document.write('<script src="zapatillas_manual.js?v=' + Math.random() + '"><\/script>');
     </script>
 
-    <!-- 3. Zapatillas: catálogo que actualiza el bot automáticamente (con anti-caché) -->
+    <!-- 3. Zapatillas del bot: COMPARTIDAS -->
     <script>
         document.write('<script src="catalogo.js?v=' + Math.random() + '"><\/script>');
     </script>
@@ -61,6 +62,9 @@
         ];
     </script>
 
-    <script src="tienda.js"></script>
+    <!-- 5. Precios y WhatsApp PROPIOS de clienteA. Ruta completa desde la raíz
+         porque el <base> de arriba mueve TODAS las rutas relativas, y este
+         archivo NO es compartido: vive únicamente en esta carpeta. -->
+    <script src="revendedores/clienteA/tienda.js"></script>
 </body>
 </html>

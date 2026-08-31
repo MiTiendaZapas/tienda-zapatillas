@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="../../">
+    <title>TIENDA F.O</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>TIENDA F.O</h1>
+        <button class="carrito-btn" onclick="abrirCarrito()">
+            🛒 <span class="badge" id="contador-carrito">0</span>
+        </button>
+    </header>
+
+    <div class="buscador-container">
+        <input type="text" id="buscador" placeholder="🔍 Buscar modelo..." onkeyup="filtrarCatalogo()">
+    </div>
+
+    <div class="container">
+        <div class="grid-productos" id="grid-productos"></div>
+    </div>
+
+    <div class="modal-overlay" id="modal-carrito">
+        <div class="modal-carrito">
+            <div class="header-modal">
+                <h2>Tu Pedido</h2>
+                <button class="close-btn" onclick="cerrarCarrito()">✖</button>
+            </div>
+            
+            <ul class="lista-carrito" id="lista-carrito"></ul>
+            
+            <!-- ACÁ SE INYECTAN LOS BOTONES DE COMPRA AUTOMÁTICAMENTE -->
+            <div id="footer-opciones" class="footer-modal"></div>
+        </div>
+    </div>
+
+    <!-- 1. Indumentaria: COMPARTIDA (la resuelve el <base> de arriba) -->
+    <script>
+        document.write('<script src="indumentaria.js?v=' + Math.random() + '"><\/script>');
+    </script>
+
+    <!-- 2. Zapatillas manuales: COMPARTIDAS -->
+    <script>
+        document.write('<script src="zapatillas_manual.js?v=' + Math.random() + '"><\/script>');
+    </script>
+
+    <!-- 3. Zapatillas del bot: COMPARTIDAS -->
+    <script>
+        document.write('<script src="catalogo.js?v=' + Math.random() + '"><\/script>');
+    </script>
+
+    <!-- 4. Unimos: indumentaria, zapatillas manuales, zapatillas del bot -->
+    <script>
+        const stock_actualizado = [
+            ...(typeof stock_zapatillas_manual !== 'undefined' ? stock_zapatillas_manual : []),
+            ...(typeof stock_zapatillas !== 'undefined' ? stock_zapatillas : [])
+        ];
+    </script>
+
+    <!-- 5. Precios y WhatsApp PROPIOS de clienteA. Ruta completa desde la raíz
+         porque el <base> de arriba mueve TODAS las rutas relativas, y este
+         archivo NO es compartido: vive únicamente en esta carpeta. -->
+    <script src="revendedores/clienteA/tienda.js"></script>
+</body>
+</html>

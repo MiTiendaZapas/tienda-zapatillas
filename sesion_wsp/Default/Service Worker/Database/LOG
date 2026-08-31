@@ -1,2 +1,3 @@
-2026/08/28-14:49:25.366 1870 Creating DB C:\Users\mateo\OneDrive\Escritorio\proyectos\TiendaZapasOficial\sesion_wsp\Default\Service Worker\Database since it was missing.
-2026/08/28-14:49:25.376 1870 Reusing MANIFEST C:\Users\mateo\OneDrive\Escritorio\proyectos\TiendaZapasOficial\sesion_wsp\Default\Service Worker\Database/MANIFEST-000001
+2026/08/30-14:15:42.968 2158 Reusing MANIFEST C:\Users\mateo\OneDrive\Escritorio\proyectos\TiendaZapasOficial\sesion_wsp\Default\Service Worker\Database/MANIFEST-000001
+2026/08/30-14:15:42.989 2158 Recovering log #3
+2026/08/30-14:15:42.989 2158 Reusing old log C:\Users\mateo\OneDrive\Escritorio\proyectos\TiendaZapasOficial\sesion_wsp\Default\Service Worker\Database/000003.log 

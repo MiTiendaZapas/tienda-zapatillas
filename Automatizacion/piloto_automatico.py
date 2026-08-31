@@ -219,6 +219,9 @@ def rutina_actualizacion():
             archivos_a_subir.append(ARCHIVO_INDUMENTARIA)
         if os.path.exists(ARCHIVO_ZAPATILLAS_MANUAL):
             archivos_a_subir.append(ARCHIVO_ZAPATILLAS_MANUAL)
+        if os.path.isdir(CARPETA_FOTOS):
+            # Sube fotos nuevas o modificadas que hayas agregado a mano
+            archivos_a_subir.append(CARPETA_FOTOS)
 
         subprocess.run(["git", "add"] + archivos_a_subir, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
