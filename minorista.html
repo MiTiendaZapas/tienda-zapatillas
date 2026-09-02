@@ -51,13 +51,20 @@
         document.write('<script src="catalogo.js?v=' + Math.random() + '"><\/script>');
     </script>
 
-    <!-- 4. Unimos: indumentaria, zapatillas manuales, zapatillas del bot -->
+    <!-- 4. Función que fusiona talles cuando el mismo modelo aparece repetido
+         entre tienda del proveedor y stock manual (anti-caché) -->
     <script>
-        const stock_actualizado = [
+        document.write('<script src="mezclar_stock.js?v=' + Math.random() + '"><\/script>');
+    </script>
+
+    <!-- 5. Unimos: indumentaria, zapatillas manuales, zapatillas del bot,
+         y fusionamos los talles de los modelos que se repiten -->
+    <script>
+        const stock_actualizado = mezclarStockPorModelo([
             ...stock_indumentaria,
             ...(typeof stock_zapatillas_manual !== 'undefined' ? stock_zapatillas_manual : []),
             ...(typeof stock_zapatillas !== 'undefined' ? stock_zapatillas : [])
-        ];
+        ]);
     </script>
 
     <script src="minorista.js"></script>

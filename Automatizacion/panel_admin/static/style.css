@@ -1,0 +1,129 @@
+* { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+body { background-color: #f0f2f5; color: #222; }
+
+header {
+    background-color: #111; color: #fff; padding: 14px 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    position: sticky; top: 0; z-index: 100; gap: 10px; flex-wrap: wrap;
+}
+header h1 { font-size: 18px; }
+.repo-path { font-size: 11px; color: #aaa; max-width: 45vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.tabs {
+    display: flex; gap: 4px; background: #1c1c1c; padding: 0 12px; overflow-x: auto;
+}
+.tab-btn {
+    background: none; border: none; color: #bbb; padding: 12px 14px; font-size: 13px;
+    cursor: pointer; white-space: nowrap; border-bottom: 3px solid transparent;
+}
+.tab-btn:hover { color: #fff; }
+.tab-btn.activa { color: #fff; border-bottom-color: #28a745; font-weight: bold; }
+
+.container { max-width: 1100px; margin: 24px auto; padding: 0 16px 60px; }
+
+.tab-panel { display: none; }
+.tab-panel.activa { display: block; }
+
+h2 { margin-bottom: 6px; }
+h3 { margin: 14px 0 8px; }
+.ayuda { color: #666; font-size: 13px; margin-bottom: 12px; }
+code { background: #e9ecef; padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+
+.encabezado-seccion { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 4px; }
+
+/* Tarjetas resumen dashboard */
+.tarjetas-resumen { display: flex; gap: 16px; margin: 16px 0 24px; flex-wrap: wrap; }
+.tarjeta {
+    background: #fff; border-radius: 10px; padding: 18px 24px; min-width: 180px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; flex-direction: column; gap: 4px;
+}
+.tarjeta .numero { font-size: 30px; font-weight: bold; }
+.tarjeta .etiqueta { font-size: 12px; color: #666; }
+.tarjeta.alerta .numero { color: #dc3545; }
+
+/* Lista de modelos sin foto */
+.lista-faltantes { display: flex; flex-direction: column; gap: 8px; }
+.fila-faltante {
+    background: #fff; border-radius: 8px; padding: 10px 14px; display: flex;
+    align-items: center; justify-content: space-between; gap: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    flex-wrap: wrap;
+}
+.fila-faltante .nombre { font-weight: 600; font-size: 14px; }
+.fila-faltante input[type="file"] { font-size: 12px; max-width: 220px; }
+.sin-faltantes { color: #28a745; font-weight: bold; padding: 20px; text-align: center; background: #fff; border-radius: 8px; }
+
+/* Tabla de stock manual */
+.tabla-stock { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.fila-stock {
+    background: #fff; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center;
+    gap: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); flex-wrap: wrap;
+}
+.fila-stock img.thumb { width: 46px; height: 46px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd; background:#eee; }
+.fila-stock .info { flex: 1; min-width: 160px; }
+.fila-stock .info .nombre { font-weight: 600; font-size: 14px; }
+.fila-stock .info .talles-resumen { font-size: 12px; color: #666; }
+.badge-sin-foto { background: #ffe3e3; color: #c0392b; font-size: 11px; font-weight: bold; padding: 2px 8px; border-radius: 10px; }
+.fila-stock .acciones { display: flex; gap: 6px; }
+
+/* Botones */
+.btn {
+    background: #e9ecef; border: none; padding: 9px 14px; border-radius: 6px; font-size: 13px;
+    cursor: pointer; font-weight: 600; color: #222; transition: 0.15s;
+}
+.btn:hover { background: #dee2e6; }
+.btn-primario { background: #111; color: #fff; }
+.btn-primario:hover { background: #333; }
+.btn-chico { padding: 5px 10px; font-size: 12px; }
+.btn-grande { padding: 13px 20px; font-size: 15px; margin-top: 10px; }
+.btn-encender { background: #28a745; color: #fff; }
+.btn-encender:hover { background: #1ebe57; }
+.btn-apagar { background: #dc3545; color: #fff; }
+.btn-apagar:hover { background: #c82333; }
+.btn-borrar { background: #ffe3e3; color: #c0392b; }
+.btn-borrar:hover { background: #ffc9c9; }
+
+/* Bots */
+.bots-grid { display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 14px; }
+@media (min-width: 800px) { .bots-grid { grid-template-columns: 1fr 1fr; } }
+.bot-card { background: #fff; border-radius: 10px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.bot-header { display: flex; justify-content: space-between; align-items: center; }
+.estado-badge { font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 12px; background: #e9ecef; color: #666; }
+.estado-badge.activo { background: #d4f7dc; color: #1a7431; }
+.bot-botones { display: flex; gap: 8px; margin: 10px 0; }
+.bot-input-fila { display: flex; gap: 6px; margin-bottom: 10px; }
+.bot-input-fila input { flex: 1; padding: 7px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; }
+.bot-log {
+    background: #111; color: #ddd; font-size: 11px; padding: 10px; border-radius: 6px;
+    height: 220px; overflow-y: auto; white-space: pre-wrap; word-break: break-word;
+}
+
+/* Publicar */
+.git-status { background: #fff; border-radius: 8px; padding: 12px; margin: 12px 0; font-size: 12px; font-family: monospace; min-height: 20px; white-space: pre-wrap; }
+.git-resultado { margin-top: 12px; padding: 12px; border-radius: 8px; font-size: 13px; display: none; }
+.git-resultado.ok { display: block; background: #d4f7dc; color: #1a7431; }
+.git-resultado.error { display: block; background: #ffe3e3; color: #c0392b; white-space: pre-wrap; }
+
+/* Modal formulario */
+.modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none;
+    align-items: center; justify-content: center; z-index: 1000; padding: 16px;
+}
+.modal-overlay.activa { display: flex; }
+.modal-caja { background: #fff; border-radius: 10px; max-width: 480px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 20px; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.close-btn { background: none; border: none; font-size: 18px; cursor: pointer; }
+
+#form-producto label { display: block; font-size: 12px; font-weight: bold; margin: 12px 0 4px; color: #444; }
+#form-producto input[type="text"] {
+    width: 100%; padding: 9px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;
+}
+.foto-picker { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.foto-preview { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd; }
+
+.talles-filas { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+.fila-talle { display: flex; gap: 6px; align-items: center; }
+.fila-talle input { flex: 1; padding: 7px 8px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; }
+.fila-talle button { background: none; border: none; color: #c0392b; font-size: 16px; cursor: pointer; }
+
+.modal-acciones { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+.form-error { color: #c0392b; font-size: 12px; margin-top: 8px; }

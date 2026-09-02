@@ -166,6 +166,35 @@ def formatear_talles(talles):
                 
     return ", ".join(resultado)
 
+# Modelos de ojotas que no tienen la palabra "ojotas" en el nombre, pero se
+# venden y se muestran igual que el resto de las ojotas (talles bi-numerales).
+# Tiene que coincidir EXACTO (en minúsculas) con lo que ya usan tienda.js y
+# minorista.js, para que el mensaje de WhatsApp diga lo mismo que la web.
+MODELOS_OJOTAS_BINUMERAL = ["mind beige", "mind gris", "mind negras", "mind blancas"]
+
+def es_modelo_ojota(nombre):
+    n = nombre.lower().strip()
+    return "ojotas" in n or n in MODELOS_OJOTAS_BINUMERAL
+
+def formatear_talles_ojota(talles):
+    """
+    Junta los talles de a pares consecutivos (39, 40 -> "39/40"), igual que
+    procesarTallesOjota() en tienda.js/minorista.js, para que el texto que se
+    manda por WhatsApp coincida con cómo se ven los talles en la web.
+    """
+    if not talles:
+        return None
+
+    numeros = sorted(set(talles))
+    resultado = []
+    for i in range(0, len(numeros), 2):
+        if i + 1 < len(numeros):
+            resultado.append(f"{numeros[i]}/{numeros[i+1]}")
+        else:
+            resultado.append(str(numeros[i]))
+
+    return ", ".join(resultado)
+
 def actualizar_stock():
     print("--- FASE 1: ESCANEANDO Y FILTRANDO STOCK EN TIENDANUBE ---")
     with sync_playwright() as p:
@@ -208,7 +237,7 @@ def actualizar_stock():
                     sys.exit(1)
                 continue
 
-            texto_talles = formatear_talles(talles)
+            texto_talles = formatear_talles_ojota(talles) if es_modelo_ojota(nombre) else formatear_talles(talles)
             if texto_talles is None:
                 continue
 
