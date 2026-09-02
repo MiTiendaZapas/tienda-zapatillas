@@ -51,7 +51,7 @@ const stock_zapatillas = [
   { modelo: 'New balance ABZORB BEGE', talles: [{"talle": 34, "stock": 3}, {"talle": 35, "stock": 1}], foto: 'Fotos/New balance ABZORB BEGE.jpeg' },
   { modelo: 'Jordan 1 café flamingo', talles: [{"talle": 37, "stock": 2}, {"talle": 40, "stock": 1}], foto: 'Fotos/Jordan 1 café flamingo.jpeg' },
   { modelo: 'Super star rosa', talles: [{"talle": 40, "stock": 1}], foto: 'Fotos/Super star rosa.jpeg' },
-  { modelo: 'Súper star brillo', talles: [{"talle": 37, "stock": 5}, {"talle": 38, "stock": 6}, {"talle": 39, "stock": 11}, {"talle": 40, "stock": 6}, {"talle": 41, "stock": 4}], foto: 'Fotos/Súper star brillo.jpeg' },
+  { modelo: 'Súper star brillo', talles: [{"talle": 37, "stock": 5}, {"talle": 38, "stock": 5}, {"talle": 39, "stock": 11}, {"talle": 40, "stock": 6}, {"talle": 41, "stock": 4}], foto: 'Fotos/Súper star brillo.jpeg' },
   { modelo: 'Ojotas total black', talles: [{"talle": 39, "stock": 17}, {"talle": 40, "stock": 17}, {"talle": 41, "stock": 12}, {"talle": 42, "stock": 12}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 2}], foto: 'Fotos/Ojotas total black.jpeg' },
   { modelo: 'Sb dunk cinza/preto', talles: [{"talle": 39, "stock": 1}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 1}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 3}], foto: 'Fotos/Sb dunk cinza preto.jpeg' },
   { modelo: 'ABZORB marrones', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 4}, {"talle": 36, "stock": 7}, {"talle": 37, "stock": 1}, {"talle": 39, "stock": 1}], foto: 'Fotos/ABZORB marrones.jpeg' },
