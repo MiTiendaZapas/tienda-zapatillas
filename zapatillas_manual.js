@@ -4,7 +4,7 @@
 const stock_zapatillas_manual = [
     { modelo: 'Adidas supernova', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 39, "stock": 1}], foto: 'Fotos/Adidas supernova.jpeg' },
     { modelo: 'Botines total 90', talles: [{"talle": 39, "stock": 1}, {"talle": 40, "stock": 2}, {"talle": 38, "stock": 1}], foto: 'Fotos/Botines total 90.jpeg' },
-    { modelo: 'Jordan 1 botitas charol negra', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 1}], foto: 'Fotos/Jordan 1 botitas charol negra.jpeg' },
+    { modelo: 'Jordan 1 botitas charol negra', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 1}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 1}], foto: 'Fotos/Jordan 1 botitas charol negra.jpeg' },
     { modelo: 'Jordan charol azul', talles: [{"talle": 42, "stock": 2}, {"talle": 43, "stock": 2}], foto: 'Fotos/Jordan charol azul.jpeg' },
     { modelo: 'Jordan low vérmelo', talles: [{"talle": 36, "stock": 1}, {"talle": 39, "stock": 1}], foto: 'Fotos/Jordan low vérmelo.jpeg' },
     { modelo: 'Jordan retro 4 pink', talles: [{"talle": 39, "stock": 1}, {"talle": 40, "stock": 1}], foto: 'Fotos/Jordan retro 4 pink.jpeg' },
