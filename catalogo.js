@@ -1,5 +1,5 @@
 const stock_zapatillas = [
-  { modelo: 'Air forcé 1 blancas', talles: [{"talle": 35, "stock": 2}, {"talle": 41, "stock": 10}, {"talle": 42, "stock": 8}, {"talle": 43, "stock": 4}, {"talle": 44, "stock": 3}], foto: 'Fotos/Air forcé 1 blancas.jpeg' },
+  { modelo: 'Air forcé 1 blancas', talles: [{"talle": 35, "stock": 2}, {"talle": 41, "stock": 10}, {"talle": 42, "stock": 8}, {"talle": 43, "stock": 4}, {"talle": 44, "stock": 2}], foto: 'Fotos/Air forcé 1 blancas.jpeg' },
   { modelo: 'Vans KNU clasicas', talles: [{"talle": 34, "stock": 6}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 1}, {"talle": 42, "stock": 2}], foto: 'Fotos/Vans KNU clasicas.jpeg' },
   { modelo: 'Panda sb dunk', talles: [{"talle": 43, "stock": 5}], foto: 'Fotos/Panda sb dunk.jpeg' },
   { modelo: 'Adidas forum blancas', talles: [{"talle": 35, "stock": 2}, {"talle": 37, "stock": 1}, {"talle": 40, "stock": 4}, {"talle": 41, "stock": 1}], foto: 'Fotos/Adidas forum blancas.jpeg' },
@@ -102,7 +102,6 @@ const stock_zapatillas = [
   { modelo: 'Mind gris', talles: [{"talle": 41, "stock": 4}, {"talle": 42, "stock": 4}, {"talle": 43, "stock": 6}, {"talle": 44, "stock": 6}], foto: 'Fotos/Mind gris.jpeg' },
   { modelo: 'Samba total black', talles: [{"talle": 36, "stock": 1}], foto: 'Fotos/Samba total black.jpeg' },
   { modelo: 'Nike V5 rosa', talles: [{"talle": 35, "stock": 2}, {"talle": 37, "stock": 4}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 3}], foto: 'Fotos/Nike V5 rosa.jpeg' },
-  { modelo: 'Adidas 2000 BLACK', talles: [{"talle": 44, "stock": 1}], foto: 'Fotos/Adidas 2000 BLACK.jpeg' },
   { modelo: 'Jordan 1 suela celeste', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 3}, {"talle": 41, "stock": 2}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 1}], foto: 'Fotos/Jordan 1 suela celeste.jpeg' },
   { modelo: 'Nb ABZORB white', talles: [{"talle": 35, "stock": 3}], foto: 'Fotos/Nb ABZORB white.jpeg' },
   { modelo: 'Air forcé black brillo', talles: [{"talle": 37, "stock": 1}, {"talle": 38, "stock": 1}, {"talle": 39, "stock": 2}], foto: 'Fotos/Air forcé black brillo.jpeg' },
