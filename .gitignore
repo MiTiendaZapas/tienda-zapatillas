@@ -1,0 +1,40 @@
+# ============================================================
+# Carpeta automatizacion/ completa: panel admin, accesos directos
+# (.bat/.vbs), sesion de WhatsApp Web, logs, PIDs. Todo esto corre
+# 100% local en tu PC y no hace falta que esté en GitHub.
+#
+# Si en algun momento queres mantener piloto_automatico.py y/o
+# bot_whatsapp.py versionados en GitHub a pesar de esta regla,
+# se agregan a mano una sola vez con:
+#   git add -f automatizacion/piloto_automatico.py automatizacion/bot_whatsapp.py
+# ============================================================
+automatizacion/
+
+# ============================================================
+# Python
+# ============================================================
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+
+# ============================================================
+# Carpetas que arma PyInstaller si alguna vez usás build_exe.bat
+# ============================================================
+build/
+dist/
+*.spec
+
+# ============================================================
+# Basura que dejan los sistemas operativos
+# ============================================================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ============================================================
+# Configuración local de editor (opcional, sacá esta línea si
+# querés compartir la config de VS Code del proyecto)
+# ============================================================
+.vscode/
