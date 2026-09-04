@@ -19,7 +19,8 @@ const PRECIOS_ESPECIFICOS = {
     "mind gris":    { unidad: 40000, mayor: 35000 },
     "mind negras":  { unidad: 40000, mayor: 35000 },
     "mind blancas": { unidad: 40000, mayor: 35000 },
-    "tl1 negras":   { unidad: 60000, mayor: 42000 },  // mismo precio que shox
+    "tl1 negras":   { unidad: 60000, mayor: 42000 },  
+    "tl1 blancas":  { unidad: 60000, mayor: 42000 }, // mismo precio que shox
 };
 
 // Modelos que, aunque no tengan la palabra "ojotas" en el nombre, se
