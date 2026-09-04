@@ -3,6 +3,7 @@ import re
 import sys
 import time
 import random
+import json
 from io import BytesIO
 from PIL import Image
 import win32clipboard
@@ -12,9 +13,28 @@ from playwright.sync_api import sync_playwright
 URL_LISTADO = "https://vestitepiola.mitiendanube.com/productos/?order=best-selling"
 ARCHIVO_SALIDA = "stock_proveedor.txt"
 CARPETA_FOTOS = "Fotos"
+RUTA_ZAPATILLAS_MANUAL = "zapatillas_manual.js"
 MAX_SCROLLS = 200
 ESTABLE_LIMITE = 3
 TIMEOUT_PRODUCTO_MS = 15000
+
+# Mensaje de precios que se manda como texto (sin foto), UNA sola vez,
+# después de haber mandado todas las fotos de zapatillas. Es texto fijo:
+# si el día de mañana cambiás alguno de estos precios en tienda.js, hay
+# que venir a actualizarlo acá también a mano.
+MENSAJE_FINAL_PRECIOS = (
+    "Zapatillas calidad Brasil 🇧🇷 (primera línea,luxo)\n"
+    "Talles de adulto $43.000 por unidad ‼️\n"
+    "🔥 A PARTIR DE 5 unidades te quedan en $37.000/$39.000/$41.000 🔥\n"
+    "🚨 TALLE NIÑO $35.000c/u 🚨\n"
+    "Por mayor $30.000c/u ‼️\n"
+    "🚨OJOTAS $35.000c/u🚨\n"
+    "Por mayor $31.000c/u‼️\n"
+    "🚨 OJOTAS  MIND  $37.000c/u🚨\n"
+    "Por mayor $35.000c/u ‼️\n"
+    "🚨 JORDAN 11 Y RETRO 11 PANDA $55.000c/u 🚨\n"
+    "Por mayor $50.000c/u ‼️"
+)
 # -----------------------------
 
 def limpiar_nombre_archivo(nombre):
@@ -35,6 +55,26 @@ def copiar_imagen_al_portapapeles(ruta_imagen):
     win32clipboard.EmptyClipboard()
     win32clipboard.SetClipboardData(win32clipboard.CF_DIB, data)
     win32clipboard.CloseClipboard()
+
+def enviar_mensaje_texto(page, texto):
+    """
+    Manda un mensaje de SOLO TEXTO (sin foto) al chat que ya está abierto
+    en WhatsApp Web. Se usa para el mensaje final de precios, después de
+    haber mandado todas las fotos de zapatillas.
+    """
+    barra_mensaje = page.locator('div[contenteditable="true"]').last
+    barra_mensaje.click()
+    page.wait_for_timeout(500)
+
+    lineas_texto = texto.split('\n')
+    for i, linea in enumerate(lineas_texto):
+        page.keyboard.insert_text(linea)
+        if i < len(lineas_texto) - 1:
+            page.keyboard.press("Shift+Enter")
+
+    page.wait_for_timeout(500)
+    page.keyboard.press("Enter")
+    page.wait_for_timeout(1000)
 
 def cargar_listado_completo(page):
     estable = 0
@@ -195,6 +235,86 @@ def formatear_talles_ojota(talles):
 
     return ", ".join(resultado)
 
+# Mismo patrón que usa el Panel Admin para leer zapatillas_manual.js: cada
+# producto es { modelo: '...', talles: [{"talle": N, "stock": N}, ...], foto: '...' }
+_PATRON_STOCK_MANUAL = re.compile(
+    r"\{\s*modelo:\s*'((?:[^'\\]|\\.)*)'\s*,\s*talles:\s*(\[.*?\])\s*,\s*foto:\s*'((?:[^'\\]|\\.)*)'\s*\}",
+    re.DOTALL,
+)
+
+def cargar_zapatillas_manual(ruta=RUTA_ZAPATILLAS_MANUAL):
+    """
+    Lee el stock que cargaste a mano (desde el Panel Admin o editando el
+    archivo directo) en zapatillas_manual.js. Devuelve una lista de
+    (nombre_modelo, set_de_talles) con SOLO los talles que tienen stock > 0
+    (un talle cargado con stock 0 no se manda como disponible).
+    """
+    if not os.path.exists(ruta):
+        return []
+
+    with open(ruta, "r", encoding="utf-8") as f:
+        contenido = f.read()
+
+    productos = []
+    for match in _PATRON_STOCK_MANUAL.finditer(contenido):
+        nombre_crudo, talles_raw, _foto = match.groups()
+        nombre = nombre_crudo.replace("\\'", "'")
+
+        try:
+            talles = json.loads(talles_raw)
+        except json.JSONDecodeError:
+            talles = []
+
+        talles_disponibles = set()
+        for t in talles:
+            try:
+                numero = int(t.get("talle"))
+                stock = int(t.get("stock", 0))
+            except (TypeError, ValueError):
+                continue
+            if stock > 0:
+                talles_disponibles.add(numero)
+
+        if talles_disponibles:
+            productos.append((nombre, talles_disponibles))
+
+    return productos
+
+def fusionar_stock_tienda_y_casa(productos_manual, productos_proveedor):
+    """
+    Junta el stock manual (casa, zapatillas_manual.js) con el escaneado en
+    vivo de la tienda del proveedor -- igual que hace mezclar_stock.js en la
+    web: si el mismo modelo aparece en los dos lados, se combinan los
+    talles en una sola entrada (no se manda dos veces el mismo modelo).
+
+    Los modelos que están en zapatillas_manual.js van SIEMPRE primero en el
+    resultado (estén o no también en la tienda), y recién después los que
+    son solamente de la tienda del proveedor, en el orden en que se
+    escanearon.
+
+    La comparación de "es el mismo modelo" es por nombre exacto (sin
+    importar mayúsculas/minúsculas ni espacios de más), igual que en el
+    Panel Admin y en mezclar_stock.js -- para que se fusionen, el nombre
+    tiene que estar escrito igual en los dos lados.
+    """
+    combinados = {}
+    orden = []
+
+    for nombre, talles in productos_manual:
+        clave = nombre.lower().strip()
+        combinados[clave] = {"nombre": nombre, "talles": set(talles)}
+        orden.append(clave)
+
+    for nombre, talles in productos_proveedor:
+        clave = nombre.lower().strip()
+        if clave in combinados:
+            combinados[clave]["talles"] |= set(talles)
+        else:
+            combinados[clave] = {"nombre": nombre, "talles": set(talles)}
+            orden.append(clave)
+
+    return [(combinados[clave]["nombre"], combinados[clave]["talles"]) for clave in orden]
+
 def actualizar_stock():
     print("--- FASE 1: ESCANEANDO Y FILTRANDO STOCK EN TIENDANUBE ---")
     with sync_playwright() as p:
@@ -219,8 +339,7 @@ def actualizar_stock():
             browser.close()
             sys.exit(1)
 
-        lineas = []
-        incluidos = 0
+        productos_proveedor = []
         fallas_seguidas = 0
         MAX_FALLAS_SEGUIDAS = 4
 
@@ -237,22 +356,36 @@ def actualizar_stock():
                     sys.exit(1)
                 continue
 
-            texto_talles = formatear_talles_ojota(talles) if es_modelo_ojota(nombre) else formatear_talles(talles)
-            if texto_talles is None:
+            if not talles:
                 continue
 
-            print(f"  [{i}/{len(productos)}] {nombre}: {texto_talles}")
-            lineas.append(nombre)
-            lineas.append(texto_talles)
-            lineas.append("")
-            incluidos += 1
+            print(f"  [{i}/{len(productos)}] {nombre}: {len(talles)} talles escaneados")
+            productos_proveedor.append((nombre, talles))
 
         browser.close()
+
+    # --- Sumamos el stock de casa (zapatillas_manual.js) con el escaneado ---
+    productos_manual = cargar_zapatillas_manual()
+    if productos_manual:
+        print(f"\n📦 Stock manual (casa) cargado: {len(productos_manual)} modelo(s) desde {RUTA_ZAPATILLAS_MANUAL}")
+
+    productos_finales = fusionar_stock_tienda_y_casa(productos_manual, productos_proveedor)
+
+    lineas = []
+    incluidos = 0
+    for nombre, talles in productos_finales:
+        texto_talles = formatear_talles_ojota(talles) if es_modelo_ojota(nombre) else formatear_talles(talles)
+        if texto_talles is None:
+            continue
+        lineas.append(nombre)
+        lineas.append(texto_talles)
+        lineas.append("")
+        incluidos += 1
 
     with open(ARCHIVO_SALIDA, "w", encoding="utf-8") as f:
         f.write("\n".join(lineas).strip() + "\n")
 
-    print(f"\n✅ Análisis finalizado. {incluidos} modelos con stock real guardados en {ARCHIVO_SALIDA}\n")
+    print(f"\n✅ Análisis finalizado. {incluidos} modelos con stock real guardados en {ARCHIVO_SALIDA} (stock de casa primero)\n")
 
 def parsear_stock_txt():
     items = []
@@ -373,6 +506,14 @@ def main():
                 page.keyboard.press("Escape")
                 page.wait_for_timeout(1000)
                 page.keyboard.press("Escape")
+
+        print("\nMandando el mensaje final de precios...")
+        try:
+            page.wait_for_timeout(1500)
+            enviar_mensaje_texto(page, MENSAJE_FINAL_PRECIOS)
+            print("✅ Mensaje final de precios enviado.")
+        except Exception as e:
+            print(f"❌ Error al mandar el mensaje final de precios: {e}")
 
         print(f"\n¡Terminado! Se actualizaron los datos y se enviaron {enviados} fotos con éxito.")
         
