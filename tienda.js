@@ -19,8 +19,12 @@ const PRECIOS_ESPECIFICOS = {
     "mind gris":    { unidad: 37000, mayor: 35000 },
     "mind negras":  { unidad: 37000, mayor: 35000 },
     "mind blancas": { unidad: 37000, mayor: 35000 },
-    "tl1 negras":   { unidad: 43000, mayor: 42000 },
-    "tl1 blancas":   { unidad: 43000, mayor: 42000 }  // mismo precio que shox
+    // "tl1 negras" ya NO va acá: se sacó de este diccionario para que el
+    // precio de TL1 siga siempre al de shox automáticamente (ver la palabra
+    // "shox" más abajo en obtenerPrecioMayorista, donde ahora también
+    // matchea "tl1"; por unidad, shox no tiene regla propia y cae al precio
+    // por defecto, así que TL1 cae ahí también). Así, si el día de mañana
+    // cambia el precio de shox, TL1 cambia solo con eso.
 };
 
 // Modelos que, aunque no tengan la palabra "ojotas" en el nombre, se
@@ -156,6 +160,7 @@ function obtenerPrecioMayorista(nombreProducto) {
         nombre.includes("puma 180") || 
         nombre.includes("campus") ||
         nombre.includes("shox") ||
+        nombre.includes("tl1") ||
         nombre.includes("haylan")) {
         return 42000;
     }

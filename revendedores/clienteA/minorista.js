@@ -18,7 +18,6 @@ const PRECIOS_ESPECIFICOS = {
     "mind beige":  { unidad: 40000, mayor: 35000 },
     "mind gris":   { unidad: 40000, mayor: 35000 },
     "mind negras": { unidad: 40000, mayor: 35000 },
-    "tl1 negras":  { unidad: 60000, mayor: 42000 },  // mismo precio que shox
 };
 
 // Modelos que, aunque no tengan la palabra "ojotas" en el nombre, se
@@ -111,6 +110,7 @@ function obtenerPrecioMayorista(nombreProducto) {
         nombre.includes("puma 180") || 
         nombre.includes("nike zoom") ||
         nombre.includes("shox") ||
+        nombre.includes("tl1") ||
         nombre.includes("haylan")) {
         return 42000;
     }
