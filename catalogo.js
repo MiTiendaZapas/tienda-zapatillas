@@ -1,5 +1,5 @@
 const stock_zapatillas = [
-  { modelo: 'Air forcé 1 blancas', talles: [{"talle": 35, "stock": 3}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 1}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 1}, {"talle": 41, "stock": 7}, {"talle": 42, "stock": 6}, {"talle": 43, "stock": 4}, {"talle": 44, "stock": 2}], foto: 'Fotos/Air forcé 1 blancas.jpeg' },
+  { modelo: 'Air forcé 1 blancas', talles: [{"talle": 35, "stock": 3}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 1}, {"talle": 38, "stock": 2}, {"talle": 41, "stock": 7}, {"talle": 42, "stock": 6}, {"talle": 43, "stock": 4}, {"talle": 44, "stock": 2}], foto: 'Fotos/Air forcé 1 blancas.jpeg' },
   { modelo: 'Vans KNU clasicas', talles: [{"talle": 34, "stock": 8}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 5}, {"talle": 37, "stock": 6}, {"talle": 38, "stock": 2}], foto: 'Fotos/Vans KNU clasicas.jpeg' },
   { modelo: 'Panda sb dunk', talles: [{"talle": 43, "stock": 5}], foto: 'Fotos/Panda sb dunk.jpeg' },
   { modelo: 'Adidas forum blancas', talles: [{"talle": 35, "stock": 2}, {"talle": 37, "stock": 1}, {"talle": 40, "stock": 3}], foto: 'Fotos/Adidas forum blancas.jpeg' },
@@ -28,7 +28,7 @@ const stock_zapatillas = [
   { modelo: 'New balance 9060 suela rosa', talles: [{"talle": 34, "stock": 3}, {"talle": 35, "stock": 4}, {"talle": 36, "stock": 3}], foto: 'Fotos/New balance 9060 suela rosa.jpeg' },
   { modelo: 'Dunk glistter celeste', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 3}, {"talle": 38, "stock": 1}, {"talle": 40, "stock": 2}], foto: 'Fotos/Dunk glistter celeste.jpeg' },
   { modelo: 'Jordan 1 verniz', talles: [{"talle": 34, "stock": 2}, {"talle": 35, "stock": 5}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 5}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 8}, {"talle": 40, "stock": 7}, {"talle": 41, "stock": 7}, {"talle": 42, "stock": 5}, {"talle": 43, "stock": 4}, {"talle": 44, "stock": 1}], foto: 'Fotos/Jordan 1 verniz.jpeg' },
-  { modelo: 'Shox black', talles: [{"talle": 40, "stock": 2}, {"talle": 41, "stock": 14}, {"talle": 42, "stock": 10}, {"talle": 43, "stock": 7}, {"talle": 44, "stock": 2}], foto: 'Fotos/Shox black.jpeg' },
+  { modelo: 'Shox black', talles: [{"talle": 40, "stock": 2}, {"talle": 41, "stock": 14}, {"talle": 42, "stock": 9}, {"talle": 43, "stock": 7}, {"talle": 44, "stock": 2}], foto: 'Fotos/Shox black.jpeg' },
   { modelo: 'Vans Haylan 01', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 1}, {"talle": 41, "stock": 1}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Vans Haylan 01.jpeg' },
   { modelo: 'NB 530 blanca/negro', talles: [{"talle": 34, "stock": 3}, {"talle": 36, "stock": 2}], foto: 'Fotos/NB 530 blanca negro.jpeg' },
   { modelo: 'Dunk celeste', talles: [{"talle": 38, "stock": 1}, {"talle": 39, "stock": 1}], foto: 'Fotos/Dunk celeste.jpeg' },
