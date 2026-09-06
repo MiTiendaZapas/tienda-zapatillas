@@ -47,7 +47,7 @@ const stock_zapatillas = [
   { modelo: 'Ojotas total black', talles: [{"talle": 37, "stock": 5}, {"talle": 38, "stock": 5}, {"talle": 39, "stock": 38}, {"talle": 40, "stock": 38}, {"talle": 41, "stock": 33}, {"talle": 42, "stock": 33}, {"talle": 43, "stock": 6}, {"talle": 44, "stock": 6}], foto: 'Fotos/Ojotas total black.jpeg' },
   { modelo: 'Samba Classic', talles: [{"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Samba Classic.jpeg' },
   { modelo: 'Vans Haylan beige', talles: [{"talle": 40, "stock": 4}, {"talle": 42, "stock": 3}, {"talle": 43, "stock": 3}], foto: 'Fotos/Vans Haylan beige.jpeg' },
-  { modelo: 'Vans HAYLAN celestes', talles: [{"talle": 36, "stock": 4}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 4}, {"talle": 39, "stock": 3}], foto: 'Fotos/Vans HAYLAN celestes.jpeg' },
+  { modelo: 'Vans HAYLAN celestes', talles: [{"talle": 36, "stock": 3}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 4}, {"talle": 39, "stock": 3}], foto: 'Fotos/Vans HAYLAN celestes.jpeg' },
   { modelo: 'Jordan retro 4 GREEN', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 2}], foto: 'Fotos/Jordan retro 4 GREEN.jpeg' },
   { modelo: 'New balance ABZORB BEGE', talles: [{"talle": 34, "stock": 3}], foto: 'Fotos/New balance ABZORB BEGE.jpeg' },
   { modelo: 'Jordan 1 café flamingo', talles: [{"talle": 40, "stock": 1}], foto: 'Fotos/Jordan 1 café flamingo.jpeg' },
