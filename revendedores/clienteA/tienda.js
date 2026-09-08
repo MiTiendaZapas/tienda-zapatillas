@@ -59,13 +59,8 @@ function obtenerPrecioMinorista(nombreProducto) {
         return 43000;
     }
 
-    // RETRO 11 PANDA Y JORDAN 11 SUELA BLANCA ($55.000 por unidad)
-    if (nombre.includes("retro 11 panda") || nombre.includes("jordan 11 suela blanca")) {
-        return 55000;
-    }
-
-    // JORDAN 11 SUELA CELESTE ($55.000 por unidad)
-    if (nombre.includes("jordan 11 suela celeste")) {
+    // TODOS LOS JORDAN 11 Y RETRO 11 PANDA ($55.000 por unidad)
+    if (nombre.includes("jordan 11") || nombre.includes("retro 11 panda")) {
         return 55000;
     }
 
@@ -78,13 +73,6 @@ function obtenerPrecioMinorista(nombreProducto) {
         nombre.includes("new balance 4000 negra") ||
         nombre.includes("nb 4000 negra")) {
         return 43000;
-    }
-
-    // Excepciones de $55.000 por unidad
-    if (nombre.includes("jordan 11 suela azul") ||
-        nombre.includes("jordan 11 negra/blanca") ||
-        nombre.includes("jordan 11 negra blanca")) {
-        return 55000;
     }
 
     // Precio por defecto por unidad para el resto del catálogo
@@ -123,13 +111,8 @@ function obtenerPrecioMayorista(nombreProducto) {
         return 39500;
     }
 
-    // RETRO 11 PANDA Y JORDAN 11 SUELA BLANCA POR MAYOR ($50.000)
-    if (nombre.includes("retro 11 panda") || nombre.includes("jordan 11 suela blanca")) {
-        return 50000;
-    }
-
-    // JORDAN 11 SUELA CELESTE POR MAYOR ($50.000)
-    if (nombre.includes("jordan 11 suela celeste")) {
+    // TODOS LOS JORDAN 11 Y RETRO 11 PANDA POR MAYOR ($50.000)
+    if (nombre.includes("jordan 11") || nombre.includes("retro 11 panda")) {
         return 50000;
     }
 
@@ -142,13 +125,6 @@ function obtenerPrecioMayorista(nombreProducto) {
         nombre.includes("new balance 4000 negra") ||
         nombre.includes("nb 4000 negra")) {
         return 42000;
-    }
-
-    // PRECIOS DE 50.000
-    if (nombre.includes("jordan 11 suela azul") ||
-        nombre.includes("jordan 11 negra/blanca") ||
-        nombre.includes("jordan 11 negra blanca")) {
-        return 50000;
     }
 
     // PRECIOS DE 42.000

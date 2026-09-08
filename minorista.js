@@ -19,11 +19,6 @@ const PRECIOS_ESPECIFICOS = {
     "mind gris":    { unidad: 40000, mayor: 35000 },
     "mind negras":  { unidad: 40000, mayor: 35000 },
     "mind blancas": { unidad: 40000, mayor: 35000 },
-    // "tl1 negras" ya NO va acá: se sacó de este diccionario para que el
-    // precio de TL1 siga siempre al de shox automáticamente (ver la palabra
-    // "shox" más abajo en obtenerPrecioMinorista y obtenerPrecioMayorista,
-    // donde ahora también matchea "tl1"). Así, si el día de mañana cambia el
-    // precio de shox, TL1 cambia solo con eso, sin tener que tocar acá.
 };
 
 // Modelos que, aunque no tengan la palabra "ojotas" en el nombre, se
@@ -65,18 +60,8 @@ function obtenerPrecioMinorista(nombreProducto) {
         return 55000;
     }
 
-    // JORDAN 11 SUELA AZUL ($65.000 por unidad)
-    if (nombre.includes("jordan 11 suela azul")) {
-        return 65000;
-    }
-
-    // JORDAN 11 SUELA CELESTE ($65.000 por unidad)
-    if (nombre.includes("jordan 11 suela celeste")) {
-        return 65000;
-    }
-
-    // RETRO 11 PANDA Y JORDAN 11 SUELA BLANCA ($65.000 por unidad)
-    if (nombre.includes("retro 11 panda") || nombre.includes("jordan 11 suela blanca")) {
+    // TODOS LOS JORDAN 11 Y RETRO 11 PANDA ($65.000 por unidad)
+    if (nombre.includes("jordan 11") || nombre.includes("retro 11 panda")) {
         return 65000;
     }
 
@@ -98,7 +83,7 @@ function obtenerPrecioMinorista(nombreProducto) {
         nombre.includes("puma 180") || 
         nombre.includes("campus") || 
         nombre.includes("shox") || 
-        nombre.includes("tl1") ||
+        nombre.includes("tl1") || 
         nombre.includes("haylan") || 
         nombre.includes("vans haylan") ||
         nombre.includes("forum verde summer") ||
@@ -111,8 +96,6 @@ function obtenerPrecioMinorista(nombreProducto) {
         nombre.includes("jordan pink") ||
         nombre.includes("negras medias") ||
         nombre.includes("jordan 1 brillosa") || 
-        nombre.includes("jordan 11 negra/blanca") ||
-        nombre.includes("jordan 11 negra blanca") ||
         nombre.includes("exclusivas white")) {
         return 60000;
     }
@@ -166,13 +149,8 @@ function obtenerPrecioMayorista(nombreProducto) {
         return 39000;
     }
 
-    // RETRO 11 PANDA Y JORDAN 11 SUELA BLANCA POR MAYOR ($50.000)
-    if (nombre.includes("retro 11 panda") || nombre.includes("jordan 11 suela blanca")) {
-        return 50000;
-    }
-
-    // JORDAN 11 SUELA CELESTE POR MAYOR ($50.000)
-    if (nombre.includes("jordan 11 suela celeste")) {
+    // TODOS LOS JORDAN 11 Y RETRO 11 PANDA POR MAYOR ($50.000)
+    if (nombre.includes("jordan 11") || nombre.includes("retro 11 panda")) {
         return 50000;
     }
 
@@ -185,13 +163,6 @@ function obtenerPrecioMayorista(nombreProducto) {
         nombre.includes("new balance 4000") ||
         nombre.includes("nb 4000")) {
         return 42000;
-    }
-
-    // PRECIOS DE 50.000
-    if (nombre.includes("jordan 11 suela azul") ||
-        nombre.includes("jordan 11 negra/blanca") ||
-        nombre.includes("jordan 11 negra blanca")) {
-        return 50000;
     }
 
     // PRECIOS DE 42.000
