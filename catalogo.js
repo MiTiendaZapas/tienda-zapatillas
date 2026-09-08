@@ -55,7 +55,7 @@ const stock_zapatillas = [
   { modelo: 'Super star rosa', talles: [{"talle": 40, "stock": 1}], foto: 'Fotos/Super star rosa.jpeg' },
   { modelo: 'Air Jordan Pink', talles: [{"talle": 37, "stock": 2}], foto: 'Fotos/Air Jordan Pink.jpeg' },
   { modelo: 'Sb dunk cinza/preto', talles: [{"talle": 43, "stock": 1}, {"talle": 44, "stock": 2}], foto: 'Fotos/Sb dunk cinza preto.jpeg' },
-  { modelo: 'Jordan low brillo', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 5}, {"talle": 38, "stock": 5}, {"talle": 39, "stock": 3}, {"talle": 40, "stock": 2}], foto: 'Fotos/Jordan low brillo.jpeg' },
+  { modelo: 'Jordan low brillo', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 5}, {"talle": 38, "stock": 5}, {"talle": 39, "stock": 3}, {"talle": 40, "stock": 2}], foto: 'Fotos/Jordan low brillo.jpeg' },
   { modelo: 'Jordan 1 azules', talles: [{"talle": 34, "stock": 2}, {"talle": 35, "stock": 4}, {"talle": 36, "stock": 6}, {"talle": 37, "stock": 5}, {"talle": 38, "stock": 4}, {"talle": 39, "stock": 2}], foto: 'Fotos/Jordan 1 azules.jpeg' },
   { modelo: 'Mind negras', talles: [{"talle": 43, "stock": 8}, {"talle": 44, "stock": 8}], foto: 'Fotos/Mind negras.jpeg' },
   { modelo: 'ABZORB marrones', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 4}, {"talle": 36, "stock": 7}], foto: 'Fotos/ABZORB marrones.jpeg' },
