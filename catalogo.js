@@ -68,7 +68,7 @@ const stock_zapatillas = [
   { modelo: 'Vans Haylan azul', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 4}, {"talle": 38, "stock": 1}, {"talle": 39, "stock": 4}, {"talle": 40, "stock": 1}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Vans Haylan azul.jpeg' },
   { modelo: 'Air forcé stussy', talles: [{"talle": 40, "stock": 1}, {"talle": 44, "stock": 1}], foto: 'Fotos/Air forcé stussy.jpeg' },
   { modelo: 'Mind blancas', talles: [{"talle": 41, "stock": 6}, {"talle": 42, "stock": 6}, {"talle": 43, "stock": 4}, {"talle": 44, "stock": 4}], foto: 'Fotos/Mind blancas.jpeg' },
-  { modelo: 'Shox gris', talles: [{"talle": 39, "stock": 1}, {"talle": 40, "stock": 1}, {"talle": 41, "stock": 1}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 2}], foto: 'Fotos/Shox gris.jpeg' },
+  { modelo: 'Shox gris', talles: [{"talle": 39, "stock": 1}, {"talle": 41, "stock": 1}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 2}], foto: 'Fotos/Shox gris.jpeg' },
   { modelo: 'Shox tapón rosa', talles: [{"talle": 39, "stock": 1}, {"talle": 40, "stock": 2}], foto: 'Fotos/Shox tapón rosa.jpeg' },
   { modelo: 'Air Jordan black', talles: [{"talle": 39, "stock": 1}, {"talle": 43, "stock": 1}], foto: 'Fotos/Air Jordan black.jpeg' },
   { modelo: 'Jordan 1 charol roja', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 2}], foto: 'Fotos/Jordan 1 charol roja.jpeg' },
