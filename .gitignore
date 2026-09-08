@@ -9,7 +9,9 @@
 #   git add -f automatizacion/piloto_automatico.py automatizacion/bot_whatsapp.py
 # ============================================================
 automatizacion/
-
+sesion_wsp/
+automatizacion/sesion_wsp/
+automatizacion/
 # ============================================================
 # Python
 # ============================================================
