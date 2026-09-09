@@ -143,5 +143,8 @@ const stock_zapatillas = [
   { modelo: 'Vans Haylan tira gris', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 1}], foto: 'Fotos/Vans Haylan tira gris.jpeg' },
   { modelo: 'Jordan retro 4 gris', talles: [{"talle": 36, "stock": 2}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 1}], foto: 'Fotos/Jordan retro 4 gris.jpeg' },
   { modelo: 'Jordan retro 4 doraudo', talles: [{"talle": 35, "stock": 2}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 2}, {"talle": 39, "stock": 1}], foto: 'Fotos/Jordan retro 4 doraudo.jpeg' },
+  { modelo: 'Mind rojas', talles: [{"talle": 39, "stock": 3}, {"talle": 40, "stock": 3}, {"talle": 41, "stock": 12}, {"talle": 42, "stock": 12}, {"talle": 43, "stock": 8}, {"talle": 44, "stock": 8}], foto: 'Fotos/Mind rojas.jpeg' },
+  { modelo: 'Jordan 1 preto verniz', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 1}], foto: 'Fotos/Jordan 1 preto verniz.jpeg' },
+  { modelo: 'Jordan retro 4 black costura', talles: [{"talle": 38, "stock": 1}, {"talle": 39, "stock": 1}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 2}, {"talle": 42, "stock": 1}], foto: 'Fotos/Jordan retro 4 black costura.jpeg' },
   { modelo: 'Air forcé glister rosa', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 1}], foto: 'Fotos/Air forcé glister rosa.jpeg' },
 ];
