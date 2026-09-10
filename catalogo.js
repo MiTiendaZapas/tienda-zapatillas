@@ -48,7 +48,7 @@ const stock_zapatillas = [
   { modelo: 'Vans Haylan beige', talles: [{"talle": 40, "stock": 1}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 3}], foto: 'Fotos/Vans Haylan beige.jpeg' },
   { modelo: 'Vans HAYLAN celestes', talles: [{"talle": 36, "stock": 2}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 2}], foto: 'Fotos/Vans HAYLAN celestes.jpeg' },
   { modelo: 'New balance 9060 suela gris', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 3}, {"talle": 36, "stock": 4}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 1}], foto: 'Fotos/New balance 9060 suela gris.jpeg' },
-  { modelo: 'Jordan retro 4 GREEN', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 1}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 2}], foto: 'Fotos/Jordan retro 4 GREEN.jpeg' },
+  { modelo: 'Jordan retro 4 GREEN', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 1}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 1}], foto: 'Fotos/Jordan retro 4 GREEN.jpeg' },
   { modelo: 'Mind negras', talles: [{"talle": 39, "stock": 11}, {"talle": 40, "stock": 11}, {"talle": 41, "stock": 55}, {"talle": 42, "stock": 55}, {"talle": 43, "stock": 40}, {"talle": 44, "stock": 40}], foto: 'Fotos/Mind negras.jpeg' },
   { modelo: 'New balance ABZORB BEGE', talles: [{"talle": 34, "stock": 3}, {"talle": 35, "stock": 1}], foto: 'Fotos/New balance ABZORB BEGE.jpeg' },
   { modelo: 'Jordan 1 café flamingo', talles: [{"talle": 40, "stock": 1}], foto: 'Fotos/Jordan 1 café flamingo.jpeg' },
