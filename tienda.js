@@ -15,23 +15,32 @@ let carrito = [];
 // un poco cada vez, no uses este diccionario: agregá una regla de palabras
 // combinadas más abajo, como la de "NB 9060 nuevas brillo" (9060 + brillo).
 const PRECIOS_ESPECIFICOS = {
-    "mind beige":   { unidad: 37000, mayor: 35000 },
-    "mind gris":    { unidad: 37000, mayor: 35000 },
-    "mind negras":  { unidad: 37000, mayor: 35000 },
-    "mind blancas": { unidad: 37000, mayor: 35000 },
+    // Productos con nombre fijo y precio propio que NO siguen ningún patrón
+    // general van acá (nombre exacto, comparación completa).
 };
 
-// Modelos que, aunque no tengan la palabra "ojotas" en el nombre, se
-// venden y se muestran como ojotas (talles bi-numerales tipo 39/40, 41/42).
-const MODELOS_OJOTAS_BINUMERAL = ["mind beige", "mind gris", "mind negras", "mind blancas"];
+// Precio de TODA la línea "Mind" (ojotas). Cualquier producto cuyo nombre
+// EMPIECE con "mind " (Mind beige, Mind rojas, Mind lo-que-sea) usa este
+// precio automáticamente, sin tener que agregar nada a mano acá.
+const PRECIO_MIND = { unidad: 37000, mayor: 35000 };
+
+// "empieza con" (no .includes) para que "Nike mind gris" -que NO empieza
+// con "mind"- nunca entre acá ni se confunda con la línea de ojotas.
+function esModeloMind(nombreLower) {
+    return nombreLower.startsWith("mind ");
+}
 
 function esModeloOjota(modelo) {
     const m = modelo.toLowerCase().trim();
-    return m.includes("ojotas") || MODELOS_OJOTAS_BINUMERAL.includes(m);
+    return m.includes("ojotas") || esModeloMind(m);
 }
 
 function obtenerPrecioMinorista(nombreProducto) {
     const nombre = nombreProducto.toLowerCase().trim();
+
+    if (esModeloMind(nombre)) {
+        return PRECIO_MIND.unidad;
+    }
 
     if (PRECIOS_ESPECIFICOS[nombre]) {
         return PRECIOS_ESPECIFICOS[nombre].unidad;
@@ -82,6 +91,10 @@ function obtenerPrecioMinorista(nombreProducto) {
 
 function obtenerPrecioMayorista(nombreProducto) {
     const nombre = nombreProducto.toLowerCase().trim();
+
+    if (esModeloMind(nombre)) {
+        return PRECIO_MIND.mayor;
+    }
 
     if (PRECIOS_ESPECIFICOS[nombre]) {
         return PRECIOS_ESPECIFICOS[nombre].mayor;
