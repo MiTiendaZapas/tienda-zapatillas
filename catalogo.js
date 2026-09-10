@@ -28,7 +28,7 @@ const stock_zapatillas = [
   { modelo: 'Shox black', talles: [{"talle": 41, "stock": 6}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 3}], foto: 'Fotos/Shox black.jpeg' },
   { modelo: 'Dunk total black', talles: [{"talle": 43, "stock": 1}], foto: 'Fotos/Dunk total black.jpeg' },
   { modelo: 'Ojotas Louis Vuitton negras', talles: [{"talle": 39, "stock": 4}, {"talle": 40, "stock": 4}, {"talle": 41, "stock": 6}, {"talle": 42, "stock": 6}], foto: 'Fotos/Ojotas Louis Vuitton negras.jpeg' },
-  { modelo: 'Dunk glistter celeste', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 40, "stock": 1}], foto: 'Fotos/Dunk glistter celeste.jpeg' },
+  { modelo: 'Dunk glistter celeste', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}], foto: 'Fotos/Dunk glistter celeste.jpeg' },
   { modelo: 'NB 530 blanca/negro', talles: [{"talle": 34, "stock": 1}, {"talle": 37, "stock": 7}, {"talle": 38, "stock": 3}], foto: 'Fotos/NB 530 blanca negro.jpeg' },
   { modelo: 'Vans Haylan 01', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Vans Haylan 01.jpeg' },
   { modelo: 'Dunk celeste', talles: [{"talle": 36, "stock": 1}, {"talle": 37, "stock": 4}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 1}], foto: 'Fotos/Dunk celeste.jpeg' },
