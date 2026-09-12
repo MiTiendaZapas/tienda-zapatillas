@@ -133,7 +133,7 @@ const stock_zapatillas = [
   { modelo: 'Sb Dunk VINO', talles: [{"talle": 39, "stock": 1}, {"talle": 40, "stock": 1}, {"talle": 42, "stock": 2}], foto: 'Fotos/Sb Dunk VINO.jpeg' },
   { modelo: 'Nb 530 grafite', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 1}], foto: 'Fotos/Nb 530 grafite.jpeg' },
   { modelo: 'Jordan retro 4 doraudo', talles: [{"talle": 35, "stock": 2}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 1}, {"talle": 39, "stock": 1}], foto: 'Fotos/Jordan retro 4 doraudo.jpeg' },
-  { modelo: 'TL1 blancas', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 1}], foto: 'Fotos/TL1 blancas.jpeg' },
+  { modelo: 'TL1 blancas', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 1}], foto: 'Fotos/TL1 blancas.jpeg' },
   { modelo: 'Air forcé blanca brillo', talles: [{"talle": 35, "stock": 2}, {"talle": 36, "stock": 4}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 5}, {"talle": 39, "stock": 3}, {"talle": 40, "stock": 2}], foto: 'Fotos/Air forcé blanca brillo.jpeg' },
   { modelo: 'Jordan retro 4 caramelo', talles: [{"talle": 39, "stock": 1}, {"talle": 40, "stock": 1}, {"talle": 41, "stock": 2}, {"talle": 42, "stock": 3}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Jordan retro 4 caramelo.jpeg' },
   { modelo: 'Jordan retro 4 black/dorado', talles: [{"talle": 38, "stock": 1}, {"talle": 40, "stock": 3}, {"talle": 41, "stock": 2}, {"talle": 42, "stock": 1}], foto: 'Fotos/Jordan retro 4 black dorado.jpeg' },
