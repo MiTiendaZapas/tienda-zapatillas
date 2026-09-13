@@ -137,7 +137,7 @@ const stock_zapatillas = [
   { modelo: 'Jordan retro 4 black/dorado', talles: [{"talle": 38, "stock": 1}, {"talle": 40, "stock": 3}, {"talle": 41, "stock": 2}, {"talle": 42, "stock": 1}], foto: 'Fotos/Jordan retro 4 black dorado.jpeg' },
   { modelo: 'Jordan 1 preto verniz', talles: [{"talle": 35, "stock": 2}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 1}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 1}], foto: 'Fotos/Jordan 1 preto verniz.jpeg' },
   { modelo: 'Vans Haylan tira gris', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 1}], foto: 'Fotos/Vans Haylan tira gris.jpeg' },
-  { modelo: 'Air forcé tela rosa', talles: [{"talle": 34, "stock": 3}, {"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 2}, {"talle": 40, "stock": 1}], foto: 'Fotos/Air forcé tela rosa.jpeg' },
+  { modelo: 'Air forcé tela rosa', talles: [{"talle": 34, "stock": 3}, {"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 2}], foto: 'Fotos/Air forcé tela rosa.jpeg' },
   { modelo: 'Jordan 1 beige tornasol', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 2}], foto: 'Fotos/Jordan 1 beige tornasol.jpeg' },
   { modelo: 'Jordan 1 bordo/rosa', talles: [{"talle": 35, "stock": 2}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 1}], foto: 'Fotos/Jordan 1 bordo rosa.jpeg' },
   { modelo: 'NB celeste 9060', talles: [{"talle": 35, "stock": 1}], foto: 'Fotos/NB celeste 9060.jpeg' },
