@@ -424,7 +424,7 @@ function cargarProductos() {
 
             let precioMayorista = obtenerPrecioMayorista(producto.modelo);
 
-            textoMayoristaHtml = `<div style="font-size: 12px; color: #28a745; margin-bottom: 6px; font-weight: bold;">Llevando 5 o más: $${precioMayorista.toLocaleString('es-AR')}</div>`;
+            textoMayoristaHtml = `<div style="font-size: 12px; color: #28a745; margin-bottom: 6px; font-weight: bold;">Llevando 5 o más pares surtidos: $${precioMayorista.toLocaleString('es-AR')}</div>`;
 
         }
 
