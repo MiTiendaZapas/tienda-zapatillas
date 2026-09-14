@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo Minorista</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Minorista/Mayorista</title>
+    <link rel="stylesheet" href="../style.css">
 </head>
 <body>
 
     <header>
-        <h1>Mi Tienda Zapas - Minorista</h1>
+        <h1>Mi Tienda Zapas - Minorista/Mayorista</h1>
         <button class="carrito-btn" onclick="abrirCarrito()">
             🛒 <span class="badge" id="contador-carrito">0</span>
         </button>
@@ -51,22 +51,17 @@
         document.write('<script src="catalogo.js?v=' + Math.random() + '"><\/script>');
     </script>
 
-    <!-- 4. Función que fusiona talles cuando el mismo modelo aparece repetido
-         entre tienda del proveedor y stock manual (anti-caché) -->
+    <!-- 4. Unimos: indumentaria, zapatillas manuales, zapatillas del bot -->
     <script>
-        document.write('<script src="mezclar_stock.js?v=' + Math.random() + '"><\/script>');
-    </script>
-
-    <!-- 5. Unimos: indumentaria, zapatillas manuales, zapatillas del bot,
-         y fusionamos los talles de los modelos que se repiten -->
-    <script>
-        const stock_actualizado = mezclarStockPorModelo([
+        const stock_actualizado = [
             ...stock_indumentaria,
             ...(typeof stock_zapatillas_manual !== 'undefined' ? stock_zapatillas_manual : []),
             ...(typeof stock_zapatillas !== 'undefined' ? stock_zapatillas : [])
-        ]);
+        ];
     </script>
 
-    <script src="minorista.js"></script>
+    <script>
+        document.write('<script src="minorista.js?v=' + Math.random() + '"><\/script>');
+    </script>
 </body>
 </html>

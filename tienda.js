@@ -241,7 +241,7 @@ function cargarProductos() {
             textoMayoristaHtml = `<div style="font-size: 12px; color: #28a745; margin-bottom: 6px; font-weight: bold;">Llevando 10 o más: $${precioMayInd.toLocaleString('es-AR')}</div>`;
         } else {
             let precioMayorista = obtenerPrecioMayorista(producto.modelo);
-            textoMayoristaHtml = `<div style="font-size: 12px; color: #28a745; margin-bottom: 6px; font-weight: bold;">Llevando 5 o más: $${precioMayorista.toLocaleString('es-AR')}</div>`;
+            textoMayoristaHtml = `<div style="font-size: 12px; color: #28a745; margin-bottom: 6px; font-weight: bold;">Llevando 5 o más pares surtidos: $${precioMayorista.toLocaleString('es-AR')}</div>`;
         }
 
         grid.innerHTML += `
@@ -480,7 +480,7 @@ function actualizarCarrito() {
         footerOpciones.innerHTML = `
             <div class="opcion-compra mayorista">
                 <div class="detalle-opcion">
-                    <strong>Comprando por mayor (5 pares o más)</strong>
+                    <strong>Comprando por mayor (5 pares o más surtidos)</strong>
                     <span class="precio-final">$${totalMayor.toLocaleString('es-AR')}</span>
                     <span class="aviso-cambio">Sin cambio de talle</span>
                 </div>
@@ -564,7 +564,7 @@ function enviarPedido(modoElegido) {
 
     if (calificaMayorista) {
         if (usarMayorista) {
-            mensaje += `%0ACompra por MAYOR (5 pares o más): SIN cambio de talle.%0A`;
+            mensaje += `%0ACompra por MAYOR (5 pares o más surtidos): SIN cambio de talle.%0A`;
         } else {
             mensaje += `%0ACompra por UNIDAD: CON posibilidad de cambio de talle.%0A`;
         }
