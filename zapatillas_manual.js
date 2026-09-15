@@ -2,6 +2,7 @@
 // nunca escribe ni pisa este archivo). Editado desde el Panel Admin.
 
 const stock_zapatillas_manual = [
+    { modelo: 'Adidas nizza', talles: [{"talle": 40, "stock": 1}], foto: 'Fotos/Adidas nizza.jpeg' },
     { modelo: 'Adidas supernova', talles: [{"talle": 35, "stock": 1}, {"talle": 39, "stock": 1}], foto: 'Fotos/Adidas supernova.jpeg' },
     { modelo: 'Botines total 90', talles: [{"talle": 39, "stock": 1}, {"talle": 40, "stock": 1}], foto: 'Fotos/Botines total 90.jpeg' },
     { modelo: 'Jordan 1 botitas charol negra', talles: [{"talle": 36, "stock": 2}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 1}], foto: 'Fotos/Jordan 1 botitas charol negra.jpeg' },
