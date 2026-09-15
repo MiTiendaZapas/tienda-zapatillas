@@ -60,7 +60,7 @@ const stock_zapatillas = [
   { modelo: 'Jordan 1 azules', talles: [{"talle": 35, "stock": 2}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 4}], foto: 'Fotos/Jordan 1 azules.jpeg' },
   { modelo: 'Air Jordan pipa gris', talles: [{"talle": 40, "stock": 3}, {"talle": 41, "stock": 4}, {"talle": 42, "stock": 1}, {"talle": 43, "stock": 1}], foto: 'Fotos/Air Jordan pipa gris.jpeg' },
   { modelo: 'Sb dunk cinza/preto', talles: [{"talle": 44, "stock": 1}], foto: 'Fotos/Sb dunk cinza preto.jpeg' },
-  { modelo: 'Shox tapón rojo', talles: [{"talle": 40, "stock": 3}, {"talle": 41, "stock": 6}, {"talle": 42, "stock": 5}, {"talle": 44, "stock": 1}], foto: 'Fotos/Shox tapón rojo.jpeg' },
+  { modelo: 'Shox tapón rojo', talles: [{"talle": 40, "stock": 2}, {"talle": 41, "stock": 6}, {"talle": 42, "stock": 5}, {"talle": 44, "stock": 1}], foto: 'Fotos/Shox tapón rojo.jpeg' },
   { modelo: 'ABZORB marrones', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 3}, {"talle": 36, "stock": 6}], foto: 'Fotos/ABZORB marrones.jpeg' },
   { modelo: 'Vans Haylan azul', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 4}, {"talle": 38, "stock": 1}, {"talle": 39, "stock": 2}, {"talle": 42, "stock": 1}], foto: 'Fotos/Vans Haylan azul.jpeg' },
   { modelo: 'Air Jordan black', talles: [{"talle": 38, "stock": 1}, {"talle": 39, "stock": 4}, {"talle": 40, "stock": 4}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 4}], foto: 'Fotos/Air Jordan black.jpeg' },
