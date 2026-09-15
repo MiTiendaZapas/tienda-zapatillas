@@ -51,7 +51,7 @@ const stock_zapatillas = [
   { modelo: 'New balance 9060 suela gris', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 4}, {"talle": 37, "stock": 3}, {"talle": 39, "stock": 1}], foto: 'Fotos/New balance 9060 suela gris.jpeg' },
   { modelo: 'Mind beige', talles: [{"talle": 39, "stock": 4}, {"talle": 40, "stock": 4}, {"talle": 41, "stock": 54}, {"talle": 42, "stock": 54}, {"talle": 43, "stock": 45}, {"talle": 44, "stock": 45}], foto: 'Fotos/Mind beige.jpeg' },
   { modelo: 'Jordan retro 4 GREEN', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 38, "stock": 1}], foto: 'Fotos/Jordan retro 4 GREEN.jpeg' },
-  { modelo: 'Air Jordan Pink', talles: [{"talle": 38, "stock": 3}, {"talle": 39, "stock": 3}], foto: 'Fotos/Air Jordan Pink.jpeg' },
+  { modelo: 'Air Jordan Pink', talles: [{"talle": 38, "stock": 2}, {"talle": 39, "stock": 3}], foto: 'Fotos/Air Jordan Pink.jpeg' },
   { modelo: 'Jordan low VERNIZ /AZUL', talles: [{"talle": 34, "stock": 3}, {"talle": 35, "stock": 5}, {"talle": 36, "stock": 6}, {"talle": 37, "stock": 7}, {"talle": 38, "stock": 5}, {"talle": 41, "stock": 1}], foto: 'Fotos/Jordan low VERNIZ AZUL.jpeg' },
   { modelo: 'New balance ABZORB BEGE', talles: [{"talle": 34, "stock": 3}], foto: 'Fotos/New balance ABZORB BEGE.jpeg' },
   { modelo: 'Súper star brillo', talles: [{"talle": 37, "stock": 2}, {"talle": 39, "stock": 5}, {"talle": 40, "stock": 6}, {"talle": 41, "stock": 3}], foto: 'Fotos/Súper star brillo.jpeg' },
