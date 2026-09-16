@@ -7,6 +7,19 @@ import json
 import subprocess
 from playwright.sync_api import sync_playwright
 
+# --- FIJA LA CARPETA DE TRABAJO A LA RAÍZ DEL REPO ---
+# Este script vive en automatizacion/, que está en .gitignore. Pero
+# catalogo.js, indumentaria.js y Fotos/ tienen que quedar en la RAÍZ del
+# repo (un nivel arriba), que es donde los lee index.html/minorista.html
+# y donde SÍ los trackea git. Por eso subimos un nivel antes de arrancar,
+# sin importar desde dónde ejecutes este archivo.
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+os.chdir(REPO_ROOT)
+print(f"[DEBUG] Este script está en: {os.path.abspath(__file__)}")
+print(f"[DEBUG] REPO_ROOT calculado: {REPO_ROOT}")
+print(f"[DEBUG] Carpeta de trabajo actual: {os.getcwd()}")
+print(f"[DEBUG] ¿Existe .git acá?: {os.path.isdir(os.path.join(REPO_ROOT, '.git'))}")
+
 # --- CONFIGURACIÓN ---
 URL_LISTADO = "https://vestitepiola.mitiendanube.com/productos/?order=best-selling"
 CARPETA_FOTOS = "Fotos"
@@ -32,7 +45,7 @@ def limpiar_nombre_archivo(nombre):
 def cargar_listado_completo(page):
     estable = 0
     anterior = -1
-    
+
     for _ in range(MAX_SCROLLS):
         page.evaluate("window.scrollTo(0, document.body.scrollHeight);")
         page.wait_for_timeout(1000)
@@ -44,19 +57,19 @@ def cargar_listado_completo(page):
                 try:
                     page.evaluate("window.scrollBy(0, -150);")
                     boton.first.click(timeout=3000)
-                    page.wait_for_timeout(2500) 
+                    page.wait_for_timeout(2500)
                 except:
                     pass
-        
+
         actual = page.locator('.js-item-product, .product-container').count()
-        
+
         if actual == anterior:
             estable += 1
-            if estable >= ESTABLE_LIMITE: 
+            if estable >= ESTABLE_LIMITE:
                 break
         else:
             estable = 0
-            
+
         anterior = actual
 
 def extraer_productos(page):
@@ -73,7 +86,7 @@ def extraer_productos(page):
                 continue
             href = link.get_attribute("href")
             nombre = link.get_attribute("title") or link.inner_text().strip()
-            
+
             if not href or not nombre or href in vistos:
                 continue
 
@@ -87,7 +100,7 @@ def extraer_productos(page):
             texto_tarjeta = tarjeta.inner_text().lower()
             if "sin stock" in texto_tarjeta or "agotado" in texto_tarjeta:
                 continue
-                
+
             vistos.add(href)
             productos.append((nombre, href))
         except:
@@ -97,7 +110,7 @@ def extraer_productos(page):
 def talles_disponibles_en_producto(page, url):
     page.goto(url, wait_until="networkidle", timeout=TIMEOUT_PRODUCTO_MS)
     disponibles = {}
-    
+
     try:
         variantes_json = page.evaluate("""() => {
             if (window.LS && window.LS.variants) {
@@ -105,20 +118,20 @@ def talles_disponibles_en_producto(page, url):
             }
             return null;
         }""")
-        
+
         if variantes_json:
             variants = json.loads(variantes_json)
             for v in variants:
                 stock_val = v.get('stock')
                 cant = 0
-                
+
                 if isinstance(stock_val, int) and stock_val > 0:
                     cant = stock_val
                 elif isinstance(stock_val, str) and stock_val.isdigit():
                     cant = int(stock_val)
                 elif stock_val is True:
                     cant = 99
-                    
+
                 if cant > 0:
                     for opt in ['option0', 'option1', 'option2']:
                         val = v.get(opt)
@@ -128,12 +141,12 @@ def talles_disponibles_en_producto(page, url):
                                 num_int = int(num)
                                 if 15 <= num_int <= 50:
                                     disponibles[num_int] = max(disponibles.get(num_int, 0), cant)
-            
+
             if disponibles:
                 return [{"talle": k, "stock": v} for k, v in sorted(disponibles.items())]
     except Exception as e:
         pass
-    
+
     try:
         opciones = page.locator('select option')
         if opciones.count() > 0:
@@ -149,17 +162,17 @@ def talles_disponibles_en_producto(page, url):
                         disponibles[num_int] = 99
     except:
         pass
-    
+
     return [{"talle": k, "stock": v} for k, v in sorted(disponibles.items())]
 
 def rutina_actualizacion():
     print("\n--- INICIANDO ESCANEO DE STOCK (ZAPATILLAS) ---")
     productos_finales = []
-    
+
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
-        
+
         print(f"Abriendo {URL_LISTADO} ...")
         page.goto(URL_LISTADO, wait_until="networkidle")
         try:
@@ -169,7 +182,7 @@ def rutina_actualizacion():
 
         print("Cargando catálogo completo...")
         cargar_listado_completo(page)
-        
+
         productos_detectados = extraer_productos(page)
         print(f"Modelos con posible stock detectados: {len(productos_detectados)}")
 
@@ -178,7 +191,7 @@ def rutina_actualizacion():
                 talles_datos = talles_disponibles_en_producto(page, url)
                 if not talles_datos:
                     continue
-                
+
                 nombre_archivo = limpiar_nombre_archivo(nombre)
                 ruta_foto_final = ""
                 for ext in ['.jpg', '.jpeg', '.png', '.webp']:
@@ -186,7 +199,7 @@ def rutina_actualizacion():
                     if os.path.exists(ruta_prueba):
                         ruta_foto_final = f"Fotos/{nombre_archivo}{ext}"
                         break
-                
+
                 if ruta_foto_final:
                     productos_finales.append({
                         "modelo": nombre,
@@ -195,7 +208,7 @@ def rutina_actualizacion():
                     })
             except:
                 continue
-                
+
         browser.close()
 
     # Guarda únicamente las zapatillas como stock_zapatillas en catalogo.js
@@ -223,16 +236,16 @@ def rutina_actualizacion():
             # Sube fotos nuevas o modificadas que hayas agregado a mano
             archivos_a_subir.append(CARPETA_FOTOS)
 
-        subprocess.run(["git", "add"] + archivos_a_subir, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(["git", "add"] + archivos_a_subir, check=True)
 
         resultado_commit = subprocess.run(["git", "commit", "-m", f"Stock actualizado (zapatillas + indumentaria) a las {hora_subida}"], capture_output=True, text=True)
-        
+
         if "nothing to commit" not in resultado_commit.stdout:
             subprocess.run(["git", "push", "origin", "main"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             print(f"[{hora_subida}] 🔄 HUBO CAMBIOS: Se actualizó la web (zapatillas y/o indumentaria).")
         else:
             print(f"[{hora_subida}] ⏸️ NO HUBO CAMBIOS: El stock sigue igual.")
-            
+
     except Exception as e:
         print(f"⚠️ Error al verificar o subir a GitHub: {e}")
 
@@ -243,7 +256,7 @@ def main():
             rutina_actualizacion()
         except Exception as e:
             print(f"\n❌ Hubo un error inesperado: {e}")
-        
+
         minutos_espera = random.uniform(14, 18)
         print(f"\n[{time.strftime('%H:%M:%S')}] Durmiendo... Próximo escaneo en {minutos_espera:.1f} minutos.\n")
         time.sleep(int(minutos_espera * 60))
