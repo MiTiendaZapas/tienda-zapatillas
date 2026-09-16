@@ -9,6 +9,16 @@ from PIL import Image
 import win32clipboard
 from playwright.sync_api import sync_playwright
 
+# --- FIJA LA CARPETA DE TRABAJO A LA RAÍZ DEL REPO ---
+# Este script vive en automatizacion/, que está en .gitignore. Pero Fotos/ y
+# zapatillas_manual.js están un nivel arriba, en la raíz del repo. Por eso
+# subimos un nivel antes de arrancar, sin importar desde dónde lo ejecutes.
+# La sesión de WhatsApp (sesion_wsp/) queda guardada dentro de automatizacion/
+# para no mezclarla con los archivos que sí sube git.
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT = os.path.dirname(SCRIPT_DIR)
+os.chdir(REPO_ROOT)
+
 # --- CONFIGURACIÓN GENERAL ---
 URL_LISTADO = "https://vestitepiola.mitiendanube.com/productos/?order=best-selling"
 ARCHIVO_SALIDA = "stock_proveedor.txt"
@@ -442,8 +452,8 @@ def main():
     print("\n--- FASE 2: ENVIANDO POR WHATSAPP ---")
     with sync_playwright() as p:
         browser = p.chromium.launch_persistent_context(
-            user_data_dir="./sesion_wsp",
-            headless=False 
+            user_data_dir=os.path.join(SCRIPT_DIR, "sesion_wsp"),
+            headless=False
         )
         page = browser.new_page()
         
