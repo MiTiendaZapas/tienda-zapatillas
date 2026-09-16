@@ -39,7 +39,7 @@ const stock_zapatillas = [
   { modelo: 'Adidas forum salmon', talles: [{"talle": 36, "stock": 1}], foto: 'Fotos/Adidas forum salmon.jpeg' },
   { modelo: 'Ojotas total black', talles: [{"talle": 37, "stock": 30}, {"talle": 38, "stock": 30}, {"talle": 39, "stock": 93}, {"talle": 40, "stock": 93}, {"talle": 41, "stock": 73}, {"talle": 42, "stock": 73}, {"talle": 43, "stock": 26}, {"talle": 44, "stock": 26}], foto: 'Fotos/Ojotas total black.jpeg' },
   { modelo: 'Dunk glitter rosa', talles: [{"talle": 38, "stock": 1}, {"talle": 40, "stock": 1}], foto: 'Fotos/Dunk glitter rosa.jpeg' },
-  { modelo: 'Jordan low 1 DIAMOND', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 9}, {"talle": 38, "stock": 4}, {"talle": 39, "stock": 3}, {"talle": 40, "stock": 2}], foto: 'Fotos/Jordan low 1 DIAMOND.jpeg' },
+  { modelo: 'Jordan low 1 DIAMOND', talles: [{"talle": 36, "stock": 2}, {"talle": 37, "stock": 9}, {"talle": 38, "stock": 4}, {"talle": 39, "stock": 3}, {"talle": 40, "stock": 2}], foto: 'Fotos/Jordan low 1 DIAMOND.jpeg' },
   { modelo: 'Sb dunk pipa negra', talles: [{"talle": 39, "stock": 1}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 4}, {"talle": 44, "stock": 1}], foto: 'Fotos/Sb dunk pipa negra.jpeg' },
   { modelo: 'Air force 1 blanca /pipa gris', talles: [{"talle": 42, "stock": 1}, {"talle": 43, "stock": 1}, {"talle": 44, "stock": 1}], foto: 'Fotos/Air force 1 blanca pipa gris.jpeg' },
   { modelo: 'Mind negras', talles: [{"talle": 41, "stock": 29}, {"talle": 42, "stock": 29}, {"talle": 43, "stock": 24}, {"talle": 44, "stock": 24}], foto: 'Fotos/Mind negras.jpeg' },
