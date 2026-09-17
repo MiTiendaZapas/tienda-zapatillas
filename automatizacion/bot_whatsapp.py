@@ -14,6 +14,28 @@ from playwright.sync_api import sync_playwright
 sys.stdout.reconfigure(encoding="utf-8")
 sys.stderr.reconfigure(encoding="utf-8")
 
+def _deshabilitar_quickedit_windows():
+    # En Windows, un clic o una selección de texto en la ventana de la consola
+    # activa "QuickEdit Mode" y pausa el proceso hasta que apretás Enter o Esc.
+    # Lo desactivamos al arrancar para que no se confunda con un cuelgue real.
+    if os.name != "nt":
+        return
+    try:
+        import ctypes
+        kernel32 = ctypes.windll.kernel32
+        STD_INPUT_HANDLE = -10
+        ENABLE_EXTENDED_FLAGS = 0x0080
+        ENABLE_QUICK_EDIT_MODE = 0x0040
+        handle = kernel32.GetStdHandle(STD_INPUT_HANDLE)
+        modo = ctypes.c_uint32()
+        if kernel32.GetConsoleMode(handle, ctypes.byref(modo)):
+            nuevo_modo = (modo.value & ~ENABLE_QUICK_EDIT_MODE) | ENABLE_EXTENDED_FLAGS
+            kernel32.SetConsoleMode(handle, nuevo_modo)
+    except Exception:
+        pass
+
+_deshabilitar_quickedit_windows()
+
 # --- FIJA LA CARPETA DE TRABAJO A LA RAÍZ DEL REPO ---
 # Este script vive en automatizacion/, que está en .gitignore. Pero Fotos/ y
 # zapatillas_manual.js están un nivel arriba, en la raíz del repo. Por eso
