@@ -251,9 +251,19 @@ def rutina_actualizacion():
     # Sube catalogo.js (zapatillas, generado acá) Y también indumentaria.js
     # (que vos editás a mano), para que ninguno de los dos quede desactualizado
     # en la web publicada.
+    #
+    # Orden importante: primero committeamos el escaneo local y RECIÉN
+    # DESPUÉS hacemos pull. Si se hiciera al revés (pull con catalogo.js
+    # modificado y sin commitear todavía), un choque con otra máquina que
+    # haya pusheado en el medio (por ej. si alguna vez queda prendido el
+    # piloto en otra PC a la vez) puede mezclar el pull con cambios sueltos
+    # de forma más frágil. Pulleando sobre un working tree limpio, un
+    # conflicto real en catalogo.js lo resuelve solo el merge driver "ours"
+    # configurado en .gitattributes (se queda con la versión local, que es
+    # siempre la más fresca porque se regenera de cero en cada escaneo) en
+    # vez de dejar marcas de conflicto pegadas en el archivo que lee la web.
     try:
         hora_subida = time.strftime('%H:%M:%S')
-        subprocess.run(["git", "pull", "origin", "main"], check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
         archivos_a_subir = [ARCHIVO_JS]
         if os.path.exists(ARCHIVO_INDUMENTARIA):
@@ -269,6 +279,7 @@ def rutina_actualizacion():
         resultado_commit = subprocess.run(["git", "commit", "-m", f"Stock actualizado (zapatillas + indumentaria) a las {hora_subida}"], capture_output=True, text=True)
 
         if "nothing to commit" not in resultado_commit.stdout:
+            subprocess.run(["git", "pull", "origin", "main", "--no-edit"], check=True)
             subprocess.run(["git", "push", "origin", "main"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             print(f"[{hora_subida}] 🔄 HUBO CAMBIOS: Se actualizó la web (zapatillas y/o indumentaria).")
         else:
