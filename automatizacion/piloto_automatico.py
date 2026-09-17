@@ -296,7 +296,10 @@ def main():
         except Exception as e:
             print(f"\n❌ Hubo un error inesperado: {e}")
 
-        minutos_espera = random.uniform(14, 18)
+        # El escaneo en sí (recorrer todos los productos) suma en promedio
+        # 5-7 min más aparte de esta espera. Este rango apunta a que el ciclo
+        # completo (escaneo + espera) quede entre 15 y 20 minutos.
+        minutos_espera = random.uniform(9, 13)
         print(f"\n[{time.strftime('%H:%M:%S')}] Durmiendo... Próximo escaneo en {minutos_espera:.1f} minutos.\n")
         time.sleep(int(minutos_espera * 60))
 
