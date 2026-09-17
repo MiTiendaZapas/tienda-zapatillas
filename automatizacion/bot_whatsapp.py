@@ -9,6 +9,11 @@ from PIL import Image
 import win32clipboard
 from playwright.sync_api import sync_playwright
 
+# Fuerza UTF-8 en la salida: en Windows la consola suele usar cp1252, que no
+# sabe representar los emojis de los prints de abajo y hace crashear el script.
+sys.stdout.reconfigure(encoding="utf-8")
+sys.stderr.reconfigure(encoding="utf-8")
+
 # --- FIJA LA CARPETA DE TRABAJO A LA RAÍZ DEL REPO ---
 # Este script vive en automatizacion/, que está en .gitignore. Pero Fotos/ y
 # zapatillas_manual.js están un nivel arriba, en la raíz del repo. Por eso
