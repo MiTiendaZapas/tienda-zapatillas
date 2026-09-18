@@ -54,7 +54,7 @@ const stock_zapatillas = [
   { modelo: 'Jordan retro 4 GREEN', talles: [{"talle": 34, "stock": 1}], foto: 'Fotos/Jordan retro 4 GREEN.jpeg' },
   { modelo: 'Air Jordan Pink', talles: [{"talle": 38, "stock": 1}, {"talle": 39, "stock": 3}], foto: 'Fotos/Air Jordan Pink.jpeg' },
   { modelo: 'Mind blancas', talles: [{"talle": 39, "stock": 9}, {"talle": 40, "stock": 9}, {"talle": 41, "stock": 81}, {"talle": 42, "stock": 81}, {"talle": 43, "stock": 56}, {"talle": 44, "stock": 56}], foto: 'Fotos/Mind blancas.jpeg' },
-  { modelo: 'Jordan low VERNIZ /AZUL', talles: [{"talle": 34, "stock": 3}, {"talle": 35, "stock": 4}, {"talle": 36, "stock": 6}, {"talle": 37, "stock": 7}, {"talle": 38, "stock": 4}, {"talle": 41, "stock": 1}], foto: 'Fotos/Jordan low VERNIZ AZUL.jpeg' },
+  { modelo: 'Jordan low VERNIZ /AZUL', talles: [{"talle": 34, "stock": 3}, {"talle": 35, "stock": 3}, {"talle": 36, "stock": 6}, {"talle": 37, "stock": 7}, {"talle": 38, "stock": 4}, {"talle": 41, "stock": 1}], foto: 'Fotos/Jordan low VERNIZ AZUL.jpeg' },
   { modelo: 'New balance ABZORB BEGE', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 1}], foto: 'Fotos/New balance ABZORB BEGE.jpeg' },
   { modelo: 'Súper star brillo', talles: [{"talle": 37, "stock": 1}, {"talle": 39, "stock": 5}, {"talle": 40, "stock": 6}, {"talle": 41, "stock": 3}], foto: 'Fotos/Súper star brillo.jpeg' },
   { modelo: 'Jordan 1 café flamingo', talles: [{"talle": 40, "stock": 1}], foto: 'Fotos/Jordan 1 café flamingo.jpeg' },
