@@ -102,7 +102,6 @@ const stock_zapatillas = [
   { modelo: 'Nb 9060 marron', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 3}], foto: 'Fotos/Nb 9060 marron.jpeg' },
   { modelo: 'Sb dunk polar', talles: [{"talle": 36, "stock": 2}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 2}], foto: 'Fotos/Sb dunk polar.jpeg' },
   { modelo: 'Air forcé celeste tornasol', talles: [{"talle": 38, "stock": 1}], foto: 'Fotos/Air forcé celeste tornasol.jpeg' },
-  { modelo: 'Jordan 1 suela celeste', talles: [{"talle": 35, "stock": 1}, {"talle": 37, "stock": 1}, {"talle": 38, "stock": 1}, {"talle": 39, "stock": 3}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 1}], foto: 'Fotos/Jordan 1 suela celeste.jpeg' },
   { modelo: 'Samba total black', talles: [{"talle": 36, "stock": 1}], foto: 'Fotos/Samba total black.jpeg' },
   { modelo: 'Jordan 11 suela celeste', talles: [{"talle": 42, "stock": 1}, {"talle": 44, "stock": 1}], foto: 'Fotos/Jordan 11 suela celeste.jpeg' },
   { modelo: 'Vans Haylan azul luxo', talles: [{"talle": 37, "stock": 1}], foto: 'Fotos/Vans Haylan azul luxo.jpeg' },
