@@ -1,0 +1,9 @@
+# catalogo.js se regenera de cero en cada escaneo de piloto_automatico.py.
+# Si dos máquinas llegan a pushear a la vez y hay un choque real de merge en
+# este archivo, no tiene sentido fusionar línea por línea: nos quedamos con
+# la versión local (siempre la más reciente) en vez de dejar marcas de
+# conflicto (<<<<<<<) pegadas en el archivo que lee la web.
+#
+# Nota: esta regla necesita que cada clon del repo corra una vez:
+#   git config merge.ours.driver true
+catalogo.js merge=ours
