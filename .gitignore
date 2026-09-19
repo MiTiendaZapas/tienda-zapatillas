@@ -12,6 +12,12 @@ automatizacion/
 sesion_wsp/
 automatizacion/sesion_wsp/
 automatizacion/
+
+# stock_proveedor.txt: archivo intermedio que arma bot_whatsapp.py para
+# preparar el envio por WhatsApp. Se regenera solo en cada corrida, nadie
+# mas lo lee (ni la web ni GitHub), y al quedar modificado sin commitear
+# bloqueaba el "git pull" de piloto_automatico.py en cada ciclo.
+stock_proveedor.txt
 # ============================================================
 # Python
 # ============================================================
