@@ -116,6 +116,7 @@ const stock_zapatillas = [
   { modelo: 'Dunk verde oliva', talles: [{"talle": 43, "stock": 1}], foto: 'Fotos/Dunk verde oliva.jpeg' },
   { modelo: 'Nb ABZORB white', talles: [{"talle": 35, "stock": 3}], foto: 'Fotos/Nb ABZORB white.jpeg' },
   { modelo: 'Vans Haylan grafite', talles: [{"talle": 43, "stock": 2}], foto: 'Fotos/Vans Haylan grafite.jpeg' },
+  { modelo: 'Nb 530 marinho nova', talles: [{"talle": 37, "stock": 1}], foto: 'Fotos/Nb 530 marinho nova.jpeg' },
   { modelo: 'Jordan retro 4 black costura', talles: [{"talle": 40, "stock": 1}], foto: 'Fotos/Jordan retro 4 black costura.jpeg' },
   { modelo: 'Jordan retro 4 doraudo', talles: [{"talle": 36, "stock": 1}, {"talle": 39, "stock": 1}], foto: 'Fotos/Jordan retro 4 doraudo.jpeg' },
   { modelo: 'Jordan 1 celeste / verniz', talles: [{"talle": 34, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 1}], foto: 'Fotos/Jordan 1 celeste verniz.jpeg' },
