@@ -11,7 +11,7 @@ const stock_zapatillas = [
   { modelo: 'Sb dunk gris', talles: [{"talle": 35, "stock": 1}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 5}, {"talle": 39, "stock": 1}, {"talle": 43, "stock": 2}], foto: 'Fotos/Sb dunk gris.jpeg' },
   { modelo: 'Adidas forum Gelo', talles: [{"talle": 40, "stock": 2}], foto: 'Fotos/Adidas forum Gelo.jpeg' },
   { modelo: 'Dunk bordo', talles: [{"talle": 38, "stock": 5}, {"talle": 39, "stock": 4}], foto: 'Fotos/Dunk bordo.jpeg' },
-  { modelo: 'Deportivas fit black', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 1}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 1}, {"talle": 42, "stock": 3}, {"talle": 43, "stock": 2}], foto: 'Fotos/Deportivas fit black.jpeg' },
+  { modelo: 'Deportivas fit black', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 1}, {"talle": 40, "stock": 2}, {"talle": 42, "stock": 3}, {"talle": 43, "stock": 2}], foto: 'Fotos/Deportivas fit black.jpeg' },
   { modelo: 'Ojotas Louis Vuitton negras', talles: [{"talle": 39, "stock": 20}, {"talle": 40, "stock": 20}, {"talle": 41, "stock": 14}, {"talle": 42, "stock": 14}, {"talle": 43, "stock": 11}, {"talle": 44, "stock": 11}], foto: 'Fotos/Ojotas Louis Vuitton negras.jpeg' },
   { modelo: 'Adidas forum blanco Preto', talles: [{"talle": 35, "stock": 1}, {"talle": 37, "stock": 1}, {"talle": 39, "stock": 1}, {"talle": 40, "stock": 4}], foto: 'Fotos/Adidas forum blanco Preto.jpeg' },
   { modelo: 'Dunk pombo', talles: [{"talle": 42, "stock": 1}, {"talle": 43, "stock": 7}, {"talle": 44, "stock": 3}], foto: 'Fotos/Dunk pombo.jpeg' },
