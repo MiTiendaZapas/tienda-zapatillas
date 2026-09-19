@@ -58,6 +58,15 @@ MAX_SCROLLS = 200
 ESTABLE_LIMITE = 5
 TIMEOUT_PRODUCTO_MS = 15000
 
+# Espera normal entre escaneos (minutos). El escaneo en sí suma 5-7 min más
+# aparte de esta espera, así que el ciclo completo ronda los 15-20 min.
+ESPERA_MIN_MINUTOS = 10
+ESPERA_MAX_MINUTOS = 14
+# Si un escaneo no detecta NINGÚN producto (posible caída o bloqueo del
+# sitio), se espera este tiempo fijo antes de reintentar, en vez del ciclo
+# normal, para no insistir de golpe contra un sitio que puede estar caído.
+ESPERA_SIN_PRODUCTOS_MINUTOS = 30
+
 # Palabras clave para blindar el catálogo de zapatillas: si algún producto de
 # la tienda online contiene alguna de estas palabras, se descarta siempre,
 # aunque aparezca con stock. Así nunca se mezcla indumentaria en catalogo.js.
@@ -251,9 +260,19 @@ def rutina_actualizacion():
     # Sube catalogo.js (zapatillas, generado acá) Y también indumentaria.js
     # (que vos editás a mano), para que ninguno de los dos quede desactualizado
     # en la web publicada.
+    #
+    # Orden importante: primero committeamos el escaneo local y RECIÉN
+    # DESPUÉS hacemos pull. Si se hiciera al revés (pull con catalogo.js
+    # modificado y sin commitear todavía), un choque con otra máquina que
+    # haya pusheado en el medio (por ej. si alguna vez queda prendido el
+    # piloto en otra PC a la vez) puede mezclar el pull con cambios sueltos
+    # de forma más frágil. Pulleando sobre un working tree limpio, un
+    # conflicto real en catalogo.js lo resuelve solo el merge driver "ours"
+    # configurado en .gitattributes (se queda con la versión local, que es
+    # siempre la más fresca porque se regenera de cero en cada escaneo) en
+    # vez de dejar marcas de conflicto pegadas en el archivo que lee la web.
     try:
         hora_subida = time.strftime('%H:%M:%S')
-        subprocess.run(["git", "pull", "origin", "main"], check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
         archivos_a_subir = [ARCHIVO_JS]
         if os.path.exists(ARCHIVO_INDUMENTARIA):
@@ -269,6 +288,7 @@ def rutina_actualizacion():
         resultado_commit = subprocess.run(["git", "commit", "-m", f"Stock actualizado (zapatillas + indumentaria) a las {hora_subida}"], capture_output=True, text=True)
 
         if "nothing to commit" not in resultado_commit.stdout:
+            subprocess.run(["git", "pull", "origin", "main", "--no-edit"], check=True)
             subprocess.run(["git", "push", "origin", "main"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             print(f"[{hora_subida}] 🔄 HUBO CAMBIOS: Se actualizó la web (zapatillas y/o indumentaria).")
         else:
@@ -277,15 +297,41 @@ def rutina_actualizacion():
     except Exception as e:
         print(f"⚠️ Error al verificar o subir a GitHub: {e}")
 
+    return len(productos_detectados)
+
 def main():
     print("🤖 PILOTO AUTOMÁTICO DE ZAPATILLAS")
+    mejor_conteo_visto = 0
     while True:
+        total_productos = 0
         try:
-            rutina_actualizacion()
+            total_productos = rutina_actualizacion()
         except Exception as e:
             print(f"\n❌ Hubo un error inesperado: {e}")
 
-        minutos_espera = random.uniform(14, 18)
+        if total_productos == 0:
+            # Nada detectado: puede ser un corte del sitio o un bloqueo. En
+            # vez de reintentar enseguida con el ciclo normal, se espera el
+            # tiempo fijo largo para no insistir contra un sitio caído.
+            minutos_espera = ESPERA_SIN_PRODUCTOS_MINUTOS
+            print(f"⚠️ No se detectó ningún producto en la tienda (¿corte o bloqueo del sitio?). Espera extendida antes de reintentar.")
+        elif mejor_conteo_visto > 0 and total_productos < mejor_conteo_visto / 2:
+            # Se detectó bastante menos de lo normal: se estira la espera
+            # dentro del ciclo normal, más cuanto más lejos esté de lo usual.
+            proporcion_faltante = 1 - (total_productos / mejor_conteo_visto)
+            extra_minutos = (ESPERA_SIN_PRODUCTOS_MINUTOS - ESPERA_MAX_MINUTOS) * proporcion_faltante
+            minutos_espera = random.uniform(ESPERA_MIN_MINUTOS, ESPERA_MAX_MINUTOS) + extra_minutos
+            print(f"⚠️ Se detectaron {total_productos} productos, menos de la mitad de los {mejor_conteo_visto} vistos normalmente. Se extiende la espera por las dudas.")
+        else:
+            # El escaneo en sí (recorrer todos los productos) suma en
+            # promedio 5-7 min más aparte de esta espera. Este rango apunta a
+            # que el ciclo completo (escaneo + espera) quede entre 15 y 20
+            # minutos.
+            minutos_espera = random.uniform(ESPERA_MIN_MINUTOS, ESPERA_MAX_MINUTOS)
+
+        if total_productos > mejor_conteo_visto:
+            mejor_conteo_visto = total_productos
+
         print(f"\n[{time.strftime('%H:%M:%S')}] Durmiendo... Próximo escaneo en {minutos_espera:.1f} minutos.\n")
         time.sleep(int(minutos_espera * 60))
 
