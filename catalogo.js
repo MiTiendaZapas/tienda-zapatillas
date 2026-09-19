@@ -32,7 +32,7 @@ const stock_zapatillas = [
   { modelo: 'NB 530 blanca/negro', talles: [{"talle": 34, "stock": 2}, {"talle": 35, "stock": 1}, {"talle": 37, "stock": 1}], foto: 'Fotos/NB 530 blanca negro.jpeg' },
   { modelo: 'Air force Champion', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 2}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Air force Champion.jpeg' },
   { modelo: 'Dunk glistter celeste', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}], foto: 'Fotos/Dunk glistter celeste.jpeg' },
-  { modelo: 'Ojotas total black', talles: [{"talle": 37, "stock": 21}, {"talle": 38, "stock": 21}, {"talle": 39, "stock": 88}, {"talle": 40, "stock": 88}, {"talle": 41, "stock": 61}, {"talle": 42, "stock": 61}, {"talle": 43, "stock": 21}, {"talle": 44, "stock": 21}], foto: 'Fotos/Ojotas total black.jpeg' },
+  { modelo: 'Ojotas total black', talles: [{"talle": 37, "stock": 21}, {"talle": 38, "stock": 21}, {"talle": 39, "stock": 88}, {"talle": 40, "stock": 88}, {"talle": 41, "stock": 60}, {"talle": 42, "stock": 60}, {"talle": 43, "stock": 21}, {"talle": 44, "stock": 21}], foto: 'Fotos/Ojotas total black.jpeg' },
   { modelo: 'Dunk celeste', talles: [{"talle": 37, "stock": 2}, {"talle": 38, "stock": 1}], foto: 'Fotos/Dunk celeste.jpeg' },
   { modelo: 'Vans Haylan 01', talles: [{"talle": 35, "stock": 1}, {"talle": 43, "stock": 2}], foto: 'Fotos/Vans Haylan 01.jpeg' },
   { modelo: 'Nike shox white', talles: [{"talle": 43, "stock": 9}], foto: 'Fotos/Nike shox white.jpeg' },
