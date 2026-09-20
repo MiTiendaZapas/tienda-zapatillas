@@ -202,6 +202,19 @@ def talles_disponibles_en_producto(page, url):
 
     return [{"talle": k, "stock": v} for k, v in sorted(disponibles.items())]
 
+def _git_con_reintentos(args, intentos=3, espera_seg=15, **kwargs):
+    # Un corte de wifi de unos segundos justo en el momento del pull/push no
+    # debería perder ese escaneo: se reintenta un par de veces antes de
+    # darse por vencido y dejarlo para el próximo ciclo.
+    for intento in range(1, intentos + 1):
+        try:
+            return subprocess.run(args, check=True, **kwargs)
+        except subprocess.CalledProcessError:
+            if intento == intentos:
+                raise
+            print(f"  ⚠️ Falló '{' '.join(args)}' (intento {intento}/{intentos}), reintentando en {espera_seg}s...")
+            time.sleep(espera_seg)
+
 def rutina_actualizacion():
     print("\n--- INICIANDO ESCANEO DE STOCK (ZAPATILLAS) ---")
     productos_finales = []
@@ -288,8 +301,8 @@ def rutina_actualizacion():
         resultado_commit = subprocess.run(["git", "commit", "-m", f"Stock actualizado (zapatillas + indumentaria) a las {hora_subida}"], capture_output=True, text=True)
 
         if "nothing to commit" not in resultado_commit.stdout:
-            subprocess.run(["git", "pull", "origin", "main", "--no-edit"], check=True)
-            subprocess.run(["git", "push", "origin", "main"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            _git_con_reintentos(["git", "pull", "origin", "main", "--no-edit"])
+            _git_con_reintentos(["git", "push", "origin", "main"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             print(f"[{hora_subida}] 🔄 HUBO CAMBIOS: Se actualizó la web (zapatillas y/o indumentaria).")
         else:
             print(f"[{hora_subida}] ⏸️ NO HUBO CAMBIOS: El stock sigue igual.")
