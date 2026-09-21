@@ -24,7 +24,7 @@ const stock_zapatillas = [
   { modelo: 'Sb Jordan triple black', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 1}, {"talle": 40, "stock": 2}], foto: 'Fotos/Sb Jordan triple black.jpeg' },
   { modelo: 'Air forcé exclusivas white', talles: [{"talle": 43, "stock": 8}, {"talle": 44, "stock": 1}], foto: 'Fotos/Air forcé exclusivas white.jpeg' },
   { modelo: 'NB 530 blanca /azul', talles: [{"talle": 35, "stock": 2}], foto: 'Fotos/NB 530 blanca azul.jpeg' },
-  { modelo: 'Jordan 1 verniz', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 6}, {"talle": 37, "stock": 2}, {"talle": 39, "stock": 3}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 7}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 4}], foto: 'Fotos/Jordan 1 verniz.jpeg' },
+  { modelo: 'Jordan 1 verniz', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 6}, {"talle": 37, "stock": 2}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 7}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 4}], foto: 'Fotos/Jordan 1 verniz.jpeg' },
   { modelo: 'Adidas forum Preto blanco', talles: [{"talle": 39, "stock": 2}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 1}, {"talle": 42, "stock": 2}], foto: 'Fotos/Adidas forum Preto blanco.jpeg' },
   { modelo: 'New balance 9060 suela rosa', talles: [{"talle": 34, "stock": 3}, {"talle": 35, "stock": 6}, {"talle": 36, "stock": 6}, {"talle": 37, "stock": 3}], foto: 'Fotos/New balance 9060 suela rosa.jpeg' },
   { modelo: 'Shox black', talles: [{"talle": 41, "stock": 2}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 4}, {"talle": 44, "stock": 2}], foto: 'Fotos/Shox black.jpeg' },
