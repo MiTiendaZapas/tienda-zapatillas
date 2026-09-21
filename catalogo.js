@@ -114,7 +114,7 @@ const stock_zapatillas = [
   { modelo: 'Air forcé black brillo', talles: [{"talle": 37, "stock": 1}, {"talle": 38, "stock": 1}], foto: 'Fotos/Air forcé black brillo.jpeg' },
   { modelo: 'Adidas 2000 royal', talles: [{"talle": 43, "stock": 1}], foto: 'Fotos/Adidas 2000 royal.jpeg' },
   { modelo: 'Nb 530 marinho nova', talles: [{"talle": 38, "stock": 2}], foto: 'Fotos/Nb 530 marinho nova.jpeg' },
-  { modelo: 'Air forcé glister rosa', talles: [{"talle": 36, "stock": 1}, {"talle": 37, "stock": 2}], foto: 'Fotos/Air forcé glister rosa.jpeg' },
+  { modelo: 'Air forcé glister rosa', talles: [{"talle": 37, "stock": 2}], foto: 'Fotos/Air forcé glister rosa.jpeg' },
   { modelo: 'Jordan retro 4 doraudo', talles: [{"talle": 36, "stock": 1}, {"talle": 38, "stock": 1}, {"talle": 39, "stock": 1}], foto: 'Fotos/Jordan retro 4 doraudo.jpeg' },
   { modelo: 'Nb 4000 blancas', talles: [{"talle": 36, "stock": 1}, {"talle": 37, "stock": 1}], foto: 'Fotos/Nb 4000 blancas.jpeg' },
   { modelo: 'Jordan low glister', talles: [{"talle": 35, "stock": 4}, {"talle": 36, "stock": 4}, {"talle": 37, "stock": 4}, {"talle": 38, "stock": 2}], foto: 'Fotos/Jordan low glister.jpeg' },
