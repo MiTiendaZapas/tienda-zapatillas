@@ -1,7 +1,7 @@
 const stock_zapatillas = [
   { modelo: 'Air forcé 1 blancas', talles: [{"talle": 38, "stock": 2}, {"talle": 39, "stock": 1}, {"talle": 41, "stock": 1}, {"talle": 42, "stock": 4}, {"talle": 43, "stock": 4}, {"talle": 44, "stock": 1}], foto: 'Fotos/Air forcé 1 blancas.jpeg' },
   { modelo: 'Vans KNU clasicas', talles: [{"talle": 34, "stock": 8}, {"talle": 35, "stock": 5}, {"talle": 36, "stock": 4}, {"talle": 38, "stock": 3}, {"talle": 41, "stock": 1}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 1}], foto: 'Fotos/Vans KNU clasicas.jpeg' },
-  { modelo: 'Panda sb dunk', talles: [{"talle": 35, "stock": 3}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 4}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 6}, {"talle": 41, "stock": 1}], foto: 'Fotos/Panda sb dunk.jpeg' },
+  { modelo: 'Panda sb dunk', talles: [{"talle": 35, "stock": 3}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 4}, {"talle": 38, "stock": 1}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 6}, {"talle": 41, "stock": 1}], foto: 'Fotos/Panda sb dunk.jpeg' },
   { modelo: 'Adidas forum blancas', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 6}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 2}], foto: 'Fotos/Adidas forum blancas.jpeg' },
   { modelo: 'New balance 530 running', talles: [{"talle": 36, "stock": 2}, {"talle": 37, "stock": 1}, {"talle": 38, "stock": 4}, {"talle": 39, "stock": 5}, {"talle": 40, "stock": 5}, {"talle": 41, "stock": 1}], foto: 'Fotos/New balance 530 running.jpeg' },
   { modelo: 'Puma 180 WHITE', talles: [{"talle": 35, "stock": 6}, {"talle": 36, "stock": 4}, {"talle": 37, "stock": 14}, {"talle": 38, "stock": 13}, {"talle": 39, "stock": 8}, {"talle": 40, "stock": 5}, {"talle": 42, "stock": 4}, {"talle": 43, "stock": 3}, {"talle": 44, "stock": 1}], foto: 'Fotos/Puma 180 WHITE.jpeg' },
@@ -15,8 +15,8 @@ const stock_zapatillas = [
   { modelo: 'Adidas forum blanco Preto', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 39, "stock": 3}], foto: 'Fotos/Adidas forum blanco Preto.jpeg' },
   { modelo: 'Jordan retro 4 pintita', talles: [{"talle": 36, "stock": 1}, {"talle": 42, "stock": 1}, {"talle": 43, "stock": 3}, {"talle": 44, "stock": 1}], foto: 'Fotos/Jordan retro 4 pintita.jpeg' },
   { modelo: 'Dunk pombo', talles: [{"talle": 42, "stock": 1}, {"talle": 43, "stock": 7}, {"talle": 44, "stock": 3}], foto: 'Fotos/Dunk pombo.jpeg' },
-  { modelo: 'Forum adidas celeste', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 7}, {"talle": 38, "stock": 1}], foto: 'Fotos/Forum adidas celeste.jpeg' },
   { modelo: 'Jordan 1 botitas pink', talles: [{"talle": 39, "stock": 2}, {"talle": 40, "stock": 11}], foto: 'Fotos/Jordan 1 botitas pink.jpeg' },
+  { modelo: 'Forum adidas celeste', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 7}, {"talle": 38, "stock": 1}], foto: 'Fotos/Forum adidas celeste.jpeg' },
   { modelo: 'Air forcé 1 total black', talles: [{"talle": 34, "stock": 3}, {"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 1}, {"talle": 42, "stock": 1}, {"talle": 43, "stock": 1}], foto: 'Fotos/Air forcé 1 total black.jpeg' },
   { modelo: 'Puma 180 flamingo', talles: [{"talle": 34, "stock": 2}, {"talle": 36, "stock": 1}], foto: 'Fotos/Puma 180 flamingo.jpeg' },
   { modelo: 'Jordan retro 4 pink', talles: [{"talle": 38, "stock": 5}, {"talle": 39, "stock": 5}, {"talle": 40, "stock": 2}], foto: 'Fotos/Jordan retro 4 pink.jpeg' },
