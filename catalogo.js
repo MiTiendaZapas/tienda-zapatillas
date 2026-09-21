@@ -92,7 +92,6 @@ const stock_zapatillas = [
   { modelo: 'Puma bmw', talles: [{"talle": 35, "stock": 1}], foto: 'Fotos/Puma bmw.jpeg' },
   { modelo: 'TL1 Negras', talles: [{"talle": 35, "stock": 1}, {"talle": 38, "stock": 1}], foto: 'Fotos/TL1 Negras.jpeg' },
   { modelo: 'Vans KNU plataforma alta', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 3}, {"talle": 40, "stock": 1}], foto: 'Fotos/Vans KNU plataforma alta.jpeg' },
-  { modelo: 'Shox tapón azul', talles: [{"talle": 41, "stock": 1}], foto: 'Fotos/Shox tapón azul.jpeg' },
   { modelo: 'Vans Haylan 01 LUXO', talles: [{"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Vans Haylan 01 LUXO.jpeg' },
   { modelo: 'Dunk blanco/marinho', talles: [{"talle": 43, "stock": 1}], foto: 'Fotos/Dunk blanco marinho.jpeg' },
   { modelo: 'Campus clasicas', talles: [{"talle": 36, "stock": 2}, {"talle": 37, "stock": 1}, {"talle": 39, "stock": 1}, {"talle": 42, "stock": 1}], foto: 'Fotos/Campus clasicas.jpeg' },
