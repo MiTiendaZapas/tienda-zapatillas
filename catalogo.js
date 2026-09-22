@@ -84,6 +84,7 @@ const stock_zapatillas = [
   { modelo: 'Sb dunk platino', talles: [{"talle": 38, "stock": 2}], foto: 'Fotos/Sb dunk platino.jpeg' },
   { modelo: 'Dunk black caramelo', talles: [{"talle": 44, "stock": 1}], foto: 'Fotos/Dunk black caramelo.jpeg' },
   { modelo: 'Vans Haylan pink', talles: [{"talle": 38, "stock": 1}], foto: 'Fotos/Vans Haylan pink.jpeg' },
+  { modelo: 'Dunk jean marrón', talles: [{"talle": 40, "stock": 1}, {"talle": 41, "stock": 1}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 2}], foto: 'Fotos/Dunk jean marrón.jpeg' },
   { modelo: 'Jordan low vérmelo', talles: [{"talle": 40, "stock": 1}, {"talle": 41, "stock": 2}], foto: 'Fotos/Jordan low vérmelo.jpeg' },
   { modelo: 'New balance ABZORB', talles: [{"talle": 35, "stock": 2}], foto: 'Fotos/New balance ABZORB.jpeg' },
   { modelo: 'Jordan retro 4 preto / vérmelos', talles: [{"talle": 34, "stock": 2}, {"talle": 35, "stock": 4}, {"talle": 36, "stock": 6}, {"talle": 37, "stock": 6}, {"talle": 38, "stock": 4}, {"talle": 39, "stock": 2}], foto: 'Fotos/Jordan retro 4 preto vérmelos.jpeg' },
