@@ -1,5 +1,5 @@
 const stock_zapatillas = [
-  { modelo: 'Air forcé 1 blancas', talles: [{"talle": 38, "stock": 2}, {"talle": 39, "stock": 3}, {"talle": 40, "stock": 3}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 4}, {"talle": 43, "stock": 5}], foto: 'Fotos/Air forcé 1 blancas.jpeg' },
+  { modelo: 'Air forcé 1 blancas', talles: [{"talle": 38, "stock": 1}, {"talle": 39, "stock": 3}, {"talle": 40, "stock": 3}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 3}, {"talle": 43, "stock": 5}], foto: 'Fotos/Air forcé 1 blancas.jpeg' },
   { modelo: 'Vans KNU clasicas', talles: [{"talle": 34, "stock": 7}, {"talle": 35, "stock": 5}, {"talle": 36, "stock": 4}, {"talle": 38, "stock": 3}, {"talle": 41, "stock": 1}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 1}], foto: 'Fotos/Vans KNU clasicas.jpeg' },
   { modelo: 'Panda sb dunk', talles: [{"talle": 35, "stock": 3}, {"talle": 37, "stock": 4}, {"talle": 38, "stock": 1}, {"talle": 39, "stock": 3}, {"talle": 40, "stock": 8}, {"talle": 41, "stock": 4}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Panda sb dunk.jpeg' },
   { modelo: 'Adidas forum blancas', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 6}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 1}], foto: 'Fotos/Adidas forum blancas.jpeg' },
@@ -26,7 +26,7 @@ const stock_zapatillas = [
   { modelo: 'Air forcé exclusivas white', talles: [{"talle": 43, "stock": 8}, {"talle": 44, "stock": 1}], foto: 'Fotos/Air forcé exclusivas white.jpeg' },
   { modelo: 'Jordan 1 verniz', talles: [{"talle": 34, "stock": 2}, {"talle": 35, "stock": 8}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 4}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 3}, {"talle": 40, "stock": 1}, {"talle": 41, "stock": 7}, {"talle": 42, "stock": 1}, {"talle": 43, "stock": 4}], foto: 'Fotos/Jordan 1 verniz.jpeg' },
   { modelo: 'NB 530 blanca /azul', talles: [{"talle": 35, "stock": 2}], foto: 'Fotos/NB 530 blanca azul.jpeg' },
-  { modelo: 'Adidas forum Preto blanco', talles: [{"talle": 39, "stock": 2}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 1}, {"talle": 42, "stock": 2}], foto: 'Fotos/Adidas forum Preto blanco.jpeg' },
+  { modelo: 'Adidas forum Preto blanco', talles: [{"talle": 39, "stock": 1}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 1}, {"talle": 42, "stock": 2}], foto: 'Fotos/Adidas forum Preto blanco.jpeg' },
   { modelo: 'Ojotas total black', talles: [{"talle": 37, "stock": 12}, {"talle": 38, "stock": 12}, {"talle": 39, "stock": 80}, {"talle": 40, "stock": 80}, {"talle": 41, "stock": 50}, {"talle": 42, "stock": 50}, {"talle": 43, "stock": 15}, {"talle": 44, "stock": 15}], foto: 'Fotos/Ojotas total black.jpeg' },
   { modelo: 'New balance 9060 suela rosa', talles: [{"talle": 34, "stock": 3}, {"talle": 35, "stock": 6}, {"talle": 36, "stock": 6}, {"talle": 37, "stock": 3}], foto: 'Fotos/New balance 9060 suela rosa.jpeg' },
   { modelo: 'Shox black', talles: [{"talle": 39, "stock": 1}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 5}, {"talle": 42, "stock": 5}, {"talle": 43, "stock": 6}, {"talle": 44, "stock": 3}], foto: 'Fotos/Shox black.jpeg' },
