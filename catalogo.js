@@ -70,7 +70,7 @@ const stock_zapatillas = [
   { modelo: 'Air Jordan black', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 3}, {"talle": 40, "stock": 1}], foto: 'Fotos/Air Jordan black.jpeg' },
   { modelo: 'ABZORB marrones', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 3}, {"talle": 36, "stock": 6}], foto: 'Fotos/ABZORB marrones.jpeg' },
   { modelo: 'Vans Haylan azul', talles: [{"talle": 35, "stock": 2}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 1}, {"talle": 39, "stock": 1}, {"talle": 40, "stock": 1}], foto: 'Fotos/Vans Haylan azul.jpeg' },
-  { modelo: 'Jordan low pombo', talles: [{"talle": 39, "stock": 2}, {"talle": 40, "stock": 3}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 1}], foto: 'Fotos/Jordan low pombo.jpeg' },
+  { modelo: 'Jordan low pombo', talles: [{"talle": 39, "stock": 2}, {"talle": 40, "stock": 3}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 1}, {"talle": 43, "stock": 1}], foto: 'Fotos/Jordan low pombo.jpeg' },
   { modelo: 'Adidas boas negra', talles: [{"talle": 36, "stock": 1}], foto: 'Fotos/Adidas boas negra.jpeg' },
   { modelo: 'Jordan 1 charol roja', talles: [{"talle": 38, "stock": 1}], foto: 'Fotos/Jordan 1 charol roja.jpeg' },
   { modelo: 'Air forcé stussy', talles: [{"talle": 44, "stock": 1}], foto: 'Fotos/Air forcé stussy.jpeg' },
@@ -150,6 +150,6 @@ const stock_zapatillas = [
   { modelo: 'Dunk verde', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 2}], foto: 'Fotos/Dunk verde.jpeg' },
   { modelo: 'Jordan retro 4 RED', talles: [{"talle": 38, "stock": 1}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 3}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 1}, {"talle": 43, "stock": 1}], foto: 'Fotos/Jordan retro 4 RED.jpeg' },
   { modelo: 'Jordan retro 4 gris', talles: [{"talle": 36, "stock": 2}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 1}], foto: 'Fotos/Jordan retro 4 gris.jpeg' },
-  { modelo: 'Forum gris Qualida', talles: [{"talle": 39, "stock": 1}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Forum gris Qualida.jpeg' },
+  { modelo: 'Forum gris Qualida', talles: [{"talle": 39, "stock": 1}, {"talle": 40, "stock": 1}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Forum gris Qualida.jpeg' },
   { modelo: 'Samba azul', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 1}], foto: 'Fotos/Samba azul.jpeg' },
 ];
