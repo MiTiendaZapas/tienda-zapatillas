@@ -209,6 +209,57 @@ def talles_disponibles_en_producto(page, url):
 
     return [{"talle": k, "stock": v} for k, v in sorted(disponibles.items())]
 
+def descargar_foto_producto(page, ruta_destino_sin_extension):
+    # Se llama con "page" ya posicionada en la página del producto (la deja
+    # ahí talles_disponibles_en_producto). Busca la imagen principal
+    # (.js-product-slide-img, la primera con src real) y de su "srcset" saca
+    # la variante de mayor resolución disponible (normalmente 1024x1024) en
+    # vez de quedarse con el thumbnail chico que trae el "src" por defecto.
+    try:
+        img = page.locator(".js-product-slide-img").first
+        if img.count() == 0:
+            return ""
+
+        url_elegida = None
+        srcset = img.get_attribute("srcset") or ""
+        mejor_ancho = -1
+        for parte in srcset.split(","):
+            parte = parte.strip()
+            if not parte:
+                continue
+            trozos = parte.rsplit(" ", 1)
+            if len(trozos) != 2:
+                continue
+            url_candidata, ancho_str = trozos
+            try:
+                ancho = int(ancho_str.rstrip("w"))
+            except ValueError:
+                continue
+            if ancho > mejor_ancho:
+                mejor_ancho = ancho
+                url_elegida = url_candidata
+
+        if not url_elegida:
+            url_elegida = img.get_attribute("src") or ""
+        if not url_elegida:
+            return ""
+        if url_elegida.startswith("//"):
+            url_elegida = "https:" + url_elegida
+
+        extension = os.path.splitext(url_elegida.split("?")[0])[1] or ".jpg"
+        ruta_destino = f"{ruta_destino_sin_extension}{extension}"
+
+        respuesta = page.request.get(url_elegida, timeout=TIMEOUT_PRODUCTO_MS)
+        if not respuesta.ok:
+            return ""
+
+        with open(ruta_destino, "wb") as f:
+            f.write(respuesta.body())
+
+        return ruta_destino
+    except Exception:
+        return ""
+
 def en_horario_de_descanso(ahora=None):
     ahora = ahora or time.localtime()
     return HORA_INICIO_DESCANSO <= ahora.tm_hour < HORA_FIN_DESCANSO
@@ -267,6 +318,12 @@ def rutina_actualizacion():
                     if os.path.exists(ruta_prueba):
                         ruta_foto_final = f"Fotos/{nombre_archivo}{ext}"
                         break
+
+                if not ruta_foto_final:
+                    ruta_descargada = descargar_foto_producto(page, os.path.join(CARPETA_FOTOS, nombre_archivo))
+                    if ruta_descargada:
+                        ruta_foto_final = ruta_descargada.replace(os.sep, "/")
+                        print(f"  📷 Foto nueva descargada para '{nombre}': {ruta_foto_final}")
 
                 if ruta_foto_final:
                     productos_finales.append({
