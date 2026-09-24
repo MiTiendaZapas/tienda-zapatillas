@@ -29,7 +29,7 @@ const stock_zapatillas = [
   { modelo: 'NB 530 blanca /azul', talles: [{"talle": 35, "stock": 2}], foto: 'Fotos/NB 530 blanca azul.jpeg' },
   { modelo: 'Adidas forum Preto blanco', talles: [{"talle": 39, "stock": 2}, {"talle": 40, "stock": 1}, {"talle": 42, "stock": 1}], foto: 'Fotos/Adidas forum Preto blanco.jpeg' },
   { modelo: 'Ojotas total black', talles: [{"talle": 37, "stock": 7}, {"talle": 38, "stock": 7}, {"talle": 39, "stock": 77}, {"talle": 40, "stock": 77}, {"talle": 41, "stock": 44}, {"talle": 42, "stock": 44}, {"talle": 43, "stock": 10}, {"talle": 44, "stock": 10}], foto: 'Fotos/Ojotas total black.jpeg' },
-  { modelo: 'Shox black', talles: [{"talle": 40, "stock": 1}, {"talle": 41, "stock": 2}, {"talle": 42, "stock": 3}, {"talle": 43, "stock": 4}, {"talle": 44, "stock": 3}], foto: 'Fotos/Shox black.jpeg' },
+  { modelo: 'Shox black', talles: [{"talle": 40, "stock": 1}, {"talle": 41, "stock": 2}, {"talle": 42, "stock": 3}, {"talle": 43, "stock": 3}, {"talle": 44, "stock": 3}], foto: 'Fotos/Shox black.jpeg' },
   { modelo: 'New balance 9060 suela rosa', talles: [{"talle": 34, "stock": 3}, {"talle": 35, "stock": 6}, {"talle": 36, "stock": 5}, {"talle": 37, "stock": 2}], foto: 'Fotos/New balance 9060 suela rosa.jpeg' },
   { modelo: 'Dunk total black', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 1}, {"talle": 41, "stock": 2}, {"talle": 42, "stock": 3}, {"talle": 43, "stock": 1}, {"talle": 44, "stock": 2}], foto: 'Fotos/Dunk total black.jpeg' },
   { modelo: 'NB 530 blanca/negro', talles: [{"talle": 34, "stock": 2}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 1}, {"talle": 39, "stock": 3}], foto: 'Fotos/NB 530 blanca negro.jpeg' },
