@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>L.A IMP · Zapatillas importadas de Brasil</title>
+  <meta name="description" content="Zapatillas importadas de Brasil. Elegí modelo y talle, armá tu pedido y envialo por WhatsApp. Precio por mayor llevando 5 o más pares surtidos.">
+  <meta name="theme-color" content="#0a0a0b">
+
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_AR">
+  <meta property="og:site_name" content="L.A IMP">
+  <meta property="og:title" content="L.A IMP · Zapatillas importadas">
+  <meta property="og:description" content="Armá tu pedido de zapatillas importadas de Brasil y envialo por WhatsApp.">
+  <meta property="og:image" content="marca/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="marca/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="marca/icon-192.png">
+  <link rel="apple-touch-icon" href="marca/apple-touch-icon.png">
+
+  <script src="configuracion.js"></script>
+  <script src="motor/js/theme.js"></script>
+
+  <link rel="preload" href="catalogo/productos.json" as="fetch" crossorigin>
+  <link rel="stylesheet" href="motor/css/tienda.css">
+  <script type="module" src="motor/js/main.js"></script>
+</head>
+<body data-channel="minorista">
+  <a class="skip-link" href="#catalogo">Ir al catálogo</a>
+  <header class="site-header" id="site-header"></header>
+  <main id="main">
+    <section class="hero" id="hero"></section>
+    <section class="catalog" id="catalogo" aria-labelledby="catalog-title"></section>
+  </main>
+  <footer class="site-footer" id="site-footer"></footer>
+  <div id="overlays"></div>
+  <div class="toast-region" id="toast-region" role="status" aria-live="polite"></div>
+  <noscript>
+    <p class="noscript">Para ver el catálogo y armar tu pedido necesitás activar JavaScript en tu navegador.</p>
+  </noscript>
+</body>
+</html>
