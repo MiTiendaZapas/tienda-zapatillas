@@ -14,27 +14,11 @@ from playwright.sync_api import sync_playwright
 sys.stdout.reconfigure(encoding="utf-8")
 sys.stderr.reconfigure(encoding="utf-8")
 
-def _deshabilitar_quickedit_windows():
-    # En Windows, un clic o una selección de texto en la ventana de la consola
-    # activa "QuickEdit Mode" y pausa el proceso hasta que apretás Enter o Esc.
-    # Lo desactivamos al arrancar para que no se confunda con un cuelgue real.
-    if os.name != "nt":
-        return
-    try:
-        import ctypes
-        kernel32 = ctypes.windll.kernel32
-        STD_INPUT_HANDLE = -10
-        ENABLE_EXTENDED_FLAGS = 0x0080
-        ENABLE_QUICK_EDIT_MODE = 0x0040
-        handle = kernel32.GetStdHandle(STD_INPUT_HANDLE)
-        modo = ctypes.c_uint32()
-        if kernel32.GetConsoleMode(handle, ctypes.byref(modo)):
-            nuevo_modo = (modo.value & ~ENABLE_QUICK_EDIT_MODE) | ENABLE_EXTENDED_FLAGS
-            kernel32.SetConsoleMode(handle, nuevo_modo)
-    except Exception:
-        pass
-
-_deshabilitar_quickedit_windows()
+# A diferencia de piloto_automatico.py (que corre solo, desatendido, por
+# horas), este bot siempre corre con alguien mirando desde el paso manual de
+# la primera foto. Por eso NO desactivamos "QuickEdit Mode" de la consola
+# acá: hacerlo evitaría el cuelgue por clic accidental, pero también rompe
+# la selección con mouse y el pegado en esta ventana, que si se necesita.
 
 # --- FIJA LA CARPETA DE TRABAJO A LA RAÍZ DEL REPO ---
 # Este script vive en automatizacion/, que está en .gitignore. Pero Fotos/ y
@@ -80,6 +64,20 @@ def limpiar_nombre_archivo(nombre):
         return ""
     nombre_limpio = nombre.replace("/", " ").replace("\\", " ").replace("\u00a0", " ")
     return " ".join(nombre_limpio.split())
+
+def _goto_con_reintentos(page, url, intentos=3, espera_seg=15, **kwargs):
+    # Sin esto, un corte de internet justo al abrir la tienda o WhatsApp Web
+    # (antes de que arranque el resto del manejo de errores del script)
+    # tiraba una excepcion sin capturar y cortaba todo el bot de una.
+    for intento in range(1, intentos + 1):
+        try:
+            return page.goto(url, **kwargs)
+        except Exception as e:
+            if intento == intentos:
+                raise
+            print(f"  ⚠️ No se pudo abrir {url} (intento {intento}/{intentos}): {e}")
+            print(f"  Reintentando en {espera_seg}s...")
+            time.sleep(espera_seg)
 
 def copiar_imagen_al_portapapeles(ruta_imagen):
     imagen = Image.open(ruta_imagen)
@@ -359,7 +357,7 @@ def actualizar_stock():
         page = browser.new_page()
 
         print(f"Abriendo {URL_LISTADO} ...")
-        page.goto(URL_LISTADO, wait_until="networkidle")
+        _goto_con_reintentos(page, URL_LISTADO, wait_until="networkidle")
         try:
             page.locator("text=Entendido").first.click(timeout=3000)
         except Exception:
@@ -485,7 +483,7 @@ def main():
         page = browser.new_page()
         
         print("Abriendo WhatsApp Web...")
-        page.goto("https://web.whatsapp.com/")
+        _goto_con_reintentos(page, "https://web.whatsapp.com/")
         
         print("\n" + "="*65)
         print("🛑 PASO MANUAL (DESTROZANDO EL BLOQUEO DE WHATSAPP) 🛑")
