@@ -350,10 +350,16 @@ def fusionar_stock_tienda_y_casa(productos_manual, productos_proveedor):
 
     return [(combinados[clave]["nombre"], combinados[clave]["talles"]) for clave in orden]
 
-def actualizar_stock():
+def actualizar_stock(p):
+    # Recibe el "p" de Playwright ya abierto en vez de crear el suyo propio,
+    # para poder correr esto varias veces (una por tanda) sin anidar
+    # sync_playwright() adentro del que ya mantiene abierta la sesion de
+    # WhatsApp. Devuelve True/False en vez de sys.exit(1): un escaneo fallido
+    # no debe matar el proceso ni cerrar la sesion de WhatsApp ya abierta,
+    # solo esa tanda.
     print("--- FASE 1: ESCANEANDO Y FILTRANDO STOCK EN TIENDANUBE ---")
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+    browser = p.chromium.launch(headless=True)
+    try:
         page = browser.new_page()
 
         print(f"Abriendo {URL_LISTADO} ...")
@@ -365,14 +371,13 @@ def actualizar_stock():
 
         print("Cargando catálogo completo...")
         cargar_listado_completo(page)
-        
+
         productos = extraer_productos_con_filtro(page)
         print(f"Modelos con potencial stock detectados en catálogo: {len(productos)}")
 
         if not productos:
             print("❌ No se encontraron productos.")
-            browser.close()
-            sys.exit(1)
+            return False
 
         productos_proveedor = []
         fallas_seguidas = 0
@@ -387,8 +392,7 @@ def actualizar_stock():
                 print(f"  [{i}/{len(productos)}] {nombre}: error al leerlo, saltando...")
                 if fallas_seguidas >= MAX_FALLAS_SEGUIDAS:
                     print("\nSe cortó: fallaron demasiados productos seguidos.")
-                    browser.close()
-                    sys.exit(1)
+                    return False
                 continue
 
             if not talles:
@@ -396,7 +400,7 @@ def actualizar_stock():
 
             print(f"  [{i}/{len(productos)}] {nombre}: {len(talles)} talles escaneados")
             productos_proveedor.append((nombre, talles))
-
+    finally:
         browser.close()
 
     # --- Sumamos el stock de casa (zapatillas_manual.js) con el escaneado ---
@@ -421,6 +425,7 @@ def actualizar_stock():
         f.write("\n".join(lineas).strip() + "\n")
 
     print(f"\n✅ Análisis finalizado. {incluidos} modelos con stock real guardados en {ARCHIVO_SALIDA} (stock de casa primero)\n")
+    return True
 
 def parsear_stock_txt():
     items = []
@@ -438,29 +443,30 @@ def parsear_stock_txt():
                 items.append({"modelo": modelo, "texto": f"{modelo}\n{talles}"})
     return items
 
-def main():
-    actualizar_stock()
+def obtener_items_con_foto(p):
+    if not actualizar_stock(p):
+        return []
 
     items = parsear_stock_txt()
     if not items:
         print("❌ No hay items para enviar en el archivo de stock.")
-        return
+        return []
 
     print("Revisando fotos disponibles en la carpeta...")
     items_con_foto = []
     extensiones = ['.jpg', '.jpeg', '.png', '.webp']
-    
+
     for item in items:
         modelo_original = item["modelo"]
         modelo_archivo = limpiar_nombre_archivo(modelo_original)
-        
+
         foto_encontrada = None
         for ext in extensiones:
             ruta_prueba = os.path.join(CARPETA_FOTOS, f"{modelo_archivo}{ext}")
             if os.path.exists(ruta_prueba):
                 foto_encontrada = ruta_prueba
                 break
-                
+
         if foto_encontrada:
             item["ruta_foto"] = foto_encontrada
             items_con_foto.append(item)
@@ -469,93 +475,117 @@ def main():
 
     if not items_con_foto:
         print("\n❌ No hay fotos disponibles para enviar.")
-        return
 
-    primer_item = items_con_foto[0]
-    resto_items = items_con_foto[1:]
+    return items_con_foto
 
-    print("\n--- FASE 2: ENVIANDO POR WHATSAPP ---")
+def enviar_item(page, item):
+    modelo = item["modelo"]
+    texto = item["texto"]
+    foto_a_subir = item["ruta_foto"]
+
+    try:
+        print(f"Preparando foto de: {modelo}...")
+
+        copiar_imagen_al_portapapeles(foto_a_subir)
+
+        barra_mensaje = page.locator('div[contenteditable="true"]').last
+        barra_mensaje.click()
+        page.wait_for_timeout(500)
+
+        page.keyboard.press("Control+V")
+        page.wait_for_timeout(3500)
+
+        lineas_texto = texto.split('\n')
+        for i, linea in enumerate(lineas_texto):
+            page.keyboard.insert_text(linea)
+            if i < len(lineas_texto) - 1:
+                page.keyboard.press("Shift+Enter")
+
+        page.wait_for_timeout(1000)
+
+        page.keyboard.press("Enter")
+        page.wait_for_timeout(1000)
+
+        # TIEMPO DE ESPERA AJUSTADO: Entre 5 y 20 segundos
+        espera = random.uniform(5, 15)
+        print(f"✅ Enviado: {modelo}. Esperando {espera:.1f} segundos...")
+        time.sleep(espera)
+        return True
+
+    except Exception as e:
+        print(f"❌ Error al enviar {modelo}: {e}")
+        page.keyboard.press("Escape")
+        page.wait_for_timeout(1000)
+        page.keyboard.press("Escape")
+        return False
+
+def main():
+    # A diferencia de antes (una corrida = un envío y listo), esto ahora
+    # queda "prendido" como el piloto_automatico: abre WhatsApp Web UNA sola
+    # vez, hace el paso manual UNA sola vez (para destrabar el bloqueo de
+    # WhatsApp), y de ahí en más cada ENTER escanea el stock de nuevo y
+    # manda una tanda entera 100% automática, sin cerrar ni reabrir nada.
     with sync_playwright() as p:
         browser = p.chromium.launch_persistent_context(
             user_data_dir=os.path.join(SCRIPT_DIR, "sesion_wsp"),
             headless=False
         )
         page = browser.new_page()
-        
+
         print("Abriendo WhatsApp Web...")
         _goto_con_reintentos(page, "https://web.whatsapp.com/")
-        
-        print("\n" + "="*65)
-        print("🛑 PASO MANUAL (DESTROZANDO EL BLOQUEO DE WHATSAPP) 🛑")
-        print("1. Entrá a tu grupo de WhatsApp en la ventana que se abrió.")
-        print(f"2. Buscá y adjuntá a mano la primera foto: {primer_item['modelo']}")
-        print("3. Ponele este texto:")
-        print("-" * 30)
-        print(primer_item['texto'])
-        print("-" * 30)
-        input("👉 Cuando la foto esté ENVIADA, apretá ENTER acá: ")
-        print("="*65 + "\n")
 
-        print("¡Iniciando el envío masivo automático!...")
-        page.wait_for_timeout(3000) 
-        
-        enviados = 1 
+        primera_tanda = True
 
-        for item in resto_items:
-            modelo = item["modelo"]
-            texto = item["texto"]
-            foto_a_subir = item["ruta_foto"]
-            
+        while True:
+            if not primera_tanda:
+                print("\n" + "=" * 65)
+                input("👉 Apretá ENTER para escanear el stock y mandar una tanda nueva (o cerrá esta ventana para salir): ")
+
+            print("\n--- FASE 1: ESCANEANDO STOCK ---")
+            items_con_foto = obtener_items_con_foto(p)
+            if not items_con_foto:
+                print("No hay nada para enviar en esta tanda.")
+                primera_tanda = False
+                continue
+
+            print("\n--- FASE 2: ENVIANDO POR WHATSAPP ---")
+            if primera_tanda:
+                primer_item = items_con_foto[0]
+                items_a_enviar = items_con_foto[1:]
+
+                print("\n" + "=" * 65)
+                print("🛑 PASO MANUAL, SOLO ESTA PRIMERA VEZ (DESTROZANDO EL BLOQUEO DE WHATSAPP) 🛑")
+                print("1. Entrá a tu grupo de WhatsApp en la ventana que se abrió.")
+                print(f"2. Buscá y adjuntá a mano la primera foto: {primer_item['modelo']}")
+                print("3. Ponele este texto:")
+                print("-" * 30)
+                print(primer_item['texto'])
+                print("-" * 30)
+                input("👉 Cuando la foto esté ENVIADA, apretá ENTER acá: ")
+                print("=" * 65 + "\n")
+                enviados = 1
+                primera_tanda = False
+            else:
+                items_a_enviar = items_con_foto
+                enviados = 0
+
+            print("¡Iniciando el envío automático!...")
+            page.wait_for_timeout(3000)
+
+            for item in items_a_enviar:
+                if enviar_item(page, item):
+                    enviados += 1
+
+            print("\nMandando el mensaje final de precios...")
             try:
-                print(f"Preparando foto de: {modelo}...")
-                
-                copiar_imagen_al_portapapeles(foto_a_subir)
-                
-                barra_mensaje = page.locator('div[contenteditable="true"]').last
-                barra_mensaje.click()
-                page.wait_for_timeout(500)
-                
-                page.keyboard.press("Control+V")
-                page.wait_for_timeout(3500) 
-                
-                lineas_texto = texto.split('\n')
-                for i, linea in enumerate(lineas_texto):
-                    page.keyboard.insert_text(linea)
-                    if i < len(lineas_texto) - 1:
-                        page.keyboard.press("Shift+Enter")
-                        
-                page.wait_for_timeout(1000)
-                
-                page.keyboard.press("Enter")
-                page.wait_for_timeout(1000)
-                
-                enviados += 1
-                
-                # TIEMPO DE ESPERA AJUSTADO: Entre 5 y 20 segundos
-                espera = random.uniform(5, 15)
-                print(f"✅ Enviado: {modelo}. Esperando {espera:.1f} segundos...")
-                time.sleep(espera)
-                
+                page.wait_for_timeout(1500)
+                enviar_mensaje_texto(page, MENSAJE_FINAL_PRECIOS)
+                print("✅ Mensaje final de precios enviado.")
             except Exception as e:
-                print(f"❌ Error al enviar {modelo}: {e}")
-                page.keyboard.press("Escape")
-                page.wait_for_timeout(1000)
-                page.keyboard.press("Escape")
+                print(f"❌ Error al mandar el mensaje final de precios: {e}")
 
-        print("\nMandando el mensaje final de precios...")
-        try:
-            page.wait_for_timeout(1500)
-            enviar_mensaje_texto(page, MENSAJE_FINAL_PRECIOS)
-            print("✅ Mensaje final de precios enviado.")
-        except Exception as e:
-            print(f"❌ Error al mandar el mensaje final de precios: {e}")
-
-        print(f"\n¡Terminado! Se actualizaron los datos y se enviaron {enviados} fotos con éxito.")
-        
-        try:
-            browser.close()
-        except:
-            pass
+            print(f"\n¡Tanda terminada! Se enviaron {enviados} fotos con éxito.")
 
 if __name__ == "__main__":
     main()
