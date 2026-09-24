@@ -90,6 +90,7 @@ const stock_zapatillas = [
   { modelo: 'Jordan low vérmelo', talles: [{"talle": 41, "stock": 1}], foto: 'Fotos/Jordan low vérmelo.jpeg' },
   { modelo: 'Jordan retro 4 preto / vérmelos', talles: [{"talle": 34, "stock": 2}, {"talle": 35, "stock": 4}, {"talle": 36, "stock": 6}, {"talle": 37, "stock": 6}, {"talle": 38, "stock": 4}], foto: 'Fotos/Jordan retro 4 preto vérmelos.jpeg' },
   { modelo: 'Campus clasicas', talles: [{"talle": 36, "stock": 1}], foto: 'Fotos/Campus clasicas.jpeg' },
+  { modelo: 'Vans KNU plataforma alta', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 1}, {"talle": 39, "stock": 3}, {"talle": 40, "stock": 1}], foto: 'Fotos/Vans KNU plataforma alta.jpeg' },
   { modelo: 'New balance ABZORB', talles: [{"talle": 35, "stock": 2}], foto: 'Fotos/New balance ABZORB.jpeg' },
   { modelo: 'Air forcé carbono', talles: [{"talle": 38, "stock": 1}], foto: 'Fotos/Air forcé carbono.jpeg' },
   { modelo: 'Jordan 11 panda', talles: [{"talle": 37, "stock": 1}], foto: 'Fotos/Jordan 11 panda.jpeg' },
