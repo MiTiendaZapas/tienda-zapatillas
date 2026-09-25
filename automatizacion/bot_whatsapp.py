@@ -437,88 +437,6 @@ def fusionar_stock_tienda_y_casa(productos_manual, productos_proveedor):
 
     return [(combinados[clave]["nombre"], combinados[clave]["talles"]) for clave in orden]
 
-def foto_local_existe(nombre_archivo):
-    for ext in ['.jpg', '.jpeg', '.png', '.webp']:
-        if os.path.exists(os.path.join(CARPETA_FOTOS, f"{nombre_archivo}{ext}")):
-            return True
-    return False
-
-def _guardar_archivo_atomico(destino, contenido):
-    # Se escribe primero en una carpeta temporal (ignorada por git) y recién
-    # cuando está completo se mueve a Fotos/. Así el piloto, que hace "git add
-    # Fotos" por su cuenta, nunca puede llegar a subir una foto a medio bajar.
-    # El nombre temporal incluye el número de proceso: si el piloto y el bot
-    # bajan la MISMA foto a la vez (por ejemplo los dos arrancan a las 8), no
-    # pisan el mismo archivo temporal. Si al mover justo el otro proceso está
-    # dejando ese mismo archivo, se reintenta; y si ya quedó ahí, está bien.
-    carpeta_tmp = os.path.join(SCRIPT_DIR, "_descargas_tmp")
-    os.makedirs(carpeta_tmp, exist_ok=True)
-    tmp = os.path.join(carpeta_tmp, f"{os.path.basename(destino)}.{os.getpid()}.part")
-    with open(tmp, "wb") as f:
-        f.write(contenido)
-
-    ultimo_error = None
-    for _ in range(5):
-        try:
-            os.replace(tmp, destino)
-            return
-        except PermissionError as e:
-            ultimo_error = e
-            time.sleep(0.2)
-    try:
-        os.remove(tmp)
-    except OSError:
-        pass
-    if not os.path.exists(destino):
-        raise ultimo_error
-
-def descargar_foto_producto(page, ruta_destino_sin_extension):
-    # Se llama con "page" ya posicionada en la página del producto. Toma la
-    # imagen principal (.js-product-slide-img) y, de su "srcset", la variante
-    # de mayor resolución (normalmente 1024px) en vez del thumbnail chico.
-    # Devuelve la ruta guardada, o "" si no pudo (en ese caso el modelo
-    # simplemente queda sin foto, como antes).
-    try:
-        img = page.locator(".js-product-slide-img").first
-        if img.count() == 0:
-            return ""
-
-        url_elegida = None
-        mejor_ancho = -1
-        for parte in (img.get_attribute("srcset") or "").split(","):
-            trozos = parte.strip().rsplit(" ", 1)
-            if len(trozos) != 2:
-                continue
-            try:
-                ancho = int(trozos[1].rstrip("w"))
-            except ValueError:
-                continue
-            if ancho > mejor_ancho:
-                mejor_ancho = ancho
-                url_elegida = trozos[0]
-
-        if not url_elegida:
-            url_elegida = img.get_attribute("src") or ""
-        if not url_elegida:
-            return ""
-        if url_elegida.startswith("//"):
-            url_elegida = "https:" + url_elegida
-
-        respuesta = page.request.get(url_elegida, timeout=TIMEOUT_PRODUCTO_MS)
-        if not respuesta.ok:
-            return ""
-        contenido = respuesta.body()
-
-        # Se confirma que realmente sea una imagen antes de guardarla.
-        Image.open(BytesIO(contenido)).verify()
-
-        extension = os.path.splitext(url_elegida.split("?")[0])[1] or ".jpg"
-        ruta_destino = f"{ruta_destino_sin_extension}{extension}"
-        _guardar_archivo_atomico(ruta_destino, contenido)
-        return ruta_destino
-    except Exception:
-        return ""
-
 def actualizar_stock(p):
     # Recibe el "p" de Playwright ya abierto en vez de crear el suyo propio,
     # para poder correr esto varias veces (una por tanda) sin anidar
@@ -561,7 +479,6 @@ def actualizar_stock(p):
         productos_proveedor = []
         fallas_seguidas = 0
         MAX_FALLAS_SEGUIDAS = 4
-        fotos_descargadas = 0
 
         for i, (nombre, url) in enumerate(productos, start=1):
             talles = None
@@ -589,16 +506,6 @@ def actualizar_stock(p):
 
             print(f"  [{i}/{len(productos)}] {nombre}: {len(talles)} talles escaneados")
             productos_proveedor.append((nombre, talles))
-
-            nombre_archivo = limpiar_nombre_archivo(nombre)
-            if not foto_local_existe(nombre_archivo):
-                ruta_foto = descargar_foto_producto(page_producto, os.path.join(CARPETA_FOTOS, nombre_archivo))
-                if ruta_foto:
-                    fotos_descargadas += 1
-                    print(f"    📷 Foto nueva descargada: {ruta_foto.replace(os.sep, '/')}")
-
-        if fotos_descargadas:
-            print(f"\n📷 Se descargaron {fotos_descargadas} foto(s) nueva(s) a Fotos/ (el piloto las sube a GitHub en su próximo ciclo).")
     finally:
         browser.close()
 
@@ -670,7 +577,7 @@ def obtener_items_con_foto(p):
             item["ruta_foto"] = foto_encontrada
             items_con_foto.append(item)
         else:
-            print(f"⚠️ Sin foto para: '{modelo_original}' (buscado como '{modelo_archivo}').")
+            print(f"⚠️ Sin foto para: '{modelo_original}' (buscado como '{modelo_archivo}'). El bot no descarga fotos: las baja el piloto automático en su próximo ciclo.")
 
     if not items_con_foto:
         print("\n❌ No hay fotos disponibles para enviar.")

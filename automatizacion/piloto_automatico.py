@@ -67,12 +67,14 @@ ESPERA_MAX_MINUTOS = 14
 # normal, para no insistir de golpe contra un sitio que puede estar caído.
 ESPERA_SIN_PRODUCTOS_MINUTOS = 30
 
-# Horario de descanso: de 00:00 a 08:00 no escanea ni molesta al sitio del
+# Horario de descanso: de 00:00 a 07:30 no escanea ni molesta al sitio del
 # proveedor, aunque la laptop siga prendida (de noche no hay nadie atendiendo
-# pedidos). Con HORA_INICIO_DESCANSO=0 el rango nunca cruza la medianoche, lo
+# pedidos). Termina a las 7:30 para que el primer ciclo del día (unos 7 min)
+# ya haya bajado y subido las fotos nuevas cuando se prende el bot de
+# WhatsApp a las 8. Con INICIO=00:00 el rango nunca cruza la medianoche, lo
 # que simplifica la cuenta de cuánto falta para que termine.
-HORA_INICIO_DESCANSO = 0
-HORA_FIN_DESCANSO = 8
+INICIO_DESCANSO = (0, 0)   # (hora, minuto)
+FIN_DESCANSO = (7, 30)
 
 # Palabras clave para blindar el catálogo de zapatillas: si algún producto de
 # la tienda online contiene alguna de estas palabras, se descarta siempre,
@@ -288,14 +290,15 @@ def descargar_foto_producto(page, ruta_destino_sin_extension):
 
 def en_horario_de_descanso(ahora=None):
     ahora = ahora or time.localtime()
-    return HORA_INICIO_DESCANSO <= ahora.tm_hour < HORA_FIN_DESCANSO
+    minuto_del_dia = ahora.tm_hour * 60 + ahora.tm_min
+    return INICIO_DESCANSO[0] * 60 + INICIO_DESCANSO[1] <= minuto_del_dia < FIN_DESCANSO[0] * 60 + FIN_DESCANSO[1]
 
 def segundos_hasta_fin_de_descanso(ahora=None):
-    # Solo se llama estando ya dentro del horario de descanso (0 a
-    # HORA_FIN_DESCANSO), así que nunca hay que cruzar a otro día.
+    # Solo se llama estando ya dentro del horario de descanso (que empieza
+    # a medianoche), así que nunca hay que cruzar a otro día.
     ahora = ahora or time.localtime()
     segundos_desde_medianoche = ahora.tm_hour * 3600 + ahora.tm_min * 60 + ahora.tm_sec
-    return max(HORA_FIN_DESCANSO * 3600 - segundos_desde_medianoche, 0)
+    return max(FIN_DESCANSO[0] * 3600 + FIN_DESCANSO[1] * 60 - segundos_desde_medianoche, 0)
 
 def _git_con_reintentos(args, intentos=3, espera_seg=15, **kwargs):
     # Un corte de wifi de unos segundos justo en el momento del pull/push no
@@ -419,7 +422,7 @@ def main():
     while True:
         if en_horario_de_descanso():
             segundos = segundos_hasta_fin_de_descanso()
-            print(f"\n😴 [{time.strftime('%H:%M:%S')}] Horario de descanso ({HORA_INICIO_DESCANSO:02d}:00-{HORA_FIN_DESCANSO:02d}:00). Durmiendo {segundos / 3600:.1f} h hasta las {HORA_FIN_DESCANSO:02d}:00...\n")
+            print(f"\n😴 [{time.strftime('%H:%M:%S')}] Horario de descanso ({INICIO_DESCANSO[0]:02d}:{INICIO_DESCANSO[1]:02d}-{FIN_DESCANSO[0]:02d}:{FIN_DESCANSO[1]:02d}). Durmiendo {segundos / 3600:.1f} h hasta las {FIN_DESCANSO[0]:02d}:{FIN_DESCANSO[1]:02d}...\n")
             time.sleep(segundos)
             continue
 
