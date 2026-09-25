@@ -14,11 +14,30 @@ from playwright.sync_api import sync_playwright
 sys.stdout.reconfigure(encoding="utf-8")
 sys.stderr.reconfigure(encoding="utf-8")
 
-# A diferencia de piloto_automatico.py (que corre solo, desatendido, por
-# horas), este bot siempre corre con alguien mirando desde el paso manual de
-# la primera foto. Por eso NO desactivamos "QuickEdit Mode" de la consola
-# acá: hacerlo evitaría el cuelgue por clic accidental, pero también rompe
-# la selección con mouse y el pegado en esta ventana, que si se necesita.
+def _deshabilitar_quickedit_windows():
+    # En Windows, un clic o una selección de texto en la ventana de la consola
+    # activa "QuickEdit Mode" y CONGELA el script hasta apretar Enter o Esc
+    # (parece que "no avanza" aunque no haya ningún error). Al desactivarlo
+    # ya no hay forma de congelarlo por accidente; el costo es que no se puede
+    # seleccionar texto con el mouse en esta ventana, por eso todo lo que se
+    # imprime queda también guardado en automatizacion/logs/bot_whatsapp.log.
+    if os.name != "nt":
+        return
+    try:
+        import ctypes
+        kernel32 = ctypes.windll.kernel32
+        STD_INPUT_HANDLE = -10
+        ENABLE_EXTENDED_FLAGS = 0x0080
+        ENABLE_QUICK_EDIT_MODE = 0x0040
+        handle = kernel32.GetStdHandle(STD_INPUT_HANDLE)
+        modo = ctypes.c_uint32()
+        if kernel32.GetConsoleMode(handle, ctypes.byref(modo)):
+            nuevo_modo = (modo.value & ~ENABLE_QUICK_EDIT_MODE) | ENABLE_EXTENDED_FLAGS
+            kernel32.SetConsoleMode(handle, nuevo_modo)
+    except Exception:
+        pass
+
+_deshabilitar_quickedit_windows()
 
 # --- FIJA LA CARPETA DE TRABAJO A LA RAÍZ DEL REPO ---
 # Este script vive en automatizacion/, que está en .gitignore. Pero Fotos/ y
@@ -30,13 +49,60 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.dirname(SCRIPT_DIR)
 os.chdir(REPO_ROOT)
 
+# --- LOG A ARCHIVO ---
+# Todo lo que se imprime en la consola se copia (con hora) a
+# automatizacion/logs/bot_whatsapp.log, que está dentro de la carpeta ignorada
+# por git. Así, si algo falla o se traba, se puede ver qué pasó y cuándo sin
+# tener que copiar texto de la ventana.
+import logging
+from logging.handlers import RotatingFileHandler
+
+def _configurar_log_a_archivo(nombre_archivo):
+    carpeta = os.path.join(SCRIPT_DIR, "logs")
+    os.makedirs(carpeta, exist_ok=True)
+    handler = RotatingFileHandler(os.path.join(carpeta, nombre_archivo), maxBytes=5_000_000, backupCount=2, encoding="utf-8")
+    handler.setFormatter(logging.Formatter("%(asctime)s %(message)s", "%Y-%m-%d %H:%M:%S"))
+    logger = logging.getLogger(nombre_archivo)
+    logger.setLevel(logging.INFO)
+    logger.addHandler(handler)
+    logger.propagate = False
+    return logger
+
+class _CopiarSalidaALog:
+    def __init__(self, flujo, logger):
+        self._flujo = flujo
+        self._logger = logger
+        self._pendiente = ""
+
+    def write(self, texto):
+        self._flujo.write(texto)
+        self._pendiente += texto
+        while "\n" in self._pendiente:
+            linea, self._pendiente = self._pendiente.split("\n", 1)
+            if linea.strip():
+                self._logger.info(linea)
+        return len(texto)
+
+    def flush(self):
+        self._flujo.flush()
+
+    def __getattr__(self, nombre):
+        return getattr(self._flujo, nombre)
+
+try:
+    _logger_bot = _configurar_log_a_archivo("bot_whatsapp.log")
+    sys.stdout = _CopiarSalidaALog(sys.stdout, _logger_bot)
+    sys.stderr = _CopiarSalidaALog(sys.stderr, _logger_bot)
+except Exception:
+    pass
+
 # --- CONFIGURACIÓN GENERAL ---
 URL_LISTADO = "https://vestitepiola.mitiendanube.com/productos/?order=best-selling"
 ARCHIVO_SALIDA = "stock_proveedor.txt"
 CARPETA_FOTOS = "Fotos"
 RUTA_ZAPATILLAS_MANUAL = "zapatillas_manual.js"
 MAX_SCROLLS = 200
-ESTABLE_LIMITE = 3
+ESTABLE_LIMITE = 5
 TIMEOUT_PRODUCTO_MS = 15000
 
 # Mensaje de precios que se manda como texto (sin foto), UNA sola vez,
@@ -112,32 +178,40 @@ def enviar_mensaje_texto(page, texto):
     page.wait_for_timeout(1000)
 
 def cargar_listado_completo(page):
+    # Misma lógica que usa piloto_automatico.py. La versión anterior de este
+    # bot esperaba muy poco entre scrolls (700ms, 3 vueltas iguales) y daba
+    # el listado por terminado con ~220 de ~400 tarjetas. Hoy lo que quedaba
+    # sin cargar era casi todo "sin stock", pero el orden del listado es por
+    # más vendidos, no por stock, así que un modelo con stock podía quedar
+    # afuera sin aviso.
     estable = 0
     anterior = -1
+
     for _ in range(MAX_SCROLLS):
-        page.mouse.wheel(0, 4000)
-        page.wait_for_timeout(700)
+        page.evaluate("window.scrollTo(0, document.body.scrollHeight);")
+        page.wait_for_timeout(1000)
 
         boton = page.locator(".js-load-more")
         if boton.count() > 0:
             style = (boton.first.get_attribute("style") or "").replace(" ", "")
             if "display:none" not in style:
                 try:
-                    boton.first.click(timeout=2000)
-                    page.wait_for_timeout(900)
+                    page.evaluate("window.scrollBy(0, -150);")
+                    boton.first.click(timeout=3000)
+                    page.wait_for_timeout(2500)
                 except Exception:
                     pass
 
-        actual = page.locator(".js-quickshop-modal-open").count()
+        actual = page.locator('.js-item-product, .product-container').count()
+
         if actual == anterior:
             estable += 1
             if estable >= ESTABLE_LIMITE:
                 break
         else:
             estable = 0
-        anterior = actual
 
-    return page.content()
+        anterior = actual
 
 def extraer_productos_con_filtro(page):
     productos = []
@@ -170,14 +244,27 @@ def extraer_productos_con_filtro(page):
     return productos
 
 def talles_disponibles_en_producto(page, url: str):
-    page.goto(url, wait_until="networkidle", timeout=TIMEOUT_PRODUCTO_MS)
+    # No se espera a "networkidle" (que esperaba a que carguen imágenes,
+    # trackers y demás, ~2.4s por página, mucho más con wifi lento): los datos
+    # de stock (window.LS.variants) ya están disponibles apenas se arma el
+    # HTML. Medido contra la tienda real: ~0.5s por página con resultados
+    # idénticos. Las páginas de producto se abren en una pestaña que además
+    # bloquea imágenes/fuentes/estilos (ver actualizar_stock).
+    page.goto(url, wait_until="domcontentloaded", timeout=TIMEOUT_PRODUCTO_MS)
     disponibles = set()
+
+    try:
+        page.wait_for_function("window.LS && window.LS.variants", timeout=8000)
+    except Exception:
+        pass
 
     try:
         variants = page.evaluate("window.LS ? window.LS.variants : null")
         if variants:
             for v in variants:
                 stock = v.get('stock')
+                if isinstance(stock, str) and stock.isdigit():
+                    stock = int(stock)
                 if stock is True or (isinstance(stock, int) and stock > 0):
                     for opt in ['option0', 'option1', 'option2']:
                         val = v.get(opt)
@@ -350,6 +437,70 @@ def fusionar_stock_tienda_y_casa(productos_manual, productos_proveedor):
 
     return [(combinados[clave]["nombre"], combinados[clave]["talles"]) for clave in orden]
 
+def foto_local_existe(nombre_archivo):
+    for ext in ['.jpg', '.jpeg', '.png', '.webp']:
+        if os.path.exists(os.path.join(CARPETA_FOTOS, f"{nombre_archivo}{ext}")):
+            return True
+    return False
+
+def _guardar_archivo_atomico(destino, contenido):
+    # Se escribe primero en una carpeta temporal (ignorada por git) y recién
+    # cuando está completo se mueve a Fotos/. Así el piloto, que hace "git add
+    # Fotos" por su cuenta, nunca puede llegar a subir una foto a medio bajar.
+    carpeta_tmp = os.path.join(SCRIPT_DIR, "_descargas_tmp")
+    os.makedirs(carpeta_tmp, exist_ok=True)
+    tmp = os.path.join(carpeta_tmp, os.path.basename(destino) + ".part")
+    with open(tmp, "wb") as f:
+        f.write(contenido)
+    os.replace(tmp, destino)
+
+def descargar_foto_producto(page, ruta_destino_sin_extension):
+    # Se llama con "page" ya posicionada en la página del producto. Toma la
+    # imagen principal (.js-product-slide-img) y, de su "srcset", la variante
+    # de mayor resolución (normalmente 1024px) en vez del thumbnail chico.
+    # Devuelve la ruta guardada, o "" si no pudo (en ese caso el modelo
+    # simplemente queda sin foto, como antes).
+    try:
+        img = page.locator(".js-product-slide-img").first
+        if img.count() == 0:
+            return ""
+
+        url_elegida = None
+        mejor_ancho = -1
+        for parte in (img.get_attribute("srcset") or "").split(","):
+            trozos = parte.strip().rsplit(" ", 1)
+            if len(trozos) != 2:
+                continue
+            try:
+                ancho = int(trozos[1].rstrip("w"))
+            except ValueError:
+                continue
+            if ancho > mejor_ancho:
+                mejor_ancho = ancho
+                url_elegida = trozos[0]
+
+        if not url_elegida:
+            url_elegida = img.get_attribute("src") or ""
+        if not url_elegida:
+            return ""
+        if url_elegida.startswith("//"):
+            url_elegida = "https:" + url_elegida
+
+        respuesta = page.request.get(url_elegida, timeout=TIMEOUT_PRODUCTO_MS)
+        if not respuesta.ok:
+            return ""
+        contenido = respuesta.body()
+
+        # Se confirma que realmente sea una imagen antes de guardarla.
+        Image.open(BytesIO(contenido)).verify()
+
+        extension = os.path.splitext(url_elegida.split("?")[0])[1] or ".jpg"
+        ruta_destino = f"{ruta_destino_sin_extension}{extension}"
+        _guardar_archivo_atomico(ruta_destino, contenido)
+        return ruta_destino
+    except Exception:
+        return ""
+
 def actualizar_stock(p):
     # Recibe el "p" de Playwright ya abierto en vez de crear el suyo propio,
     # para poder correr esto varias veces (una por tanda) sin anidar
@@ -379,27 +530,57 @@ def actualizar_stock(p):
             print("❌ No se encontraron productos.")
             return False
 
+        # Pestaña aparte para las páginas de producto: no necesitan imágenes,
+        # fuentes ni estilos para leer el stock, y bloquearlos las hace ~5
+        # veces más rápidas. (El listado de arriba sí se carga completo tal
+        # cual, porque su scroll infinito depende de cómo se ve la página.)
+        page_producto = browser.new_page()
+        page_producto.route(
+            "**/*",
+            lambda ruta: ruta.abort() if ruta.request.resource_type in ("image", "font", "media", "stylesheet") else ruta.continue_(),
+        )
+
         productos_proveedor = []
         fallas_seguidas = 0
         MAX_FALLAS_SEGUIDAS = 4
+        fotos_descargadas = 0
 
         for i, (nombre, url) in enumerate(productos, start=1):
-            try:
-                talles = talles_disponibles_en_producto(page, url)
-                fallas_seguidas = 0
-            except Exception as e:
+            talles = None
+            for intento in (1, 2):
+                try:
+                    talles = talles_disponibles_en_producto(page_producto, url)
+                    break
+                except Exception as e:
+                    if intento == 1:
+                        # Un fallo puntual (por ejemplo un corte de wifi de
+                        # unos segundos) no tiene que contar como falla.
+                        time.sleep(5)
+
+            if talles is None:
                 fallas_seguidas += 1
                 print(f"  [{i}/{len(productos)}] {nombre}: error al leerlo, saltando...")
                 if fallas_seguidas >= MAX_FALLAS_SEGUIDAS:
                     print("\nSe cortó: fallaron demasiados productos seguidos.")
                     return False
                 continue
+            fallas_seguidas = 0
 
             if not talles:
                 continue
 
             print(f"  [{i}/{len(productos)}] {nombre}: {len(talles)} talles escaneados")
             productos_proveedor.append((nombre, talles))
+
+            nombre_archivo = limpiar_nombre_archivo(nombre)
+            if not foto_local_existe(nombre_archivo):
+                ruta_foto = descargar_foto_producto(page_producto, os.path.join(CARPETA_FOTOS, nombre_archivo))
+                if ruta_foto:
+                    fotos_descargadas += 1
+                    print(f"    📷 Foto nueva descargada: {ruta_foto.replace(os.sep, '/')}")
+
+        if fotos_descargadas:
+            print(f"\n📷 Se descargaron {fotos_descargadas} foto(s) nueva(s) a Fotos/ (el piloto las sube a GitHub en su próximo ciclo).")
     finally:
         browser.close()
 
