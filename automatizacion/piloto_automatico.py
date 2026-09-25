@@ -257,12 +257,30 @@ def descargar_foto_producto(page, ruta_destino_sin_extension):
         # recién completo se mueve a Fotos/: el bot de WhatsApp también puede
         # bajar fotos ahí, y este script hace "git add Fotos", así que nunca
         # debe quedar una foto a medio escribir a la vista.
+        # El nombre temporal incluye el número de proceso porque el bot puede
+        # estar bajando la MISMA foto al mismo tiempo (por ej. si los dos
+        # arrancan a las 8). Si al mover el otro proceso está dejando ese
+        # mismo archivo se reintenta, y si ya quedó ahí está bien.
         carpeta_tmp = os.path.join(os.path.dirname(os.path.abspath(__file__)), "_descargas_tmp")
         os.makedirs(carpeta_tmp, exist_ok=True)
-        ruta_tmp = os.path.join(carpeta_tmp, os.path.basename(ruta_destino) + ".part")
+        ruta_tmp = os.path.join(carpeta_tmp, f"{os.path.basename(ruta_destino)}.{os.getpid()}.part")
         with open(ruta_tmp, "wb") as f:
             f.write(respuesta.body())
-        os.replace(ruta_tmp, ruta_destino)
+
+        ultimo_error = None
+        for _ in range(5):
+            try:
+                os.replace(ruta_tmp, ruta_destino)
+                return ruta_destino
+            except PermissionError as e:
+                ultimo_error = e
+                time.sleep(0.2)
+        try:
+            os.remove(ruta_tmp)
+        except OSError:
+            pass
+        if not os.path.exists(ruta_destino):
+            raise ultimo_error
 
         return ruta_destino
     except Exception:

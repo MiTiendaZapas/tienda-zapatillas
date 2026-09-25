@@ -447,12 +447,30 @@ def _guardar_archivo_atomico(destino, contenido):
     # Se escribe primero en una carpeta temporal (ignorada por git) y recién
     # cuando está completo se mueve a Fotos/. Así el piloto, que hace "git add
     # Fotos" por su cuenta, nunca puede llegar a subir una foto a medio bajar.
+    # El nombre temporal incluye el número de proceso: si el piloto y el bot
+    # bajan la MISMA foto a la vez (por ejemplo los dos arrancan a las 8), no
+    # pisan el mismo archivo temporal. Si al mover justo el otro proceso está
+    # dejando ese mismo archivo, se reintenta; y si ya quedó ahí, está bien.
     carpeta_tmp = os.path.join(SCRIPT_DIR, "_descargas_tmp")
     os.makedirs(carpeta_tmp, exist_ok=True)
-    tmp = os.path.join(carpeta_tmp, os.path.basename(destino) + ".part")
+    tmp = os.path.join(carpeta_tmp, f"{os.path.basename(destino)}.{os.getpid()}.part")
     with open(tmp, "wb") as f:
         f.write(contenido)
-    os.replace(tmp, destino)
+
+    ultimo_error = None
+    for _ in range(5):
+        try:
+            os.replace(tmp, destino)
+            return
+        except PermissionError as e:
+            ultimo_error = e
+            time.sleep(0.2)
+    try:
+        os.remove(tmp)
+    except OSError:
+        pass
+    if not os.path.exists(destino):
+        raise ultimo_error
 
 def descargar_foto_producto(page, ruta_destino_sin_extension):
     # Se llama con "page" ya posicionada en la página del producto. Toma la
