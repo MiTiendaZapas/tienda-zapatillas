@@ -109,6 +109,7 @@ const stock_zapatillas = [
   { modelo: 'Samba total black', talles: [{"talle": 36, "stock": 1}], foto: 'Fotos/Samba total black.jpeg' },
   { modelo: 'Ojotas Nike bandera', talles: [{"talle": 37, "stock": 12}, {"talle": 38, "stock": 12}, {"talle": 39, "stock": 28}, {"talle": 40, "stock": 28}, {"talle": 41, "stock": 27}, {"talle": 42, "stock": 27}, {"talle": 43, "stock": 12}, {"talle": 44, "stock": 12}], foto: 'Fotos/Ojotas Nike bandera.jpeg' },
   { modelo: 'Jordan retro 4 caramelo', talles: [{"talle": 39, "stock": 1}, {"talle": 42, "stock": 2}], foto: 'Fotos/Jordan retro 4 caramelo.jpeg' },
+  { modelo: 'Jordan low glister', talles: [{"talle": 35, "stock": 4}, {"talle": 36, "stock": 4}, {"talle": 37, "stock": 3}], foto: 'Fotos/Jordan low glister.jpeg' },
   { modelo: 'Nb 9060 celeste', talles: [{"talle": 35, "stock": 1}, {"talle": 37, "stock": 1}], foto: 'Fotos/Nb 9060 celeste.jpeg' },
   { modelo: 'Samba beige', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 4}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 1}, {"talle": 39, "stock": 3}, {"talle": 40, "stock": 1}], foto: 'Fotos/Samba beige.jpeg' },
   { modelo: 'Air forcé blanca brillo', talles: [{"talle": 36, "stock": 3}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 4}, {"talle": 39, "stock": 1}, {"talle": 40, "stock": 2}], foto: 'Fotos/Air forcé blanca brillo.jpeg' },
