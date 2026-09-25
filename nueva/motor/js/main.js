@@ -86,6 +86,7 @@ async function startStore() {
 
     const productView = createProductView({
       config,
+      channel,
       catalog,
       pricing,
       cart,

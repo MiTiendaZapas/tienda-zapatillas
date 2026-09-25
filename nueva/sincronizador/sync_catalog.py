@@ -9,8 +9,8 @@ Uso:
     python sincronizador/sync_catalog.py --only "Panda sb dunk; Mind beige"   prueba con pocos modelos
     python sincronizador/sync_catalog.py --force          escribe aunque el catálogo se achique mucho
 
-Por ahora NO hace git add/commit/push: eso se agrega cuando se decida cómo
-publicar la plataforma.
+Este archivo solo actualiza el catálogo en la PC. Publicarlo en GitHub (y
+repetirlo cada 15-20 minutos) lo hace piloto.py.
 """
 import argparse
 import json
@@ -100,14 +100,33 @@ def build_products(provider_items, manual_items, classifier):
             "sizes": sizes,
             "origin": sorted(set(raw["origin"])),
             "images": [],
+            "name_key": key,
             "_provider_item": raw["provider_item"],
             "_manual_photo": raw["manual_photo"],
         })
     return products
 
 
+def _photos_folder_index():
+    """Fotos cargadas a mano en la carpeta Fotos/ (Panel Admin), por nombre de modelo."""
+    folder = settings.LEGACY_PHOTOS_DIR / "Fotos"
+    if not folder.is_dir():
+        return {}
+    return {normalize(f.stem.replace("/", " ")): f for f in folder.iterdir()
+            if f.suffix.lower() in (".jpg", ".jpeg", ".png", ".webp")}
+
+
 def attach_images(products, provider, store, download):
+    """Fotos de cada modelo. Orden de preferencia:
+      1. las del proveedor,
+      2. la foto del stock de casa (si el modelo es solo de casa),
+      3. si el proveedor no tiene fotos: las que ya teníamos de ese modelo con otro
+         código (por ejemplo, del proveedor anterior),
+      4. la foto con el mismo nombre en la carpeta Fotos/ del Panel Admin.
+    Las de 3 y 4 son de respaldo: apenas el proveedor cargue las suyas, se reemplazan.
+    """
     pending = [p for p in products if download and store.needs_check(p["id"])]
+    photos_folder = _photos_folder_index() if pending else {}
     for product in products:
         product["images"] = store.current(product["id"])
     for number, product in enumerate(pending, 1):
@@ -119,6 +138,12 @@ def attach_images(products, provider, store, download):
                 sources = [local]
         if sources:
             product["images"] = store.update(product["id"], sources)
+        elif not product["images"]:
+            product["images"] = store.reuse_by_name(product["id"], product["name_key"])
+            fallback = photos_folder.get(normalize(product["name"].replace("/", " ")))
+            if not product["images"] and fallback:
+                print(f"    ♻️ {product['id']}: sin fotos en el proveedor, se usa {fallback.name} de la carpeta Fotos/.")
+                product["images"] = store.update(product["id"], [fallback], reused=True)
         if number % 10 == 0:
             store.save_state()     # si se corta la luz, no se pierde lo ya descargado
 
@@ -197,6 +222,7 @@ def run():
             return 1
 
     store = ImageStore()
+    store.remember_names(products)
     if not args.dry_run:
         try:
             attach_images(products, provider, store, download=not args.no_images)
@@ -228,6 +254,7 @@ def run():
     for p in products:
         p.pop("_provider_item")
         p.pop("_manual_photo")
+        p.pop("name_key")
     write_json_atomic(settings.PRODUCTS_FILE, {
         "version": int(time.time()),
         "generatedAt": datetime.now().astimezone().isoformat(timespec="seconds"),

@@ -122,6 +122,47 @@ class TestStockManual(unittest.TestCase):
             settings.MANUAL_STOCK_FILES = original
 
 
+class TestReutilizarFotos(unittest.TestCase):
+    def test_modelo_sin_fotos_reutiliza_las_del_mismo_nombre(self):
+        from PIL import Image
+        with tempfile.TemporaryDirectory() as tmp:
+            original = (settings.CATALOG_DIR, settings.IMAGES_DIR)
+            settings.CATALOG_DIR = Path(tmp)
+            settings.IMAGES_DIR = Path(tmp) / "fotos"
+            try:
+                old = settings.IMAGES_DIR / "tn-1"
+                old.mkdir(parents=True)
+                Image.new("RGB", (30, 40)).save(old / "a-lg.webp", "WEBP")
+                Image.new("RGB", (15, 20)).save(old / "a-sm.webp", "WEBP")
+                store = ImageStore.__new__(ImageStore)
+                store.state = {"tn-1": {"sources": ["x"], "name_key": "shox gris",
+                                        "images": [{"lg": "fotos/tn-1/a-lg.webp", "sm": "fotos/tn-1/a-sm.webp", "w": 30, "h": 40}]}}
+                images = store.reuse_by_name("vp-9", "shox gris")
+                self.assertEqual(images[0]["lg"], "fotos/vp-9/a-lg.webp")
+                self.assertTrue((settings.IMAGES_DIR / "vp-9" / "a-sm.webp").exists())
+                self.assertTrue(store.needs_check("vp-9"))   # se sigue revisando por si el proveedor carga las suyas
+                self.assertEqual(store.reuse_by_name("vp-10", "otro modelo"), [])
+            finally:
+                settings.CATALOG_DIR, settings.IMAGES_DIR = original
+
+
+class TestCarpetaFotos(unittest.TestCase):
+    def test_encuentra_la_foto_por_nombre_de_modelo(self):
+        import sync_catalog
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "Fotos").mkdir()
+            (Path(tmp) / "Fotos" / "Shox tapón azul.jpeg").write_bytes(b"x")
+            (Path(tmp) / "Fotos" / "Sb dunk cinza preto.webp").write_bytes(b"x")
+            original = settings.LEGACY_PHOTOS_DIR
+            settings.LEGACY_PHOTOS_DIR = Path(tmp)
+            try:
+                index = sync_catalog._photos_folder_index()
+            finally:
+                settings.LEGACY_PHOTOS_DIR = original
+        self.assertIn(normalize("Shox tapon azul"), index)
+        self.assertIn(normalize("Sb dunk cinza / preto".replace("/", " ")), index)
+
+
 class TestImagenes(unittest.TestCase):
     def test_respuesta_que_no_es_imagen_se_rechaza(self):
         with self.assertRaises(Exception):

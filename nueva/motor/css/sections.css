@@ -67,35 +67,9 @@
 .info-card__big { font-size: 18px; font-weight: 700; color: var(--color-accent-strong); }
 
 .shipping-grid { display: grid; gap: var(--space-3); }
-@media (min-width: 900px) {
-  .shipping-grid { grid-template-columns: 1.3fr 1fr; grid-template-rows: auto 1fr; gap: var(--space-4); }
-  .info-card--wide { grid-row: span 2; }
+@media (min-width: 768px) {
+  .shipping-grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-4); align-items: start; }
 }
-
-.rate-table {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  overflow: hidden;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-control);
-}
-.rate-table__row { display: contents; }
-.rate-table__row > span {
-  padding: 10px var(--space-3);
-  border-bottom: 1px solid var(--color-border);
-  font-size: 15px;
-}
-.rate-table__row > span:last-child { text-align: right; font-weight: 700; }
-.rate-table__row:nth-child(even) > span { background: color-mix(in srgb, var(--color-surface-2) 60%, transparent); }
-.rate-table__row--head > span {
-  background: var(--color-surface-2);
-  color: var(--color-text-muted);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-.rate-table__row:last-child > span { border-bottom: 0; }
 
 .check-list { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; font-size: 15px; }
 .check-list li { display: flex; gap: var(--space-2); }
@@ -106,36 +80,36 @@
   .exchange-grid { grid-template-columns: repeat(3, 1fr); gap: var(--space-4); }
 }
 
-/* ---------- Talles ---------- */
-.size-guide {
+/* ---------- Tabla de talles ---------- */
+.size-table {
   display: grid;
-  gap: var(--space-4);
-  align-items: center;
-  padding: var(--space-5);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
-  background: var(--color-surface);
-}
-.size-guide__icon { color: var(--color-accent); }
-.size-guide__icon .icon { width: 36px; height: 36px; }
-.size-guide__title { font-size: clamp(26px, 6vw, 34px); margin-bottom: var(--space-2); }
-.size-guide__text { max-width: 60ch; color: var(--color-text-muted); }
-.size-guide__example { display: flex; align-items: center; gap: var(--space-3); }
-.size-guide__example > span:not(.size-guide__arrow) {
-  display: grid;
-  justify-items: center;
-  min-width: 96px;
-  padding: var(--space-2) var(--space-3);
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-control);
+  background: var(--color-surface);
+}
+.size-table__row { display: contents; }
+.size-table__row > span {
+  padding: 9px var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  font-size: 15px;
+  text-align: center;
+}
+.size-table__row > span:first-child { font-weight: 700; }
+.size-table__row:nth-child(even) > span { background: color-mix(in srgb, var(--color-surface-2) 55%, transparent); }
+.size-table__row--head > span {
   background: var(--color-surface-2);
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
-.size-guide__example small { color: var(--color-text-muted); font-size: 11px; }
-.size-guide__example strong { font-family: var(--font-display); font-size: 36px; line-height: 1.1; color: var(--color-accent-strong); }
-.size-guide__arrow { color: var(--color-text-muted); }
-@media (min-width: 900px) {
-  .size-guide { grid-template-columns: auto 1fr auto; }
-}
+.size-table__row:last-child > span { border-bottom: 0; }
+.size-table__hint { display: flex; gap: var(--space-2); color: var(--color-text-muted); font-size: 14px; }
+.size-table__hint .icon { flex: none; width: 18px; height: 18px; margin-top: 1px; }
+.size-page { display: grid; gap: var(--space-4); max-width: 520px; }
 
 /* ---------- Quiero revender ---------- */
 .feature-list { display: grid; gap: var(--space-3); margin: 0; padding: 0; list-style: none; }
@@ -245,6 +219,22 @@
   transition: border-color var(--duration), color var(--duration);
 }
 .social-link:hover { border-color: var(--color-accent); color: var(--color-accent-strong); }
+/* Con el usuario (@...) al lado del ícono: más fácil de encontrar después en la app. */
+.social-list:has(.social-link--handle) { flex-wrap: wrap; }
+.social-link--handle {
+  display: inline-flex;
+  gap: var(--space-2);
+  width: auto;
+  padding: 0 var(--space-4) 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.social-link--handle .icon { width: 20px; height: 20px; }
+.social-list--stack { display: grid; }
+.social-list--stack .social-link--handle { width: 100%; justify-content: flex-start; }
 
 /* ---------- Menú de celular ---------- */
 .site-header__menu { margin-left: calc(-1 * var(--space-2)); }
@@ -293,3 +283,4 @@
   padding: var(--space-4) var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom));
   border-top: 1px solid var(--color-border);
 }
+.site-footer__heading--social { margin-top: var(--space-4); }

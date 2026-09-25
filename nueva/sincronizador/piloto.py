@@ -6,6 +6,9 @@ mismo comportamiento de fondo:
   - si el proveedor falla, espera más antes de reintentar,
   - reintenta git si se corta internet un momento.
 
+Todo lo que muestra queda también en sincronizador/informes/piloto.log, para
+poder copiar texto (la ventana no permite seleccionar: un clic la pausaría).
+
 Uso:
     python sincronizador/piloto.py                 actualiza en la PC, SIN publicar (para probar)
     python sincronizador/piloto.py --publicar      actualiza y sube a GitHub (uso normal en la laptop)
@@ -29,19 +32,25 @@ sys.stderr.reconfigure(encoding="utf-8")
 SYNC_DIR = Path(__file__).resolve().parent
 ROOT = SYNC_DIR.parent
 PID_FILE = SYNC_DIR / "estado" / "piloto.pid"
+LOG_FILE = SYNC_DIR / "informes" / "piloto.log"
+LOG_MAX_BYTES = 2_000_000
 
 WAIT_MIN_MINUTES = 15
 WAIT_MAX_MINUTES = 20
 WAIT_AFTER_FAILURE_MINUTES = 30
-REST_START_HOUR = 0
-REST_END_HOUR = 8
+# Descanso nocturno (igual que el piloto de la laptop): de 00:00 a 07:30.
+# Termina 7:30 para que a las 8, cuando se usa el bot de WhatsApp, ya estén
+# las novedades del día.
+REST_START_MINUTE = 0          # 00:00
+REST_END_MINUTE = 7 * 60 + 30  # 07:30
 
 # Qué se sube a GitHub en cada ciclo (lo que no exista se saltea).
 FILES_TO_PUBLISH = ["catalogo", "zapatillas_manual.js", "indumentaria.js", "Fotos"]
 
 
 def disable_quick_edit():
-    """En Windows, un clic en la consola pausa el proceso ("QuickEdit"). Se desactiva."""
+    """En Windows, un clic en la consola pausa el proceso ("QuickEdit"). Se desactiva
+    porque el piloto corre solo durante horas; para copiar texto está el archivo piloto.log."""
     if os.name != "nt":
         return
     try:
@@ -55,15 +64,29 @@ def disable_quick_edit():
         pass
 
 
+def write_log_file(line):
+    """Copia cada línea (con fecha) a piloto.log. Si crece mucho, se guarda el anterior como .old."""
+    try:
+        LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+        if LOG_FILE.exists() and LOG_FILE.stat().st_size > LOG_MAX_BYTES:
+            LOG_FILE.replace(LOG_FILE.with_suffix(".log.old"))
+        with LOG_FILE.open("a", encoding="utf-8") as f:
+            f.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')} {line}\n")
+    except OSError:
+        pass   # si el archivo está tomado un instante, no se frena el piloto
+
+
 def log(message):
     print(f"[{time.strftime('%H:%M:%S')}] {message}", flush=True)
+    write_log_file(message)
 
 
 def seconds_until_rest_ends():
     now = time.localtime()
-    if not (REST_START_HOUR <= now.tm_hour < REST_END_HOUR):
+    minute_of_day = now.tm_hour * 60 + now.tm_min
+    if not (REST_START_MINUTE <= minute_of_day < REST_END_MINUTE):
         return 0
-    return REST_END_HOUR * 3600 - (now.tm_hour * 3600 + now.tm_min * 60 + now.tm_sec)
+    return REST_END_MINUTE * 60 - (minute_of_day * 60 + now.tm_sec)
 
 
 def git(*args, retries=3, check=True):
@@ -102,8 +125,13 @@ def run_cycle(publish_enabled):
         # Trae lo último de GitHub (por ejemplo, stock de casa publicado desde otra PC).
         # --autostash guarda un momento los cambios sin publicar del Panel Admin.
         git("pull", "--rebase", "--autostash", "origin", "HEAD")
-    result = subprocess.run([sys.executable, str(SYNC_DIR / "sync_catalog.py")], cwd=ROOT)
-    if result.returncode != 0:
+    # Se muestra lo que va haciendo el sincronizador y se copia también a piloto.log.
+    process = subprocess.Popen([sys.executable, str(SYNC_DIR / "sync_catalog.py")], cwd=ROOT,
+                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding="utf-8", errors="replace")
+    for line in process.stdout:
+        print(line, end="", flush=True)
+        write_log_file(line.rstrip())
+    if process.wait() != 0:
         log("⚠️ La sincronización no se completó; el catálogo publicado queda como estaba.")
         return False
     if publish_enabled:
@@ -128,7 +156,7 @@ def main():
         while True:
             rest = seconds_until_rest_ends()
             if rest and not args.una_vez:
-                log(f"😴 Horario de descanso ({REST_START_HOUR:02d}:00-{REST_END_HOUR:02d}:00). Durmiendo {rest / 3600:.1f} h.")
+                log(f"😴 Horario de descanso (00:00-07:30). Durmiendo {rest / 3600:.1f} h.")
                 time.sleep(rest)
                 continue
 

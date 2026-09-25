@@ -1,32 +1,31 @@
 /*
- * Páginas de información (Cómo comprar, Envíos, Cambios, Preguntas, Nosotros,
- * Quiero revender) y footer, armados desde configuracion.js.
+ * Páginas de información (Cómo comprar, Talles, Envíos, Cambios, Preguntas,
+ * Nosotros, Quiero revender) y footer, armados desde configuracion.js.
  * Cada tienda (o cliente) cambia los textos sin tocar este archivo.
  */
-import { escapeHtml, fromRoot, money, whatsappLink } from "../utils.js";
+import { escapeHtml, fromRoot, whatsappLink } from "../utils.js";
 import { icon } from "./icons.js";
+import { socialLinksHtml } from "./social.js";
 
 const esc = escapeHtml;
 
 // --- contenido de cada página ------------------------------------------------
 
-function sizeGuide(config) {
-  const notice = config.sizeNotice;
-  if (!notice) return "";
+/** Tabla de talles (también la usa la vista de cada modelo). */
+export function sizeTableHtml(chart) {
   return `
-    <section class="size-guide" id="talles" aria-labelledby="talles-title">
-      <span class="size-guide__icon">${icon("ruler")}</span>
-      <div>
-        <h2 class="size-guide__title" id="talles-title">Talles argentinos</h2>
-        <p class="size-guide__text">${esc(notice.long)}</p>
+    <div class="size-table" role="table" aria-label="${esc(chart.title)}">
+      <div class="size-table__row size-table__row--head" role="row">
+        ${chart.columns.map((c) => `<span role="columnheader">${esc(c)}</span>`).join("")}
       </div>
-      ${notice.example ? `
-        <div class="size-guide__example" aria-hidden="true">
-          <span><small>En la tienda</small><strong>${esc(notice.example.store)}</strong><small>argentino</small></span>
-          <span class="size-guide__arrow">${icon("arrowRight")}</span>
-          <span><small>En la caja</small><strong>${esc(notice.example.box)}</strong><small>brasilero</small></span>
-        </div>` : ""}
-    </section>`;
+      ${chart.rows.map((row) => `
+        <div class="size-table__row" role="row">${row.map((cell) => `<span role="cell">${esc(cell)}</span>`).join("")}</div>`).join("")}
+    </div>
+    ${chart.hint ? `<p class="size-table__hint">${icon("ruler")} ${esc(chart.hint)}</p>` : ""}`;
+}
+
+function sizesBody(config) {
+  return `<div class="size-page">${sizeTableHtml(config.sizeChart)}</div>`;
 }
 
 function howToBuyBody(config) {
@@ -38,37 +37,23 @@ function howToBuyBody(config) {
           <h2 class="step-card__title">${esc(s.title)}</h2>
           <p class="step-card__text">${esc(s.text)}</p>
         </li>`).join("")}
-    </ol>
-    ${sizeGuide(config)}`;
+    </ol>`;
 }
 
 function shippingBody(config) {
-  const { methods, rates, ratesFor } = config.shipping;
-  const cards = Object.entries(methods).map(([key, m]) => {
-    const hasRates = key === ratesFor && rates?.length;
+  const cards = Object.values(config.shipping.methods).map((m) => {
     const consult = m.consultMessage
       ? `<a class="btn btn--outline" href="${whatsappLink(config.contact.whatsappQueries, `Hola ${config.name}! ${m.consultMessage}`)}" target="_blank" rel="noopener">${icon("whatsapp")} ${esc(m.consultLabel ?? "Consultar")}</a>`
       : "";
     return `
-      <article class="info-card${hasRates ? " info-card--wide" : ""}">
+      <article class="info-card">
         <header class="info-card__head">
           <span class="info-card__icon">${icon(m.icon ?? "truck")}</span>
           <div>
             <h2 class="info-card__title">${esc(m.label)}</h2>
-            <p class="info-card__text">${esc(m.pageText ?? m.summary)}</p>
+            <p class="info-card__text">${esc(m.summary)}</p>
           </div>
         </header>
-        ${hasRates ? `
-          <div class="rate-table" role="table" aria-label="Tarifas de ${esc(m.label)}">
-            <div class="rate-table__row rate-table__row--head" role="row">
-              <span role="columnheader">Tiempo de viaje</span><span role="columnheader">Costo</span>
-            </div>
-            ${rates.map((r) => `
-              <div class="rate-table__row" role="row">
-                <span role="cell">${esc(r.label)}</span>
-                <span role="cell" class="money">${money(r.price)}</span>
-              </div>`).join("")}
-          </div>` : ""}
         ${m.points?.length ? `<ul class="check-list">${m.points.map((pt) => `<li>${icon("check")}<span>${esc(pt)}</span></li>`).join("")}</ul>` : ""}
         ${consult}
       </article>`;
@@ -90,7 +75,7 @@ function exchangesBody(config, channel) {
       ${card("mayor", false)}
       <article class="info-card">
         <h2 class="info-card__title">Falla de fábrica</h2>
-        <p class="info-card__big">Siempre se cambia</p>
+        <p class="info-card__big">${esc(config.exchanges.faultTitle ?? "Se cambia")}</p>
         <p class="info-card__text">${esc(config.exchanges.faultNote)}</p>
       </article>
     </div>`;
@@ -141,9 +126,10 @@ function resellersBody(config) {
 function pageDefinitions(config, channel, channelKey) {
   return {
     "como-comprar": () => ({ eyebrow: "Paso a paso", title: config.howToBuy.title, lead: config.howToBuy.lead, body: () => howToBuyBody(config) }),
+    talles: () => ({ eyebrow: "Elegí bien", title: config.sizeChart.title, lead: "Buscá tu talle según el largo de tu pie.", body: () => sizesBody(config) }),
     envios: () => ({ eyebrow: "Recibí tu pedido", title: config.shippingSection.title, lead: config.shippingSection.lead, body: () => shippingBody(config) }),
     cambios: () => ({ eyebrow: "Tu compra, clara", title: config.exchanges.title, lead: config.exchanges.lead, body: () => exchangesBody(config, channel) }),
-    preguntas: () => ({ eyebrow: "Ayuda", title: "Preguntas frecuentes", lead: "Las dudas más comunes sobre pedidos, talles, envíos y cambios.", body: () => faqBody(config, channelKey) }),
+    preguntas: () => ({ eyebrow: "Ayuda", title: "Preguntas frecuentes", lead: "Las dudas más comunes sobre pedidos, envíos y cambios.", body: () => faqBody(config, channelKey) }),
     nosotros: () => ({ eyebrow: "La marca", title: config.about.title, lead: "", body: () => aboutBody(config) }),
     revender: () => ({
       eyebrow: "Reventa",
@@ -254,11 +240,8 @@ export function renderFooter(root, { config, links }) {
           <a class="footer-whatsapp" href="${whatsappLink(config.contact.whatsappQueries)}" target="_blank" rel="noopener">
             ${icon("whatsapp")} <span><small>WhatsApp</small>${esc(formatPhone(config.contact.whatsappQueries))}</span>
           </a>
-          <ul class="social-list">
-            ${(config.social ?? []).map((s) => `
-              <li><a class="social-link" href="${esc(s.url)}" target="_blank" rel="noopener" aria-label="${esc(s.label)} de ${esc(config.name)}">
-                ${icon(s.network)}</a></li>`).join("")}
-          </ul>
+          ${config.social?.length ? `<h2 class="site-footer__heading site-footer__heading--social">Seguinos</h2>` : ""}
+          ${socialLinksHtml(config, { handles: true, className: "social-list--stack" })}
         </div>
       </div>
       <div class="site-footer__bottom">

@@ -16,6 +16,8 @@ Protecciones ante imprevistos:
   - Respuestas que no son imágenes (páginas de error, etc.) se descartan.
   - Reintentos al borrar o renombrar, porque OneDrive o el antivirus pueden
     tener tomado un archivo por unos segundos.
+  - Si un modelo llega SIN fotos (por ejemplo, al cambiar de proveedor) pero ya
+    teníamos fotos de ese mismo modelo (mismo nombre), se reutilizan.
 """
 import hashlib
 import io
@@ -68,6 +70,12 @@ class ImageStore:
         temp.write_text(json.dumps(self.state, ensure_ascii=False, indent=1), encoding="utf-8")
         _retry(lambda: os.replace(temp, STATE_FILE))
 
+    def remember_names(self, products):
+        """Guarda el nombre de cada modelo para poder reutilizar sus fotos si cambia de código."""
+        for product in products:
+            if product["id"] in self.state:
+                self.state[product["id"]]["name_key"] = product["name_key"]
+
     def mark_seen(self, product_ids):
         now = time.time()
         for product_id in product_ids:
@@ -83,18 +91,24 @@ class ImageStore:
     def needs_check(self, product_id):
         entry = self.state.get(product_id)
         return (not entry
+                or entry.get("reused", False)
                 or not self._files_exist(entry["images"])
                 or time.time() - entry.get("checked", 0) > settings.IMAGE_REFRESH_DAYS * DAY)
 
     # --- descarga -------------------------------------------------------------
-    def update(self, product_id, sources):
-        """Procesa las fotos de origen (URLs o rutas locales). Devuelve las publicadas."""
+    def update(self, product_id, sources, reused=False):
+        """Procesa las fotos de origen (URLs o rutas locales). Devuelve las publicadas.
+
+        reused=True: son fotos de respaldo (no del proveedor); el modelo se sigue
+        revisando en cada actualización para usar las del proveedor apenas las cargue.
+        """
         sources = sources[: settings.MAX_IMAGES_PER_PRODUCT]
         keys = [_source_key(s) for s in sources]
         previous = self.state.get(product_id)
 
         if previous and previous["sources"] == keys and self._files_exist(previous["images"]):
             previous["checked"] = time.time()
+            previous["reused"] = reused
             return previous["images"]
 
         folder = settings.IMAGES_DIR / product_id
@@ -116,7 +130,7 @@ class ImageStore:
                 _retry(file.unlink)
 
         self.state[product_id] = {
-            "sources": keys, "images": images,
+            "sources": keys, "images": images, "reused": reused,
             "checked": time.time(), "last_seen": time.time(),
         }
         return images
@@ -138,6 +152,38 @@ class ImageStore:
         if is_cover:
             image["sm"] = self._relative(sm_path)
         return image
+
+    def reuse_by_name(self, product_id, name_key):
+        """Si otro código de producto con el mismo nombre ya tenía fotos, se copian a este.
+
+        Pasa al cambiar de proveedor (los modelos cambian de código) cuando el
+        proveedor nuevo todavía no cargó fotos de un modelo que ya teníamos.
+        """
+        donor_id = next((pid for pid, entry in self.state.items()
+                         if pid != product_id and entry.get("name_key") == name_key
+                         and not entry.get("reused") and self._files_exist(entry["images"])), None)
+        if not donor_id:
+            return []
+        donor = self.state[donor_id]
+        folder = settings.IMAGES_DIR / product_id
+        folder.mkdir(parents=True, exist_ok=True)
+        images = []
+        for img in donor["images"]:
+            copy = {}
+            for size in ("sm", "lg"):
+                if size in img:
+                    source = settings.CATALOG_DIR / img[size]
+                    target = folder / source.name
+                    shutil.copy2(source, target)
+                    copy[size] = self._relative(target)
+            copy["w"], copy["h"] = img["w"], img["h"]
+            images.append(copy)
+        self.state[product_id] = {
+            "sources": [], "images": images, "name_key": name_key, "reused": True,
+            "checked": time.time(), "last_seen": time.time(),
+        }
+        print(f"    ♻️ {product_id}: sin fotos en el proveedor, se reutilizan las que ya teníamos ({donor_id}).")
+        return images
 
     # --- limpieza -------------------------------------------------------------
     def cleanup(self, current_ids):

@@ -18,7 +18,7 @@ globalThis.history = { state: null, replaceState: (_s, _t, url) => { globalThis.
 const { createPricing } = await import("../motor/js/pricing.js");
 const { createCart } = await import("../motor/js/cart.js");
 const { createFilters } = await import("../motor/js/filters.js");
-const { buildOrderMessage, cleanInput } = await import("../motor/js/whatsapp.js");
+const { buildOrderMessage } = await import("../motor/js/whatsapp.js");
 const { escapeHtml, normalize, money, whatsappLink } = await import("../motor/js/utils.js");
 
 // --- datos de prueba -------------------------------------------------------------
@@ -66,10 +66,6 @@ describe("utilidades", () => {
   });
   test("whatsappLink limpia el número y codifica el mensaje", () => {
     assert.equal(whatsappLink("+54 9 11 5377-3771", "Hola & chau"), "https://wa.me/5491153773771?text=Hola%20%26%20chau");
-  });
-  test("cleanInput saca caracteres de control y respeta el máximo", () => {
-    assert.equal(cleanInput("Juan\u0000   Pérez\n", 60), "Juan Pérez");
-    assert.equal(cleanInput("x".repeat(100), 10).length, 10);
   });
 });
 
@@ -167,23 +163,21 @@ describe("filtros", () => {
 
 // --- mensaje de WhatsApp ------------------------------------------------------------
 describe("mensaje de WhatsApp", () => {
-  const config = {
-    name: "Tienda Test",
-    shipping: { methods: { moto: { label: "Moto", messageNote: "Costo a confirmar.", fields: [{ id: "address" }, { id: "city" }] } } },
-  };
+  const config = { name: "Tienda Test" };
   const pricing = createPricing(PRICES);
   const lines = [{ product: PRODUCTS[0], productId: "p1", size: "40", qty: 5 }];
 
   test("con elección: aclara la modalidad y su condición de cambio", () => {
     const channel = { label: "Revendedores", purchaseModes: { mayor: { message: "Compra POR MAYOR: sin cambio de talle." }, unidad: { message: "x" } } };
-    const msg = buildOrderMessage({ config, channel, quote: pricing.quote(lines, "mayor"), customer: { name: "Ana", shippingMethod: "moto", address: "Calle 1", city: "Moreno" } });
+    const msg = buildOrderMessage({ config, channel, quote: pricing.quote(lines, "mayor") });
     assert.match(msg, /Air forcé 1 blancas \| Talle 40 \| x5 \| \$37\.000 c\/u = \$185\.000/);
     assert.match(msg, /\*TOTAL: \$185\.000\*/);
     assert.match(msg, /Compra POR MAYOR: sin cambio de talle\./);
-    assert.match(msg, /Dirección: Calle 1\nLocalidad: Moreno\nCosto a confirmar\./);
+    // Sin datos del cliente ni del envío: eso se habla en el chat.
+    assert.doesNotMatch(msg, /Cliente|Envío:|Dirección/);
   });
   test("sin elección (tiendas de clientes): precio por mayor automático", () => {
-    const msg = buildOrderMessage({ config, channel: { label: "Por mayor" }, quote: pricing.quote(lines, "mayor"), customer: { name: "Ana", shippingMethod: "moto" } });
+    const msg = buildOrderMessage({ config, channel: { label: "Por mayor" }, quote: pricing.quote(lines, "mayor") });
     assert.match(msg, /Compra POR MAYOR \(5 o más pares surtidos\)\./);
   });
 });
