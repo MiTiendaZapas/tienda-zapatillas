@@ -12,7 +12,7 @@ const stock_zapatillas = [
   { modelo: 'Adidas forum Gelo', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 2}], foto: 'Fotos/Adidas forum Gelo.jpeg' },
   { modelo: 'Dunk bordo', talles: [{"talle": 38, "stock": 3}, {"talle": 39, "stock": 3}], foto: 'Fotos/Dunk bordo.jpeg' },
   { modelo: 'Deportivas fit black', talles: [{"talle": 35, "stock": 2}], foto: 'Fotos/Deportivas fit black.jpeg' },
-  { modelo: 'Jordan botitas 1 vermelho', talles: [{"talle": 35, "stock": 1}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 1}], foto: 'Fotos/Jordan botitas 1 vermelho.jpeg' },
+  { modelo: 'Jordan botitas 1 vermelho', talles: [{"talle": 35, "stock": 1}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 1}], foto: 'Fotos/Jordan botitas 1 vermelho.jpeg' },
   { modelo: 'Adidas forum blanco Preto', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 39, "stock": 3}], foto: 'Fotos/Adidas forum blanco Preto.jpeg' },
   { modelo: 'Jordan retro 4 pintita', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 1}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 2}, {"talle": 43, "stock": 3}, {"talle": 44, "stock": 1}], foto: 'Fotos/Jordan retro 4 pintita.jpeg' },
   { modelo: 'Jordan 1 botitas pink', talles: [{"talle": 36, "stock": 2}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 1}, {"talle": 39, "stock": 3}, {"talle": 40, "stock": 12}], foto: 'Fotos/Jordan 1 botitas pink.jpeg' },
