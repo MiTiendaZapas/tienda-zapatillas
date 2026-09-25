@@ -34,6 +34,10 @@ ninguna diferencia y todo se puede deshacer en minutos.
    ampliada, pedidos de prueba a tu propio WhatsApp, páginas de información,
    y la tienda de ClienteA en `.../nueva/clientes/cliente-a/`.
 3. La tienda actual y el piloto viejo siguen funcionando normalmente.
+4. Foto al compartir el link: las etiquetas og:image/og:url de los HTML ya
+   apuntan a la dirección final (.../tienda-zapatillas/). En la copia de
+   `nueva/` se cambian por .../tienda-zapatillas/nueva/ para poder probarla;
+   al mudar a la raíz se usan tal cual están en plataforma-zapas.
 
 ## Fase 2 · El cambio (en horario de descanso, por ejemplo 00:30)
 
@@ -103,6 +107,17 @@ marcas y fotos. El día que se mude:
 
 1. Confirmar con el proveedor que se puede usar su API.
 2. En `sincronizador/settings.py`: `ACTIVE_PROVIDER = "vestite_api"`.
-3. Correr una sincronización: baja las fotos nuevas (los modelos cambian de código).
+3. Correr una sincronización **a mano y de noche**: la primera vez baja todas las
+   fotos nuevas (los modelos cambian de código) y **tarda unos 45 minutos**.
+   Hay que correrla con `--force`, porque el catálogo cambia mucho de golpe.
+   Las siguientes actualizaciones vuelven a tardar ~1 minuto.
 4. Revisar los precios: las reglas por nombre siguen funcionando; los precios
    fijos por modelo (`overrides`, hoy vacíos) habría que actualizarlos.
+
+**Fotos durante la mudanza** (simulado el 24/09/2026 con la tienda nueva real):
+- Modelos con fotos en el proveedor nuevo: se usan esas (hasta 6 por modelo).
+- Modelos que el proveedor nuevo todavía no fotografió: se reutilizan las que ya
+  teníamos de ese modelo, o la foto con el mismo nombre en `Fotos/`.
+  Apenas el proveedor cargue las suyas, se reemplazan solas.
+- En la simulación: 69 modelos con fotos propias, 13 con fotos reutilizadas,
+  3 con foto de `Fotos/` y 1 sin foto (un modelo que hoy no existe en ningún lado).

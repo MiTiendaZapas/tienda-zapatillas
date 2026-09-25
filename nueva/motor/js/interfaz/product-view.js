@@ -8,12 +8,22 @@ import { escapeHtml, plural } from "../utils.js";
 import { productQueryLink } from "../whatsapp.js";
 import { icon } from "./icons.js";
 import { priceHtml, sizeButtonsHtml, stockStatus } from "./product-parts.js";
+import { sizeTableHtml } from "./pages.js";
+import { createSharer, shareButtonHtml } from "./share.js";
 import { createZoomViewer } from "./zoom-viewer.js";
 
 const HASH_PREFIX = "#p/";
 const ADDED_FEEDBACK_MS = 1600;
 
-export function createProductView({ config, catalog, pricing, cart, overlays, onAdded, onOpenCart, onMissing }) {
+const SHARE_FEEDBACK_MS = 3000;
+const SHARE_MESSAGES = {
+  copied: "Link copiado",
+  downloaded: "Fotos descargadas y texto copiado",
+  retry: "Listo: tocá de nuevo para compartir",
+  error: "No se pudo compartir",
+};
+
+export function createProductView({ config, channel, catalog, pricing, cart, overlays, onAdded, onOpenCart, onMissing }) {
   const dialog = document.createElement("dialog");
   dialog.className = "product-view";
   dialog.setAttribute("aria-labelledby", "pv-title");
@@ -34,6 +44,7 @@ export function createProductView({ config, catalog, pricing, cart, overlays, on
 
   const content = dialog.querySelector("[data-content]");
   const zoom = createZoomViewer(dialog);
+  const sharer = createSharer({ config, channel });
   const originalTitle = document.title;
   let product = null;
   let state = { size: null, qty: 1 };
@@ -142,13 +153,14 @@ export function createProductView({ config, catalog, pricing, cart, overlays, on
       </div>`;
   }
 
-  function sizeNoticeHtml() {
-    const notice = config.sizeNotice;
-    if (!notice || !notice.categories.includes(product.category)) return "";
+  /** Tabla de talles desplegable (solo en las categorías que la usan). */
+  function sizeChartHtml() {
+    const chart = config.sizeChart;
+    if (!chart || !chart.categories.includes(product.category)) return "";
     return `
-      <details class="size-notice">
-        <summary>${icon("ruler")} <span>${escapeHtml(notice.short)} <u>¿Cómo son los talles?</u></span></summary>
-        <p>${escapeHtml(notice.long)}</p>
+      <details class="size-chart-toggle">
+        <summary>${icon("ruler")} <span>${escapeHtml(chart.title)}</span> ${icon("chevronDown")}</summary>
+        ${sizeTableHtml(chart)}
       </details>`;
   }
 
@@ -186,18 +198,21 @@ export function createProductView({ config, catalog, pricing, cart, overlays, on
           <legend class="size-picker__legend">Elegí tu talle${soldOutCount ? ` <span class="size-picker__soldout">(tachados: agotados)</span>` : ""}</legend>
           <div class="size-picker__list" data-sizes>${sizeButtonsHtml(product.sizes, state.size)}</div>
         </fieldset>
-        ${sizeNoticeHtml()}
+        ${sizeChartHtml()}
         <div class="product-view__buy" data-buy>${buyHtml()}</div>
         <div class="product-view__added" data-added hidden>
           <p>${icon("check")} <span data-added-text></span></p>
           <button class="btn btn--outline" type="button" data-added-cart>Ver pedido</button>
         </div>
-        <a class="product-view__consult" href="${productQueryLink(config, product, state.size)}" target="_blank" rel="noopener" data-consult>
-          ${icon("whatsapp")} Consultar por este modelo
-        </a>
+        <div class="product-view__actions">
+          <a class="product-view__consult" href="${productQueryLink(config, product, state.size)}" target="_blank" rel="noopener" data-consult>
+            ${icon("whatsapp")} Consultar
+          </a>
+          ${shareButtonHtml(channel, icon("share"))}
+        </div>
         <ul class="product-view__facts">
           <li>${icon("chat")} No se paga online: confirmamos el stock por WhatsApp.</li>
-          <li>${icon("truck")} Entrega: ${escapeHtml(Object.values(config.shipping.methods).map((m) => m.label).join(" · "))}.</li>
+          <li>${icon("truck")} Envíos: ${escapeHtml(Object.values(config.shipping.methods).map((m) => m.label).join(" y "))}.</li>
         </ul>
       </div>`;
     updateCount();
@@ -274,10 +289,32 @@ export function createProductView({ config, catalog, pricing, cart, overlays, on
       onAdded?.({ product, size: state.size, qty: added, source: "detalle" });
       return;
     }
+    const shareBtn = event.target.closest("[data-share]");
+    if (shareBtn) {
+      shareProduct(shareBtn);
+      return;
+    }
     if (event.target.closest("[data-added-cart]")) {
       dialog.querySelector("[data-to-cart]").click();
     }
   });
+
+  /** Comparte el modelo y muestra el resultado en el mismo botón por unos segundos. */
+  async function shareProduct(button) {
+    if (button.getAttribute("aria-busy") === "true") return;
+    const label = button.querySelector("[data-share-label]");
+    const original = label.textContent;
+    button.setAttribute("aria-busy", "true");
+    label.textContent = "Preparando…";
+    const result = await sharer.share(product);
+    button.removeAttribute("aria-busy");
+    const feedback = SHARE_MESSAGES[result];
+    label.textContent = feedback ?? original;
+    if (feedback) {
+      clearTimeout(shareProduct.timer);
+      shareProduct.timer = setTimeout(() => { label.textContent = original; }, SHARE_FEEDBACK_MS);
+    }
+  }
 
   /** Confirmación dentro de la vista (la ventana tapa las notificaciones de la página). */
   function showAdded(qty) {

@@ -61,6 +61,7 @@ window.STORE_CONFIG = {
       label: "Por mayor",
       page: "index.html",
       prices: "precios-mayorista.json",
+      share: "fotos",   // compartir: fotos sin precio ni link (para revender)
       hero: {
         eyebrow: "Venta por mayor",
         title: "Catálogo de zapatillas",
@@ -76,6 +77,7 @@ window.STORE_CONFIG = {
       label: "Tienda",
       page: "minorista.html",
       prices: "precios-minorista.json",
+      share: "link",
       hero: {
         eyebrow: "Tienda online",
         title: "Catálogo de zapatillas",
@@ -95,28 +97,18 @@ window.STORE_CONFIG = {
     { id: "como-comprar", label: "Cómo comprar", file: "paginas/como-comprar.html", menu: true },
   ],
 
-  // COMPLETAR: si el cliente quiere aclarar la equivalencia de talles, copiar
-  // "sizeNotice" de la configuración de L.A IMP.
-  sizeNotice: null,
+  // COMPLETAR: si el cliente quiere mostrar una tabla de talles, copiar
+  // "sizeChart" de la configuración de L.A IMP.
+  sizeChart: null,
 
   // COMPLETAR con los métodos de envío reales del cliente. Por ahora, genéricos.
+  // En el pedido no se piden datos: el envío se coordina por WhatsApp.
   shipping: {
     methods: {
       envio: {
-        label: "Envío a domicilio",
+        label: "Envío a coordinar",
         icon: "truck",
         summary: "Coordinamos el envío y su costo por WhatsApp.",
-        checkoutNote: "El costo del envío se coordina por WhatsApp y no está incluido en el total.",
-        messageNote: "",
-        fields: [{ id: "address", required: true }, { id: "city", required: true }, { id: "reference" }],
-      },
-      retiro: {
-        label: "Retiro / a coordinar",
-        icon: "chat",
-        summary: "Coordinamos por WhatsApp el punto y el horario de entrega.",
-        checkoutNote: "Coordinamos la entrega por WhatsApp cuando confirmemos el stock.",
-        messageNote: "",
-        fields: [],
       },
     },
   },
@@ -127,7 +119,7 @@ window.STORE_CONFIG = {
     steps: [
       { title: "Elegí modelo y talle", text: "Tocá el talle en cada modelo y agregalo a tu pedido." },
       { title: "Revisá tu pedido", text: "En “Tu pedido” ves el total. Llevando 5 o más pares surtidos se aplica el precio por mayor." },
-      { title: "Envialo por WhatsApp", text: "Completás tu nombre y cómo lo recibís, y se arma el mensaje con todo el detalle." },
+      { title: "Envialo por WhatsApp", text: "Tocás “Enviar pedido por WhatsApp” y se arma el mensaje con todo el detalle." },
       { title: "Confirmamos y coordinamos", text: "Verificamos el stock, te confirmamos el pedido y coordinamos el pago y la entrega." },
     ],
   },

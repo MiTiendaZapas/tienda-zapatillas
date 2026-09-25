@@ -43,8 +43,9 @@ Además:
   - Si el cliente quiere que su comprador **elija** entre "por mayor" y "por unidad" (como L.A IMP),
     agregá `purchaseModes` copiándolo de la configuración de L.A IMP.
   - Sin `purchaseModes`, el precio por mayor se aplica solo al llegar a la cantidad mínima.
-- **`shipping.methods`**: los métodos de envío y qué datos se piden en cada uno
-  (`fields`). Los datos posibles están en `motor/js/checkout-fields.js`.
+- **`shipping.methods`**: los métodos de envío que se informan en la tienda. En el
+  pedido no se piden datos: nombre y envío se coordinan por WhatsApp.
+- **`social`** y **`sizeChart`**: redes (franja de arriba, footer) y tabla de talles (opcionales).
 - **`pages`**: qué páginas de información tiene. Cada página necesita sus textos
   (ver la configuración de L.A IMP como ejemplo: `howToBuy`, `exchanges`, `faq`, `about`...).
 

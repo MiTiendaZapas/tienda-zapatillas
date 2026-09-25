@@ -1,27 +1,26 @@
 /*
- * Pedido: contador del header, barra fija en celular y panel con 3 pasos:
- *   1. Revisar  ->  2. Datos y envío  ->  3. Confirmar y enviar por WhatsApp
+ * Pedido: contador del header, barra fija en celular y panel.
+ * Un solo paso: revisar el pedido, elegir por mayor o por unidad (si lleva
+ * 5 o más pares) y enviarlo por WhatsApp. No se piden datos: nombre y envío
+ * se coordinan en el chat.
  */
 import { escapeHtml, money, plural, readStorage, writeStorage } from "../utils.js";
-import { FIELDS } from "../checkout-fields.js";
-import { buildOrderMessage, cleanInput, orderLink } from "../whatsapp.js";
+import { buildOrderMessage, orderLink } from "../whatsapp.js";
 import { icon } from "./icons.js";
+import { socialLinksHtml } from "./social.js";
 
-const CUSTOMER_KEY = "customer";
 const MODE_KEY = "purchase-mode";
 
 
 export function createCartView({ config, channel, cart, pricing, overlays, storagePrefix }) {
   const headerButton = document.querySelector("[data-open-cart]");
   const headerCount = document.querySelector("[data-cart-count]");
-  const customerKey = `${storagePrefix}:${CUSTOMER_KEY}`;
   const modeKey = `${storagePrefix}:${MODE_KEY}`;
   // Si la versión de la tienda define "purchaseModes", el cliente elige por mayor o
   // por unidad. Si no, el precio por mayor se aplica solo al llegar a la cantidad.
   const modes = channel.purchaseModes ?? null;
   let purchaseMode = modes ? readStorage(modeKey, null) : "mayor";   // "mayor" | "unidad" | null (sin elegir)
-  let step = "review";
-  let lastMessage = "";
+  let sent = false;   // true después de tocar "Enviar pedido por WhatsApp"
 
   // --- barra fija (celular) --------------------------------------------------
   const bar = document.createElement("div");
@@ -44,14 +43,8 @@ export function createCartView({ config, channel, cart, pricing, overlays, stora
   dialog.innerHTML = `
     <div class="drawer__panel">
       <header class="drawer__header">
-        <button class="icon-btn drawer__back" type="button" data-back aria-label="Volver" hidden>${icon("chevronLeft")}</button>
         <div>
           <h2 class="drawer__title" id="drawer-title" tabindex="-1">Tu pedido</h2>
-          <ol class="steps" aria-label="Pasos del pedido">
-            <li data-step-indicator="review">Revisar</li>
-            <li data-step-indicator="details">Datos y envío</li>
-            <li data-step-indicator="confirm">Enviar</li>
-          </ol>
         </div>
         <button class="icon-btn" type="button" data-close aria-label="Cerrar">${icon("close")}</button>
       </header>
@@ -62,10 +55,9 @@ export function createCartView({ config, channel, cart, pricing, overlays, stora
 
   const body = dialog.querySelector("[data-body]");
   const footer = dialog.querySelector("[data-footer]");
-  const backButton = dialog.querySelector("[data-back]");
 
   function open() {
-    step = "review";
+    sent = false;
     render();
     dialog.showModal();
     document.body.classList.add("is-locked");
@@ -79,17 +71,9 @@ export function createCartView({ config, channel, cart, pricing, overlays, stora
   // Tocar fuera del panel (sobre el fondo oscuro) lo cierra.
   dialog.addEventListener("click", (event) => { if (event.target === dialog) close(); });
   dialog.querySelector("[data-close]").addEventListener("click", close);
-  backButton.addEventListener("click", () => goTo(step === "confirm" ? "details" : "review"));
   document.addEventListener("click", (event) => {
     if (event.target.closest("[data-open-cart]")) open();
   });
-
-  function goTo(next) {
-    step = next;
-    render();
-    body.scrollTop = 0;
-    dialog.querySelector(".drawer__title").focus?.();
-  }
 
   const currentQuote = () => pricing.quote(cart.lines(), purchaseMode);
   const needsModeChoice = (quote) => Boolean(modes) && quote.canChoose && !purchaseMode;
@@ -204,7 +188,7 @@ export function createCartView({ config, channel, cart, pricing, overlays, stora
             </li>`;
         }).join("")}
       </ul>
-      <p class="drawer__note">${icon("chat")} No se paga online. Te confirmamos el stock por WhatsApp antes de cualquier pago.</p>`;
+      <p class="drawer__note">${icon("chat")} No se paga online. Te confirmamos el stock por WhatsApp y ahí coordinamos el envío.</p>`;
 
     const pending = needsModeChoice(quote);
     footer.innerHTML = `
@@ -212,8 +196,16 @@ export function createCartView({ config, channel, cart, pricing, overlays, stora
         <span>Total <small>(${itemsText(cart.count())}${quote.canChoose && !pending ? `, ${modes ? modes[quote.mode].title.toLowerCase() : "por mayor"}` : ""}, sin envío)</small></span>
         ${pending ? `<span class="drawer__pending">Elegí por mayor o por unidad</span>` : `<strong class="money">${money(quote.total)}</strong>`}
       </div>
-      <button class="btn btn--primary btn--block btn--lg" type="button" data-next ${pending ? "disabled" : ""}>Continuar con el pedido ${icon("arrowRight")}</button>`;
-    footer.querySelector("[data-next]").addEventListener("click", () => goTo("details"));
+      ${pending
+        ? `<button class="btn btn--whatsapp btn--block btn--lg" type="button" disabled>${icon("whatsapp")} Enviar pedido por WhatsApp</button>`
+        : `<a class="btn btn--whatsapp btn--block btn--lg" href="${orderLink(config, buildOrderMessage({ config, channel, quote }))}" target="_blank" rel="noopener" data-send>
+            ${icon("whatsapp")} Enviar pedido por WhatsApp</a>`}`;
+    footer.querySelector("[data-send]")?.addEventListener("click", () => {
+      document.dispatchEvent(new CustomEvent("store:order-sent", { detail: { total: quote.total, items: cart.count() } }));
+      sent = true;
+      // La ayuda aparece un instante después, para no interferir con la apertura de WhatsApp.
+      setTimeout(render, 300);
+    });
   }
 
   body.addEventListener("change", (event) => {
@@ -233,139 +225,39 @@ export function createCartView({ config, channel, cart, pricing, overlays, stora
     if (event.target.closest("[data-line-remove]")) cart.remove(lineProduct, lineSize);
   });
 
-  // --- paso 2: datos y envío ---------------------------------------------------
-  function fieldHtml(id, { required, value }) {
-    const f = FIELDS[id];
-    return `
-      <div class="field">
-        <label class="field__label" for="f-${id}">${escapeHtml(f.label)}${required ? '<span class="field__required"> *</span>' : ""}</label>
-        <input class="field__input" id="f-${id}" name="${id}" type="text" maxlength="${f.max}"
-          autocomplete="${f.autocomplete ?? "off"}" placeholder="${escapeHtml(f.placeholder ?? "")}" value="${escapeHtml(value ?? "")}"
-          aria-describedby="e-${id}" ${required ? 'aria-required="true"' : ""}>
-        <p class="field__error" id="e-${id}"></p>
-      </div>`;
-  }
-
-  function renderDetails() {
-    if (needsModeChoice(currentQuote())) {
-      goTo("review");
-      return;
-    }
-    const methods = config.shipping.methods;
-    const draft = readStorage(customerKey, {});   // lo que el cliente escribió la vez anterior
-    let method = methods[draft.shippingMethod] ? draft.shippingMethod : Object.keys(methods)[0];
-
-    body.innerHTML = `
-      <form class="checkout-form" id="checkout-form" novalidate>
-        ${fieldHtml("name", { required: true, value: draft.name })}
-        <fieldset class="field">
-          <legend class="field__label">¿Cómo lo recibís?</legend>
-          <div class="choice-list">
-            ${Object.entries(methods).map(([key, m]) => `
-              <label class="choice">
-                <input type="radio" name="shippingMethod" value="${escapeHtml(key)}" ${key === method ? "checked" : ""}>
-                <span class="choice__box">
-                  <span class="choice__title">${escapeHtml(m.label)}</span>
-                  <span class="choice__text">${escapeHtml(m.summary)}</span>
-                </span>
-              </label>`).join("")}
-          </div>
-        </fieldset>
-        <div class="shipping-fields" data-method-fields></div>
-        <p class="drawer__note" data-shipping-note></p>
-        <div class="field">
-          <label class="field__label" for="f-notes">Comentarios <span class="field__optional">(opcional)</span></label>
-          <textarea class="field__input" id="f-notes" name="notes" rows="2" maxlength="${FIELDS.notes.max}">${escapeHtml(draft.notes ?? "")}</textarea>
-        </div>
-      </form>`;
-
-    footer.innerHTML = `<button class="btn btn--primary btn--block btn--lg" type="submit" form="checkout-form">Revisar mensaje ${icon("arrowRight")}</button>`;
-
-    const form = body.querySelector("form");
-    // Al cambiar de método se dibujan sus campos, conservando lo ya escrito.
-    const renderMethodFields = () => {
-      const current = methods[method];
-      form.querySelector("[data-method-fields]").innerHTML = (current.fields ?? [])
-        .map((f) => fieldHtml(f.id, { required: f.required, value: draft[f.id] }))
-        .join("");
-      form.querySelector("[data-shipping-note]").innerHTML = current.checkoutNote ? `${icon("truck")} ${escapeHtml(current.checkoutNote)}` : "";
-    };
-    form.addEventListener("change", (event) => {
-      if (event.target.name !== "shippingMethod") return;
-      method = event.target.value;
-      renderMethodFields();
-    });
-    form.addEventListener("input", (event) => {
-      const input = event.target;
-      if (input.name in FIELDS) draft[input.name] = input.value;
-      // El error de un campo se borra apenas el cliente lo completa.
-      if (input.getAttribute("aria-invalid") === "true" && input.value.trim().length >= 2) {
-        input.setAttribute("aria-invalid", "false");
-        form.querySelector(`#e-${input.name}`).textContent = "";
-      }
-    });
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
-      const customer = validate(form, method);
-      if (!customer) return;
-      writeStorage(customerKey, customer);
-      goTo("confirm");
-    });
-    renderMethodFields();
-  }
-
-  function validate(form, method) {
-    const fields = [{ id: "name", required: true }, ...(config.shipping.methods[method].fields ?? []), { id: "notes" }];
-    const customer = { shippingMethod: method };
-    let firstInvalid = null;
-    for (const { id, required } of fields) {
-      const input = form.elements[id];
-      const value = cleanInput(input.value, FIELDS[id].max);
-      const invalid = Boolean(required) && value.length < 2;
-      customer[id] = value;
-      input.setAttribute("aria-invalid", String(invalid));
-      const error = form.querySelector(`#e-${id}`);
-      if (error) error.textContent = invalid ? `Completá “${FIELDS[id].label}”.` : "";
-      if (invalid && !firstInvalid) firstInvalid = input;
-    }
-    if (firstInvalid) {
-      firstInvalid.focus();
-      return null;
-    }
-    return customer;
-  }
-
-  // --- paso 3: confirmar y enviar ----------------------------------------------
-  function renderConfirm() {
+  // --- después de enviar ----------------------------------------------------------
+  function renderSent() {
     const quote = currentQuote();
-    const customer = readStorage(customerKey, null);
-    if (!quote.lines.length || !customer || needsModeChoice(quote)) {
-      goTo("review");
+    if (!quote.lines.length || needsModeChoice(quote)) {
+      sent = false;
+      renderReview();
       return;
     }
-    lastMessage = buildOrderMessage({ config, channel, quote, customer });
+    const message = buildOrderMessage({ config, channel, quote });
+    const social = socialLinksHtml(config, { handles: true, className: "social-list--stack" });
     body.innerHTML = `
-      <p class="drawer__lead">Este es el mensaje que se va a enviar. Revisalo y tocá “Enviar por WhatsApp”.</p>
-      <pre class="message-preview">${escapeHtml(lastMessage).replace(/\*(.+?)\*/g, "<strong>$1</strong>")}</pre>
-      <p class="drawer__note">${icon("chat")} Enviar el pedido no es una compra: te respondemos por WhatsApp para confirmar el stock y coordinar el pago y la entrega.</p>
-      <div class="sent-help" data-sent-help hidden>
+      <div class="sent-panel">
+        <span class="sent-panel__icon">${icon("check")}</span>
+        <h3 class="sent-panel__title">¡Listo! Se abrió WhatsApp con tu pedido</h3>
+        <p class="sent-panel__text">Tocá enviar en el chat y te confirmamos el stock y el envío.</p>
+      </div>
+      <div class="sent-help">
         <p><strong>¿No se abrió WhatsApp?</strong> Copiá el mensaje y mandalo al ${escapeHtml(formatPhone(config.contact.whatsappOrders))}.</p>
         <div class="sent-help__actions">
           <button class="btn btn--outline" type="button" data-copy>Copiar mensaje</button>
           <button class="btn btn--ghost" type="button" data-clear>Ya lo envié, vaciar pedido</button>
         </div>
-      </div>`;
-    footer.innerHTML = `
-      <a class="btn btn--whatsapp btn--block btn--lg" href="${orderLink(config, lastMessage)}" target="_blank" rel="noopener" data-send>
-        ${icon("whatsapp")} Enviar pedido por WhatsApp
-      </a>`;
-    footer.querySelector("[data-send]").addEventListener("click", () => {
-      body.querySelector("[data-sent-help]").hidden = false;
-      document.dispatchEvent(new CustomEvent("store:order-sent", { detail: { total: quote.total, items: cart.count() } }));
-    });
+      </div>
+      ${social ? `
+        <div class="sent-social">
+          <p class="sent-social__title">${escapeHtml(config.socialInvite ?? "Seguinos en las redes")}</p>
+          ${social}
+        </div>` : ""}`;
+    footer.innerHTML = `<button class="btn btn--outline btn--block btn--lg" type="button" data-back-to-cart>${icon("chevronLeft")} Volver al pedido</button>`;
+    footer.querySelector("[data-back-to-cart]").addEventListener("click", () => { sent = false; render(); });
     body.querySelector("[data-copy]").addEventListener("click", async (event) => {
       try {
-        await navigator.clipboard.writeText(lastMessage);
+        await navigator.clipboard.writeText(message);
         event.target.textContent = "¡Copiado!";
       } catch {
         event.target.textContent = "No se pudo copiar";
@@ -378,14 +270,7 @@ export function createCartView({ config, channel, cart, pricing, overlays, stora
   }
 
   function render() {
-    backButton.hidden = step === "review";
-    dialog.querySelectorAll("[data-step-indicator]").forEach((el) => {
-      el.classList.toggle("is-current", el.dataset.stepIndicator === step);
-      if (el.dataset.stepIndicator === step) el.setAttribute("aria-current", "step");
-      else el.removeAttribute("aria-current");
-    });
-    if (step === "details") renderDetails();
-    else if (step === "confirm") renderConfirm();
+    if (sent) renderSent();
     else renderReview();
   }
 
@@ -396,7 +281,7 @@ export function createCartView({ config, channel, cart, pricing, overlays, stora
       writeStorage(modeKey, null);
     }
     updateSummary({ bump: event.type === "add" });
-    if (dialog.open && step === "review") render();
+    if (dialog.open && !sent) render();
   });
   updateSummary();
 
