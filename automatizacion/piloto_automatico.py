@@ -43,6 +43,53 @@ _deshabilitar_quickedit_windows()
 # sin importar desde dónde ejecutes este archivo.
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(REPO_ROOT)
+
+# --- LOG A ARCHIVO ---
+# Todo lo que se imprime en la consola se copia (con fecha y hora) a
+# automatizacion/logs/piloto_automatico.log, dentro de la carpeta ignorada por
+# git. Sirve para ver qué pasó cuando algo falla mientras nadie mira la ventana.
+import logging
+from logging.handlers import RotatingFileHandler
+
+def _configurar_log_a_archivo(nombre_archivo):
+    carpeta = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
+    os.makedirs(carpeta, exist_ok=True)
+    handler = RotatingFileHandler(os.path.join(carpeta, nombre_archivo), maxBytes=5_000_000, backupCount=2, encoding="utf-8")
+    handler.setFormatter(logging.Formatter("%(asctime)s %(message)s", "%Y-%m-%d %H:%M:%S"))
+    logger = logging.getLogger(nombre_archivo)
+    logger.setLevel(logging.INFO)
+    logger.addHandler(handler)
+    logger.propagate = False
+    return logger
+
+class _CopiarSalidaALog:
+    def __init__(self, flujo, logger):
+        self._flujo = flujo
+        self._logger = logger
+        self._pendiente = ""
+
+    def write(self, texto):
+        self._flujo.write(texto)
+        self._pendiente += texto
+        while "\n" in self._pendiente:
+            linea, self._pendiente = self._pendiente.split("\n", 1)
+            if linea.strip():
+                self._logger.info(linea)
+        return len(texto)
+
+    def flush(self):
+        self._flujo.flush()
+
+    def __getattr__(self, nombre):
+        return getattr(self._flujo, nombre)
+
+try:
+    _logger_piloto = _configurar_log_a_archivo("piloto_automatico.log")
+    sys.stdout = _CopiarSalidaALog(sys.stdout, _logger_piloto)
+    sys.stderr = _CopiarSalidaALog(sys.stderr, _logger_piloto)
+except Exception:
+    pass
+
 print(f"[DEBUG] Este script está en: {os.path.abspath(__file__)}")
 print(f"[DEBUG] REPO_ROOT calculado: {REPO_ROOT}")
 print(f"[DEBUG] Carpeta de trabajo actual: {os.getcwd()}")
@@ -300,18 +347,55 @@ def segundos_hasta_fin_de_descanso(ahora=None):
     segundos_desde_medianoche = ahora.tm_hour * 3600 + ahora.tm_min * 60 + ahora.tm_sec
     return max(FIN_DESCANSO[0] * 3600 + FIN_DESCANSO[1] * 60 - segundos_desde_medianoche, 0)
 
-def _git_con_reintentos(args, intentos=3, espera_seg=15, **kwargs):
-    # Un corte de wifi de unos segundos justo en el momento del pull/push no
-    # debería perder ese escaneo: se reintenta un par de veces antes de
-    # darse por vencido y dejarlo para el próximo ciclo.
+def _sincronizar_y_subir(intentos=3, espera_seg=15):
+    # pull + push se reintentan JUNTOS como una unidad: si el push falla
+    # porque justo alguien más subió algo (la tienda nueva se trabaja en
+    # paralelo y también hace push al mismo repo), reintentar solo el push
+    # fallaría igual las 3 veces; hay que volver a traer lo nuevo primero.
+    # También cubre un corte breve de wifi. Se muestra el motivo REAL que da
+    # git (antes se descartaba y no había forma de saber por qué falló).
     for intento in range(1, intentos + 1):
-        try:
-            return subprocess.run(args, check=True, **kwargs)
-        except subprocess.CalledProcessError:
-            if intento == intentos:
-                raise
-            print(f"  ⚠️ Falló '{' '.join(args)}' (intento {intento}/{intentos}), reintentando en {espera_seg}s...")
-            time.sleep(espera_seg)
+        for paso, comando in (("git pull", ["git", "pull", "origin", "main", "--no-edit"]),
+                              ("git push", ["git", "push", "origin", "main"])):
+            resultado = subprocess.run(comando, capture_output=True, text=True)
+            if resultado.returncode != 0:
+                motivo = (resultado.stderr or resultado.stdout or "sin mensaje").strip()
+                print(f"  ⚠️ Falló {paso} (intento {intento}/{intentos}): {motivo}")
+                if intento == intentos:
+                    raise RuntimeError(f"{paso} falló {intentos} veces seguidas: {motivo}")
+                time.sleep(espera_seg)
+                break
+        else:
+            return
+
+def _limpiar_merge_colgado():
+    # A veces git termina de crear el commit del merge pero no llega a borrar
+    # .git/MERGE_HEAD (en Windows, por ejemplo, si otro programa tiene el
+    # archivo abierto justo en ese momento). Mientras exista, TODOS los
+    # "git pull" siguientes fallan con "You have not concluded your merge" y
+    # el piloto no puede volver a subir nada hasta que alguien lo limpie a
+    # mano. Solo se limpia si el merge ya quedó commiteado (MERGE_HEAD ya es
+    # parte del historial de HEAD) y no hay conflictos sin resolver; un merge
+    # realmente a medias no se toca.
+    ruta_merge_head = os.path.join(".git", "MERGE_HEAD")
+    if not os.path.exists(ruta_merge_head):
+        return
+    if subprocess.run(["git", "ls-files", "-u"], capture_output=True, text=True).stdout.strip():
+        return
+    with open(ruta_merge_head, encoding="utf-8") as f:
+        sha = f.read().strip()
+    if subprocess.run(["git", "merge-base", "--is-ancestor", sha, "HEAD"]).returncode == 0:
+        subprocess.run(["git", "merge", "--quit"])
+        print("🧹 Se limpió un merge que había quedado colgado (ya estaba commiteado); si no, bloqueaba todos los pull.")
+
+def _commits_sin_subir():
+    # Cuántos commits locales todavía no llegaron a GitHub (por ejemplo si un
+    # push anterior falló). Es una consulta local, no usa la red.
+    resultado = subprocess.run(["git", "rev-list", "--count", "origin/main..HEAD"], capture_output=True, text=True)
+    try:
+        return int(resultado.stdout.strip())
+    except ValueError:
+        return 0
 
 def rutina_actualizacion():
     print("\n--- INICIANDO ESCANEO DE STOCK (ZAPATILLAS) ---")
@@ -400,14 +484,24 @@ def rutina_actualizacion():
             # Sube fotos nuevas o modificadas que hayas agregado a mano
             archivos_a_subir.append(CARPETA_FOTOS)
 
+        _limpiar_merge_colgado()
+
         subprocess.run(["git", "add"] + archivos_a_subir, check=True)
 
         resultado_commit = subprocess.run(["git", "commit", "-m", f"Stock actualizado (zapatillas + indumentaria) a las {hora_subida}"], capture_output=True, text=True)
 
-        if "nothing to commit" not in resultado_commit.stdout:
-            _git_con_reintentos(["git", "pull", "origin", "main", "--no-edit"])
-            _git_con_reintentos(["git", "push", "origin", "main"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            print(f"[{hora_subida}] 🔄 HUBO CAMBIOS: Se actualizó la web (zapatillas y/o indumentaria).")
+        hay_commit_nuevo = "nothing to commit" not in resultado_commit.stdout
+        pendientes = _commits_sin_subir()
+
+        if hay_commit_nuevo or pendientes > 0:
+            # Si un push anterior falló, los commits quedan solo en esta
+            # laptop: hay que seguir intentando subirlos aunque este ciclo no
+            # haya cambiado nada, si no la web queda desactualizada.
+            _sincronizar_y_subir()
+            if hay_commit_nuevo:
+                print(f"[{hora_subida}] 🔄 HUBO CAMBIOS: Se actualizó la web (zapatillas y/o indumentaria).")
+            else:
+                print(f"[{hora_subida}] 🔄 Se subieron {pendientes} commit(s) que habían quedado pendientes de un intento anterior.")
         else:
             print(f"[{hora_subida}] ⏸️ NO HUBO CAMBIOS: El stock sigue igual.")
 
