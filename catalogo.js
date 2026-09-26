@@ -43,7 +43,7 @@ const stock_zapatillas = [
   { modelo: 'Jordan low 1 DIAMOND', talles: [{"talle": 35, "stock": 1}, {"talle": 37, "stock": 7}, {"talle": 38, "stock": 5}, {"talle": 39, "stock": 1}, {"talle": 40, "stock": 1}], foto: 'Fotos/Jordan low 1 DIAMOND.jpeg' },
   { modelo: 'Sb dunk pipa negra', talles: [{"talle": 39, "stock": 3}, {"talle": 40, "stock": 3}, {"talle": 41, "stock": 1}, {"talle": 42, "stock": 5}, {"talle": 43, "stock": 7}, {"talle": 44, "stock": 2}], foto: 'Fotos/Sb dunk pipa negra.jpeg' },
   { modelo: 'Sb dunk glitter beige', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 1}, {"talle": 40, "stock": 1}], foto: 'Fotos/Sb dunk glitter beige.jpeg' },
-  { modelo: 'Mind beige', talles: [{"talle": 39, "stock": 5}, {"talle": 40, "stock": 5}, {"talle": 41, "stock": 61}, {"talle": 42, "stock": 61}, {"talle": 43, "stock": 51}, {"talle": 44, "stock": 51}], foto: 'Fotos/Mind beige.jpeg' },
+  { modelo: 'Mind beige', talles: [{"talle": 39, "stock": 5}, {"talle": 40, "stock": 5}, {"talle": 41, "stock": 61}, {"talle": 42, "stock": 61}, {"talle": 43, "stock": 50}, {"talle": 44, "stock": 50}], foto: 'Fotos/Mind beige.jpeg' },
   { modelo: 'Air force 1 blanca /pipa gris', talles: [{"talle": 43, "stock": 1}, {"talle": 44, "stock": 1}], foto: 'Fotos/Air force 1 blanca pipa gris.jpeg' },
   { modelo: 'Deportivas fit white', talles: [{"talle": 35, "stock": 2}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 2}, {"talle": 39, "stock": 1}], foto: 'Fotos/Deportivas fit white.jpeg' },
   { modelo: 'Air forcé blanca pipa negra', talles: [{"talle": 34, "stock": 1}, {"talle": 36, "stock": 1}], foto: 'Fotos/Air forcé blanca pipa negra.jpeg' },
