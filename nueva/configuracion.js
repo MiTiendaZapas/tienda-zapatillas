@@ -19,6 +19,10 @@ window.STORE_CONFIG = {
   // Orden de los modelos: "marca-modelo" (marca A-Z y modelo A-Z) o "mas-vendidos".
   catalogOrder: "marca-modelo",
 
+  // Encabezado del catálogo: "compacto" (título y cantidad en una línea) o
+  // "clasico" (la versión anterior, con "Stock disponible" arriba).
+  catalogHeader: "compacto",
+
   logo: {
     small: "marca/logo-160.webp",
     large: "marca/logo-512.webp",
@@ -49,13 +53,31 @@ window.STORE_CONFIG = {
       "success": "#2e7d32",
     },
     colorScheme: "light",
+    // Modo oscuro: mismo estilo simple, en gris oscuro. Sigue la configuración
+    // del celular/computadora y se puede cambiar con el botón del header.
+    darkColors: {
+      "bg": "#111113",
+      "surface": "#1a1a1d",
+      "surface-2": "#26262a",
+      "border": "#34343a",
+      "text": "#f4f4f5",
+      "text-muted": "#a1a1aa",
+      "accent": "#f4f4f5",
+      "accent-strong": "#ffffff",
+      "accent-contrast": "#111113",
+      "accent-gradient": "#f4f4f5",
+      "danger": "#ef5350",
+      "success": "#66bb6a",
+    },
+    // Tamaño general: "compacta" (todo un poco más chico) o "normal" (como antes).
+    density: "compacta",
   },
 
   contact: {
     // Consultas (modelos, talles, stock) y pedidos van al mismo número,
     // pero con mensajes distintos para que se reconozcan en el chat.
-    whatsappQueries: "5491153773771",
-    whatsappOrders: "5491153773771",
+    whatsappQueries: "5491136284751",
+    whatsappOrders: "5491136284751",
   },
 
   // Redes: se muestran en la franja de arriba de todo, en la tienda minorista,
@@ -103,9 +125,6 @@ window.STORE_CONFIG = {
       // "Compartir" de cada modelo: el link directo al modelo en esta tienda.
       share: "link",
       hero: {
-        eyebrow: "Tienda online",
-        title: "Tus próximas zapatillas",
-        highlight: "a un mensaje",
         text: "Elegí tu modelo y tu talle, armá el pedido y envialo por WhatsApp. Te confirmamos el stock y coordinamos la entrega.",
         points: [
           { icon: "repeat", text: "Cambio de talle sin cargo comprando por unidad" },
@@ -252,7 +271,7 @@ window.STORE_CONFIG = {
     text: "Armamos catálogos online a medida para emprendimientos: con tu marca, tus precios y los pedidos directo a tu WhatsApp.",
     whatsapp: "5491153773771",
     ctaLabel: "Consultar",
-    message: "Hola! Vi la tienda de L.A IMP y me interesa una tienda así para mi negocio.",
+    message: "Hola! Vi la tienda y me interesa una tienda así para mi negocio.",
   },
 
   footer: {
