@@ -9,7 +9,7 @@ const stock_zapatillas = [
   { modelo: 'Super star clásic', talles: [{"talle": 35, "stock": 3}, {"talle": 36, "stock": 5}, {"talle": 37, "stock": 4}, {"talle": 38, "stock": 7}, {"talle": 39, "stock": 7}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 1}, {"talle": 42, "stock": 2}, {"talle": 43, "stock": 3}, {"talle": 44, "stock": 3}], foto: 'Fotos/Super star clásic.jpeg' },
   { modelo: 'Air forcé suela celeste', talles: [{"talle": 40, "stock": 2}, {"talle": 41, "stock": 4}, {"talle": 42, "stock": 10}, {"talle": 43, "stock": 7}, {"talle": 44, "stock": 2}], foto: 'Fotos/Air forcé suela celeste.jpeg' },
   { modelo: 'Sb dunk gris', talles: [{"talle": 37, "stock": 3}, {"talle": 38, "stock": 4}, {"talle": 39, "stock": 1}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 2}, {"talle": 43, "stock": 4}], foto: 'Fotos/Sb dunk gris.jpeg' },
-  { modelo: 'Adidas forum Gelo', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 2}], foto: 'Fotos/Adidas forum Gelo.jpeg' },
+  { modelo: 'Adidas forum Gelo', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 1}, {"talle": 38, "stock": 2}], foto: 'Fotos/Adidas forum Gelo.jpeg' },
   { modelo: 'Dunk bordo', talles: [{"talle": 38, "stock": 3}, {"talle": 39, "stock": 3}], foto: 'Fotos/Dunk bordo.jpeg' },
   { modelo: 'Deportivas fit black', talles: [{"talle": 35, "stock": 1}], foto: 'Fotos/Deportivas fit black.jpeg' },
   { modelo: 'Jordan botitas 1 vermelho', talles: [{"talle": 36, "stock": 1}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 2}], foto: 'Fotos/Jordan botitas 1 vermelho.jpeg' },
