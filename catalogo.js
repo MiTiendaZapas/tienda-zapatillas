@@ -167,6 +167,6 @@ const stock_zapatillas = [
   { modelo: 'Súper star prata off', talles: [{"talle": 39, "stock": 1}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 3}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Súper star prata off.webp' },
   { modelo: 'Adidas running marron', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 1}], foto: 'Fotos/Adidas running marron.webp' },
   { modelo: 'Adidas running beige marron', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 1}], foto: 'Fotos/Adidas running beige marron.webp' },
-  { modelo: 'Shox beige', talles: [{"talle": 39, "stock": 2}, {"talle": 40, "stock": 3}, {"talle": 41, "stock": 6}, {"talle": 42, "stock": 6}, {"talle": 43, "stock": 4}, {"talle": 44, "stock": 2}], foto: 'Fotos/Shox beige.webp' },
+  { modelo: 'Shox beige', talles: [{"talle": 39, "stock": 2}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 6}, {"talle": 42, "stock": 6}, {"talle": 43, "stock": 4}, {"talle": 44, "stock": 2}], foto: 'Fotos/Shox beige.webp' },
   { modelo: 'Adidas running dorada', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 1}], foto: 'Fotos/Adidas running dorada.webp' },
 ];
