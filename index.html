@@ -1,73 +1,17 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-AR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo Exclusivo</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>L.A IMP · Revendedores</title>
+  <!-- La tienda se mudó: esta dirección vieja lleva sola a la nueva. -->
+  <link rel="canonical" href="https://mitiendazapas.github.io/mayorista/">
+  <meta http-equiv="refresh" content="0; url=https://mitiendazapas.github.io/mayorista/">
+  <script>location.replace("https://mitiendazapas.github.io/mayorista/" + location.hash);</script>
+  <meta name="robots" content="noindex">
+  <style>body{font-family:system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0;padding:16px;text-align:center;background:#f5f5f3;color:#18181b}a{color:inherit}</style>
 </head>
 <body>
-
-    <header>
-        <h1>Mi Tienda Zapas</h1>
-        <button class="carrito-btn" onclick="abrirCarrito()">
-            🛒 <span class="badge" id="contador-carrito">0</span>
-        </button>
-    </header>
-
-    <div class="buscador-container">
-        <input type="text" id="buscador" placeholder="🔍 Buscar modelo..." onkeyup="filtrarCatalogo()">
-    </div>
-
-    <div class="container">
-        <div class="grid-productos" id="grid-productos"></div>
-    </div>
-
-    <div class="modal-overlay" id="modal-carrito">
-        <div class="modal-carrito">
-            <div class="header-modal">
-                <h2>Tu Pedido</h2>
-                <button class="close-btn" onclick="cerrarCarrito()">✖</button>
-            </div>
-            
-            <ul class="lista-carrito" id="lista-carrito"></ul>
-            
-            <!-- ACÁ SE INYECTAN LOS BOTONES DE COMPRA AUTOMÁTICAMENTE -->
-            <div id="footer-opciones" class="footer-modal"></div>
-        </div>
-    </div>
-
-    <!-- 1. Indumentaria: stock cargado a mano. Para modificar talles/stock, editar indumentaria.js (anti-caché) -->
-    <script>
-        document.write('<script src="indumentaria.js?v=' + Math.random() + '"><\/script>');
-    </script>
-
-    <!-- 2. Zapatillas cargadas a mano (no vienen de la tienda online). Editar zapatillas_manual.js (anti-caché) -->
-    <script>
-        document.write('<script src="zapatillas_manual.js?v=' + Math.random() + '"><\/script>');
-    </script>
-
-    <!-- 3. Zapatillas: catálogo que actualiza el bot automáticamente (con anti-caché) -->
-    <script>
-        document.write('<script src="catalogo.js?v=' + Math.random() + '"><\/script>');
-    </script>
-
-    <!-- 4. Función que fusiona talles cuando el mismo modelo aparece repetido
-         entre tienda del proveedor y stock manual (anti-caché) -->
-    <script>
-        document.write('<script src="mezclar_stock.js?v=' + Math.random() + '"><\/script>');
-    </script>
-
-    <!-- 5. Unimos: indumentaria, zapatillas manuales, zapatillas del bot,
-         y fusionamos los talles de los modelos que se repiten -->
-    <script>
-        const stock_actualizado = mezclarStockPorModelo([
-            ...stock_indumentaria,
-            ...(typeof stock_zapatillas_manual !== 'undefined' ? stock_zapatillas_manual : []),
-            ...(typeof stock_zapatillas !== 'undefined' ? stock_zapatillas : [])
-        ]);
-    </script>
-
-    <script src="tienda.js"></script>
+  <p>La tienda se mudó a una dirección nueva.<br><a href="https://mitiendazapas.github.io/mayorista/">Tocá acá si no se abre sola</a>.</p>
 </body>
 </html>
