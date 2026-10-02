@@ -1,66 +1,72 @@
+"""Bot de WhatsApp: manda el stock del catálogo a un grupo, todos los días a una hora al azar.
+
+Lee el catálogo que ya mantiene el piloto (catalogo/productos.json de
+mitiendazapas.github.io): no scrapea al proveedor.
+
+Modos:
+    python bot_whatsapp.py                    programado: cada día a una hora al azar (HORA_DESDE..HORA_HASTA)
+    python bot_whatsapp.py --prueba           manda 3 modelos + el mensaje de precios al GRUPO DE PRUEBA
+    python bot_whatsapp.py --prueba --limite 10
+    python bot_whatsapp.py --ahora            manda ya mismo al grupo real (y cuenta como el envío de hoy)
+    python bot_whatsapp.py --dry-run          arma los mensajes y los muestra, sin abrir WhatsApp
+    python bot_whatsapp.py --diagnostico      abre WhatsApp y el grupo de prueba, saca una captura; NO manda nada
+    (--paso-manual: vuelve al paso viejo de mandar a mano la primera foto)
+"""
+import argparse
+import json
 import os
+import random
 import re
 import sys
+import threading
 import time
-import random
-import json
+import unicodedata
+import urllib.request
+from datetime import datetime, timedelta
 from io import BytesIO
+from pathlib import Path
+
 from PIL import Image
 import win32clipboard
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
 
 # Fuerza UTF-8 en la salida: en Windows la consola suele usar cp1252, que no
-# sabe representar los emojis de los prints de abajo y hace crashear el script.
+# sabe representar los emojis y haría crashear el script.
 sys.stdout.reconfigure(encoding="utf-8")
 sys.stderr.reconfigure(encoding="utf-8")
 
+
 def _deshabilitar_quickedit_windows():
-    # En Windows, un clic o una selección de texto en la ventana de la consola
-    # activa "QuickEdit Mode" y CONGELA el script hasta apretar Enter o Esc
-    # (parece que "no avanza" aunque no haya ningún error). Al desactivarlo
-    # ya no hay forma de congelarlo por accidente; el costo es que no se puede
-    # seleccionar texto con el mouse en esta ventana, por eso todo lo que se
-    # imprime queda también guardado en automatizacion/logs/bot_whatsapp.log.
+    # Un clic en la consola activa "QuickEdit Mode" y CONGELA el script hasta
+    # apretar Enter. Como este bot corre solo, se desactiva. Todo lo que se
+    # imprime queda también en automatizacion/logs/bot_whatsapp.log.
     if os.name != "nt":
         return
     try:
         import ctypes
         kernel32 = ctypes.windll.kernel32
-        STD_INPUT_HANDLE = -10
-        ENABLE_EXTENDED_FLAGS = 0x0080
-        ENABLE_QUICK_EDIT_MODE = 0x0040
-        handle = kernel32.GetStdHandle(STD_INPUT_HANDLE)
+        handle = kernel32.GetStdHandle(-10)
         modo = ctypes.c_uint32()
         if kernel32.GetConsoleMode(handle, ctypes.byref(modo)):
-            nuevo_modo = (modo.value & ~ENABLE_QUICK_EDIT_MODE) | ENABLE_EXTENDED_FLAGS
-            kernel32.SetConsoleMode(handle, nuevo_modo)
+            kernel32.SetConsoleMode(handle, (modo.value & ~0x0040) | 0x0080)
     except Exception:
         pass
 
+
 _deshabilitar_quickedit_windows()
 
-# --- FIJA LA CARPETA DE TRABAJO A LA RAÍZ DEL REPO ---
-# Este script vive en automatizacion/, que está en .gitignore. Pero Fotos/ y
-# zapatillas_manual.js están un nivel arriba, en la raíz del repo. Por eso
-# subimos un nivel antes de arrancar, sin importar desde dónde lo ejecutes.
-# La sesión de WhatsApp (sesion_wsp/) queda guardada dentro de automatizacion/
-# para no mezclarla con los archivos que sí sube git.
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-REPO_ROOT = os.path.dirname(SCRIPT_DIR)
-os.chdir(REPO_ROOT)
+SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPT_DIR.parent
 
-# --- LOG A ARCHIVO ---
-# Todo lo que se imprime en la consola se copia (con hora) a
-# automatizacion/logs/bot_whatsapp.log, que está dentro de la carpeta ignorada
-# por git. Así, si algo falla o se traba, se puede ver qué pasó y cuándo sin
-# tener que copiar texto de la ventana.
+# --- LOG A ARCHIVO -----------------------------------------------------------
 import logging
 from logging.handlers import RotatingFileHandler
 
+
 def _configurar_log_a_archivo(nombre_archivo):
-    carpeta = os.path.join(SCRIPT_DIR, "logs")
-    os.makedirs(carpeta, exist_ok=True)
-    handler = RotatingFileHandler(os.path.join(carpeta, nombre_archivo), maxBytes=5_000_000, backupCount=2, encoding="utf-8")
+    carpeta = SCRIPT_DIR / "logs"
+    carpeta.mkdir(exist_ok=True)
+    handler = RotatingFileHandler(carpeta / nombre_archivo, maxBytes=5_000_000, backupCount=2, encoding="utf-8")
     handler.setFormatter(logging.Formatter("%(asctime)s %(message)s", "%Y-%m-%d %H:%M:%S"))
     logger = logging.getLogger(nombre_archivo)
     logger.setLevel(logging.INFO)
@@ -68,11 +74,10 @@ def _configurar_log_a_archivo(nombre_archivo):
     logger.propagate = False
     return logger
 
+
 class _CopiarSalidaALog:
     def __init__(self, flujo, logger):
-        self._flujo = flujo
-        self._logger = logger
-        self._pendiente = ""
+        self._flujo, self._logger, self._pendiente = flujo, logger, ""
 
     def write(self, texto):
         self._flujo.write(texto)
@@ -89,6 +94,7 @@ class _CopiarSalidaALog:
     def __getattr__(self, nombre):
         return getattr(self._flujo, nombre)
 
+
 try:
     _logger_bot = _configurar_log_a_archivo("bot_whatsapp.log")
     sys.stdout = _CopiarSalidaALog(sys.stdout, _logger_bot)
@@ -96,19 +102,29 @@ try:
 except Exception:
     pass
 
-# --- CONFIGURACIÓN GENERAL ---
-URL_LISTADO = "https://vestitepiola.mitiendanube.com/productos/?order=best-selling"
-ARCHIVO_SALIDA = "stock_proveedor.txt"
-CARPETA_FOTOS = "Fotos"
-RUTA_ZAPATILLAS_MANUAL = "zapatillas_manual.js"
-MAX_SCROLLS = 200
-ESTABLE_LIMITE = 5
-TIMEOUT_PRODUCTO_MS = 15000
+# --- CONFIGURACIÓN -------------------------------------------------------------
+GRUPO_PRUEBA = "Notas Whassap"
+GRUPO_REAL = None                 # se completa cuando la prueba salga bien
 
-# Mensaje de precios que se manda como texto (sin foto), UNA sola vez,
-# después de haber mandado todas las fotos de zapatillas. Es texto fijo:
-# si el día de mañana cambiás alguno de estos precios en tienda.js, hay
-# que venir a actualizarlo acá también a mano.
+HORA_DESDE = (7, 45)              # cada día se sortea una hora entre estas dos
+HORA_HASTA = (8, 10)
+TOLERANCIA_TARDE_MIN = 120        # si la laptop estaba apagada a esa hora, se manda igual hasta 2 h después
+MAX_INTENTOS_DIA = 3
+ESPERA_ENTRE_INTENTOS_MIN = 15
+LIMITE_CARGA_MIN = 20             # tiempo máximo que se espera a que WhatsApp Web termine de sincronizar
+ESPERA_CATALOGO_FRESCO_MIN = 30   # el piloto arranca a las 7:30: se espera a que publique su primera vuelta
+CATALOGO_FRESCO_DESDE = (7, 30)
+
+URL_CATALOGO = "https://mitiendazapas.github.io/catalogo/productos.json"
+URL_BASE_CATALOGO = "https://mitiendazapas.github.io/catalogo/"
+CATALOGO_LOCAL = REPO_ROOT.parent / "mitiendazapas.github.io" / "catalogo"   # copia que mantiene el piloto en esta laptop
+CACHE_FOTOS = SCRIPT_DIR / "_cache_fotos"
+ARCHIVO_ESTADO = SCRIPT_DIR / "estado_bot.json"
+PAUSA_ENTRE_ENVIOS = (5, 15)      # segundos, al azar
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36"
+
+# Mensaje de precios que se manda como texto, UNA vez, después de las fotos.
+# Es texto fijo: si cambian los precios hay que actualizarlo acá a mano.
 MENSAJE_FINAL_PRECIOS = (
     "Zapatillas calidad Brasil 🇧🇷 (primera línea,luxo)\n"
     "Talles de adulto $43.000 por unidad ‼️\n"
@@ -122,576 +138,565 @@ MENSAJE_FINAL_PRECIOS = (
     "🚨 JORDAN 11 Y RETRO 11 PANDA $55.000c/u 🚨\n"
     "Por mayor $50.000c/u ‼️"
 )
-# -----------------------------
 
-def limpiar_nombre_archivo(nombre):
-    """Limpia barras, caracteres invisibles y espacios múltiples para cazar la foto sí o sí"""
-    if not nombre:
-        return ""
-    nombre_limpio = nombre.replace("/", " ").replace("\\", " ").replace("\u00a0", " ")
-    return " ".join(nombre_limpio.split())
 
-def _goto_con_reintentos(page, url, intentos=3, espera_seg=15, **kwargs):
-    # Sin esto, un corte de internet justo al abrir la tienda o WhatsApp Web
-    # (antes de que arranque el resto del manejo de errores del script)
-    # tiraba una excepcion sin capturar y cortaba todo el bot de una.
-    for intento in range(1, intentos + 1):
+class SesionVencida(Exception):
+    """WhatsApp Web pide vincular de nuevo (código QR)."""
+
+
+class GrupoNoEncontrado(Exception):
+    """No se pudo abrir el grupo, o el chat abierto no es el que corresponde."""
+
+
+class EnvioBloqueado(Exception):
+    """WhatsApp no está aceptando los envíos automáticos."""
+
+
+def avisar(titulo, texto):
+    """Deja constancia visible de un problema que necesita atención."""
+    print(f"🚨 {titulo}: {texto}")
+    try:
+        (SCRIPT_DIR / "logs" / "ATENCION_bot.txt").write_text(
+            f"{datetime.now():%Y-%m-%d %H:%M} {titulo}\n{texto}\n", encoding="utf-8")
+        import ctypes
+        threading.Thread(target=lambda: ctypes.windll.user32.MessageBoxW(0, texto, titulo, 0x10 | 0x40000),
+                         daemon=True).start()
+    except Exception:
+        pass
+
+
+# --- Una sola copia del bot a la vez (evita mandar todo duplicado) -------------
+def tomar_candado_unico():
+    import ctypes
+    ctypes.windll.kernel32.SetLastError(0)
+    candado = ctypes.windll.kernel32.CreateMutexW(None, False, "Global\\BotWhatsAppTiendaZapatillas")
+    if ctypes.windll.kernel32.GetLastError() == 183:      # ERROR_ALREADY_EXISTS
+        return None
+    return candado
+
+
+# --- Catálogo ------------------------------------------------------------------
+def _descargar(url, timeout=30, reintentos=3):
+    for intento in range(1, reintentos + 1):
         try:
-            return page.goto(url, **kwargs)
-        except Exception as e:
-            if intento == intentos:
+            pedido = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+            with urllib.request.urlopen(pedido, timeout=timeout) as respuesta:
+                return respuesta.read()
+        except Exception:
+            if intento == reintentos:
                 raise
-            print(f"  ⚠️ No se pudo abrir {url} (intento {intento}/{intentos}): {e}")
-            print(f"  Reintentando en {espera_seg}s...")
-            time.sleep(espera_seg)
+            time.sleep(5 * intento)
+
+
+def cargar_catalogo():
+    """Devuelve (catalogo, origen). Primero la web publicada; si falla, la copia local del piloto."""
+    try:
+        datos = json.loads(_descargar(f"{URL_CATALOGO}?t={int(time.time())}").decode("utf-8"))
+        origen = "web"
+    except Exception as error:
+        local = CATALOGO_LOCAL / "productos.json"
+        if not local.exists():
+            raise RuntimeError(f"No pude leer el catálogo de la web ({error}) y tampoco hay copia local.")
+        print(f"⚠️ Catálogo de la web no disponible ({error}); uso la copia local.")
+        datos = json.loads(local.read_text(encoding="utf-8"))
+        origen = "copia local"
+    if not datos.get("products"):
+        raise RuntimeError("El catálogo está vacío: no se manda nada.")
+    return datos, origen
+
+
+def _edad_catalogo(catalogo):
+    return datetime.now().astimezone() - datetime.fromisoformat(catalogo["generatedAt"])
+
+
+def esperar_catalogo_fresco():
+    """Si el piloto todavía no publicó su primera vuelta del día, se espera un rato."""
+    limite = time.time() + ESPERA_CATALOGO_FRESCO_MIN * 60
+    desde = datetime.now().astimezone().replace(hour=CATALOGO_FRESCO_DESDE[0], minute=CATALOGO_FRESCO_DESDE[1],
+                                                second=0, microsecond=0)
+    while True:
+        catalogo, origen = cargar_catalogo()
+        if datetime.fromisoformat(catalogo["generatedAt"]) >= desde:
+            return catalogo, origen
+        if time.time() >= limite:
+            print(f"⚠️ El catálogo es de {catalogo['generatedAt']} (el piloto no publicó la vuelta de hoy): "
+                  "se manda con ese stock.")
+            return catalogo, origen
+        print("⏳ Esperando que el piloto publique el catálogo de hoy...")
+        time.sleep(120)
+
+
+def formatear_talles(sizes):
+    """Solo talles con stock. Si hay 4 o más seguidos se resumen ("34 al 38"); los pares de ojotas ("39/40") van tal cual."""
+    con_stock = [s["size"] for s in sizes if s["stock"] > 0]
+    if not con_stock:
+        return None
+    numericos = sorted({int(t) for t in con_stock if t.isdigit()})
+    otros = sorted((t for t in con_stock if not t.isdigit()),
+                   key=lambda t: float(re.findall(r"\d+", t)[0]) if re.findall(r"\d+", t) else 999)
+    partes, grupo = [], []
+    for numero in numericos + [None]:
+        if grupo and (numero is None or numero != grupo[-1] + 1):
+            partes.extend([f"{grupo[0]} al {grupo[-1]}"] if len(grupo) >= 4 else [str(n) for n in grupo])
+            grupo = []
+        if numero is not None:
+            grupo.append(numero)
+    return ", ".join(partes + otros)
+
+
+def armar_productos(catalogo):
+    """Lista de {id, name, texto, foto} en el orden del catálogo (stock de casa primero)."""
+    productos = []
+    for producto in catalogo["products"]:
+        talles = formatear_talles(producto["sizes"])
+        if talles is None or not producto.get("images"):
+            continue
+        productos.append({
+            "id": producto["id"], "name": producto["name"],
+            "texto": f"{producto['name']}\n{talles}", "foto": producto["images"][0]["lg"],
+        })
+    return productos
+
+
+def obtener_foto(ruta_relativa):
+    """Ruta local de la foto: la copia del piloto si existe (los nombres llevan hash, no cambian), si no se baja."""
+    local = CATALOGO_LOCAL / ruta_relativa
+    if local.exists():
+        return local
+    destino = CACHE_FOTOS / ruta_relativa.replace("/", "__")
+    if not destino.exists():
+        CACHE_FOTOS.mkdir(exist_ok=True)
+        temporal = destino.with_name(destino.name + f".{os.getpid()}.part")
+        temporal.write_bytes(_descargar(URL_BASE_CATALOGO + ruta_relativa))
+        os.replace(temporal, destino)
+    return destino
+
 
 def copiar_imagen_al_portapapeles(ruta_imagen):
     imagen = Image.open(ruta_imagen)
     salida = BytesIO()
     imagen.convert("RGB").save(salida, "BMP")
-    data = salida.getvalue()[14:] 
-    salida.close()
-    
-    win32clipboard.OpenClipboard()
-    win32clipboard.EmptyClipboard()
-    win32clipboard.SetClipboardData(win32clipboard.CF_DIB, data)
-    win32clipboard.CloseClipboard()
-
-def enviar_mensaje_texto(page, texto):
-    """
-    Manda un mensaje de SOLO TEXTO (sin foto) al chat que ya está abierto
-    en WhatsApp Web. Se usa para el mensaje final de precios, después de
-    haber mandado todas las fotos de zapatillas.
-    """
-    barra_mensaje = page.locator('div[contenteditable="true"]').last
-    barra_mensaje.click()
-    page.wait_for_timeout(500)
-
-    lineas_texto = texto.split('\n')
-    for i, linea in enumerate(lineas_texto):
-        page.keyboard.insert_text(linea)
-        if i < len(lineas_texto) - 1:
-            page.keyboard.press("Shift+Enter")
-
-    page.wait_for_timeout(500)
-    page.keyboard.press("Enter")
-    page.wait_for_timeout(1000)
-
-def cargar_listado_completo(page):
-    # Misma lógica que usa piloto_automatico.py. La versión anterior de este
-    # bot esperaba muy poco entre scrolls (700ms, 3 vueltas iguales) y daba
-    # el listado por terminado con ~220 de ~400 tarjetas. Hoy lo que quedaba
-    # sin cargar era casi todo "sin stock", pero el orden del listado es por
-    # más vendidos, no por stock, así que un modelo con stock podía quedar
-    # afuera sin aviso.
-    estable = 0
-    anterior = -1
-
-    for _ in range(MAX_SCROLLS):
-        page.evaluate("window.scrollTo(0, document.body.scrollHeight);")
-        page.wait_for_timeout(1000)
-
-        boton = page.locator(".js-load-more")
-        if boton.count() > 0:
-            style = (boton.first.get_attribute("style") or "").replace(" ", "")
-            if "display:none" not in style:
-                try:
-                    page.evaluate("window.scrollBy(0, -150);")
-                    boton.first.click(timeout=3000)
-                    page.wait_for_timeout(2500)
-                except Exception:
-                    pass
-
-        actual = page.locator('.js-item-product, .product-container').count()
-
-        if actual == anterior:
-            estable += 1
-            if estable >= ESTABLE_LIMITE:
-                break
-        else:
-            estable = 0
-
-        anterior = actual
-
-def extraer_productos_con_filtro(page):
-    productos = []
-    vistos = set()
-    
-    tarjetas = page.locator('.js-item-product').all()
-    if not tarjetas:
-        tarjetas = page.locator('article, .product-container').all()
-
-    for tarjeta in tarjetas:
+    datos = salida.getvalue()[14:]
+    for intento in range(1, 6):
         try:
-            link = tarjeta.locator('a[href*="/productos/"]').first
-            if link.count() == 0:
-                continue
-            href = link.get_attribute("href")
-            nombre = link.get_attribute("title") or link.inner_text().strip()
-            
-            if not href or not nombre or href in vistos:
-                continue
-                
-            texto_tarjeta = tarjeta.inner_text().lower()
-            if "sin stock" in texto_tarjeta or "agotado" in texto_tarjeta:
-                continue
-                
-            vistos.add(href)
-            productos.append((nombre, href))
-        except Exception:
-            continue
-            
-    return productos
-
-def talles_disponibles_en_producto(page, url: str):
-    # No se espera a "networkidle" (que esperaba a que carguen imágenes,
-    # trackers y demás, ~2.4s por página, mucho más con wifi lento): los datos
-    # de stock (window.LS.variants) ya están disponibles apenas se arma el
-    # HTML. Medido contra la tienda real: ~0.5s por página con resultados
-    # idénticos. Las páginas de producto se abren en una pestaña que además
-    # bloquea imágenes/fuentes/estilos (ver actualizar_stock).
-    page.goto(url, wait_until="domcontentloaded", timeout=TIMEOUT_PRODUCTO_MS)
-    disponibles = set()
-
-    try:
-        page.wait_for_function("window.LS && window.LS.variants", timeout=8000)
-    except Exception:
-        pass
-
-    try:
-        variants = page.evaluate("window.LS ? window.LS.variants : null")
-        if variants:
-            for v in variants:
-                stock = v.get('stock')
-                if isinstance(stock, str) and stock.isdigit():
-                    stock = int(stock)
-                if stock is True or (isinstance(stock, int) and stock > 0):
-                    for opt in ['option0', 'option1', 'option2']:
-                        val = v.get(opt)
-                        if val:
-                            numeros = re.findall(r'\d+', str(val))
-                            for num in numeros:
-                                num_int = int(num)
-                                if 15 <= num_int <= 50:
-                                    disponibles.add(num_int)
-            if disponibles:
-                return disponibles
-    except Exception:
-        pass
-
-    try:
-        opciones = page.locator('select option')
-        if opciones.count() > 0:
-            for i in range(opciones.count()):
-                opcion = opciones.nth(i)
-                texto = opcion.inner_text().strip().lower()
-                
-                if "sin stock" in texto or "agotado" in texto or opcion.get_attribute('disabled') is not None:
-                    continue
-
-                numeros = re.findall(r'\d+', texto)
-                for num in numeros:
-                    num_int = int(num)
-                    if 15 <= num_int <= 50:
-                        disponibles.add(num_int)
-                        
-            if disponibles:
-                return disponibles
-    except Exception:
-        pass
-
-    return disponibles
-
-def formatear_talles(talles):
-    if not talles:
-        return None
-        
-    talles = sorted(list(set(talles)))
-    resultado = []
-    grupos = []
-    grupo_actual = [talles[0]]
-    
-    for t in talles[1:]:
-        if t == grupo_actual[-1] + 1:
-            grupo_actual.append(t)
-        else:
-            grupos.append(grupo_actual)
-            grupo_actual = [t]
-    grupos.append(grupo_actual)
-    
-    for grupo in grupos:
-        if len(grupo) >= 4:
-            resultado.append(f"{grupo[0]} al {grupo[-1]}")
-        else:
-            for num in grupo:
-                resultado.append(str(num))
-                
-    return ", ".join(resultado)
-
-# Modelos de ojotas que no tienen la palabra "ojotas" en el nombre, pero se
-# venden y se muestran igual que el resto de las ojotas (talles bi-numerales).
-# Tiene que coincidir EXACTO (en minúsculas) con lo que ya usan tienda.js y
-# minorista.js, para que el mensaje de WhatsApp diga lo mismo que la web.
-MODELOS_OJOTAS_BINUMERAL = ["mind beige", "mind gris", "mind negras", "mind blancas"]
-
-def es_modelo_ojota(nombre):
-    n = nombre.lower().strip()
-    return "ojotas" in n or n in MODELOS_OJOTAS_BINUMERAL
-
-def formatear_talles_ojota(talles):
-    """
-    Junta los talles de a pares consecutivos (39, 40 -> "39/40"), igual que
-    procesarTallesOjota() en tienda.js/minorista.js, para que el texto que se
-    manda por WhatsApp coincida con cómo se ven los talles en la web.
-    """
-    if not talles:
-        return None
-
-    numeros = sorted(set(talles))
-    resultado = []
-    for i in range(0, len(numeros), 2):
-        if i + 1 < len(numeros):
-            resultado.append(f"{numeros[i]}/{numeros[i+1]}")
-        else:
-            resultado.append(str(numeros[i]))
-
-    return ", ".join(resultado)
-
-# Mismo patrón que usa el Panel Admin para leer zapatillas_manual.js: cada
-# producto es { modelo: '...', talles: [{"talle": N, "stock": N}, ...], foto: '...' }
-_PATRON_STOCK_MANUAL = re.compile(
-    r"\{\s*modelo:\s*'((?:[^'\\]|\\.)*)'\s*,\s*talles:\s*(\[.*?\])\s*,\s*foto:\s*'((?:[^'\\]|\\.)*)'\s*\}",
-    re.DOTALL,
-)
-
-def cargar_zapatillas_manual(ruta=RUTA_ZAPATILLAS_MANUAL):
-    """
-    Lee el stock que cargaste a mano (desde el Panel Admin o editando el
-    archivo directo) en zapatillas_manual.js. Devuelve una lista de
-    (nombre_modelo, set_de_talles) con SOLO los talles que tienen stock > 0
-    (un talle cargado con stock 0 no se manda como disponible).
-    """
-    if not os.path.exists(ruta):
-        return []
-
-    with open(ruta, "r", encoding="utf-8") as f:
-        contenido = f.read()
-
-    productos = []
-    for match in _PATRON_STOCK_MANUAL.finditer(contenido):
-        nombre_crudo, talles_raw, _foto = match.groups()
-        nombre = nombre_crudo.replace("\\'", "'")
-
-        try:
-            talles = json.loads(talles_raw)
-        except json.JSONDecodeError:
-            talles = []
-
-        talles_disponibles = set()
-        for t in talles:
+            win32clipboard.OpenClipboard()
             try:
-                numero = int(t.get("talle"))
-                stock = int(t.get("stock", 0))
-            except (TypeError, ValueError):
-                continue
-            if stock > 0:
-                talles_disponibles.add(numero)
-
-        if talles_disponibles:
-            productos.append((nombre, talles_disponibles))
-
-    return productos
-
-def fusionar_stock_tienda_y_casa(productos_manual, productos_proveedor):
-    """
-    Junta el stock manual (casa, zapatillas_manual.js) con el escaneado en
-    vivo de la tienda del proveedor -- igual que hace mezclar_stock.js en la
-    web: si el mismo modelo aparece en los dos lados, se combinan los
-    talles en una sola entrada (no se manda dos veces el mismo modelo).
-
-    Los modelos que están en zapatillas_manual.js van SIEMPRE primero en el
-    resultado (estén o no también en la tienda), y recién después los que
-    son solamente de la tienda del proveedor, en el orden en que se
-    escanearon.
-
-    La comparación de "es el mismo modelo" es por nombre exacto (sin
-    importar mayúsculas/minúsculas ni espacios de más), igual que en el
-    Panel Admin y en mezclar_stock.js -- para que se fusionen, el nombre
-    tiene que estar escrito igual en los dos lados.
-    """
-    combinados = {}
-    orden = []
-
-    for nombre, talles in productos_manual:
-        clave = nombre.lower().strip()
-        combinados[clave] = {"nombre": nombre, "talles": set(talles)}
-        orden.append(clave)
-
-    for nombre, talles in productos_proveedor:
-        clave = nombre.lower().strip()
-        if clave in combinados:
-            combinados[clave]["talles"] |= set(talles)
-        else:
-            combinados[clave] = {"nombre": nombre, "talles": set(talles)}
-            orden.append(clave)
-
-    return [(combinados[clave]["nombre"], combinados[clave]["talles"]) for clave in orden]
-
-def actualizar_stock(p):
-    # Recibe el "p" de Playwright ya abierto en vez de crear el suyo propio,
-    # para poder correr esto varias veces (una por tanda) sin anidar
-    # sync_playwright() adentro del que ya mantiene abierta la sesion de
-    # WhatsApp. Devuelve True/False en vez de sys.exit(1): un escaneo fallido
-    # no debe matar el proceso ni cerrar la sesion de WhatsApp ya abierta,
-    # solo esa tanda.
-    print("--- FASE 1: ESCANEANDO Y FILTRANDO STOCK EN TIENDANUBE ---")
-    browser = p.chromium.launch(headless=True)
-    try:
-        page = browser.new_page()
-
-        print(f"Abriendo {URL_LISTADO} ...")
-        _goto_con_reintentos(page, URL_LISTADO, wait_until="networkidle")
-        try:
-            page.locator("text=Entendido").first.click(timeout=3000)
+                win32clipboard.EmptyClipboard()
+                win32clipboard.SetClipboardData(win32clipboard.CF_DIB, datos)
+            finally:
+                win32clipboard.CloseClipboard()
+            return
         except Exception:
-            pass
+            if intento == 5:
+                raise
+            time.sleep(0.5)
 
-        print("Cargando catálogo completo...")
-        cargar_listado_completo(page)
 
-        productos = extraer_productos_con_filtro(page)
-        print(f"Modelos con potencial stock detectados en catálogo: {len(productos)}")
+# --- WhatsApp Web ----------------------------------------------------------------
+def _norm(texto):
+    texto = unicodedata.normalize("NFKD", texto or "").casefold()
+    texto = "".join(c for c in texto if not unicodedata.combining(c))
+    return " ".join(texto.split())
 
-        if not productos:
-            print("❌ No se encontraron productos.")
-            return False
 
-        # Pestaña aparte para las páginas de producto: no necesitan imágenes,
-        # fuentes ni estilos para leer el stock, y bloquearlos las hace ~5
-        # veces más rápidas. (El listado de arriba sí se carga completo tal
-        # cual, porque su scroll infinito depende de cómo se ve la página.)
-        page_producto = browser.new_page()
-        page_producto.route(
-            "**/*",
-            lambda ruta: ruta.abort() if ruta.request.resource_type in ("image", "font", "media", "stylesheet") else ruta.continue_(),
-        )
+def _solo_alfanumerico(texto):
+    return " ".join(re.sub(r"[\W_]+", " ", _norm(texto)).split())
 
-        productos_proveedor = []
-        fallas_seguidas = 0
-        MAX_FALLAS_SEGUIDAS = 4
 
-        for i, (nombre, url) in enumerate(productos, start=1):
-            talles = None
-            for intento in (1, 2):
-                try:
-                    talles = talles_disponibles_en_producto(page_producto, url)
-                    break
-                except Exception as e:
-                    if intento == 1:
-                        # Un fallo puntual (por ejemplo un corte de wifi de
-                        # unos segundos) no tiene que contar como falla.
-                        time.sleep(5)
+def _goto_con_reintentos(page, url, intentos=3, espera_seg=15, **kwargs):
+    for intento in range(1, intentos + 1):
+        try:
+            return page.goto(url, **kwargs)
+        except Exception as error:
+            if intento == intentos:
+                raise
+            print(f"  ⚠️ No se pudo abrir {url} (intento {intento}/{intentos}): {error}. Reintento en {espera_seg}s...")
+            time.sleep(espera_seg)
 
-            if talles is None:
-                fallas_seguidas += 1
-                print(f"  [{i}/{len(productos)}] {nombre}: error al leerlo, saltando...")
-                if fallas_seguidas >= MAX_FALLAS_SEGUIDAS:
-                    print("\nSe cortó: fallaron demasiados productos seguidos.")
-                    return False
-                continue
-            fallas_seguidas = 0
 
-            if not talles:
-                continue
-
-            print(f"  [{i}/{len(productos)}] {nombre}: {len(talles)} talles escaneados")
-            productos_proveedor.append((nombre, talles))
-    finally:
-        browser.close()
-
-    # --- Sumamos el stock de casa (zapatillas_manual.js) con el escaneado ---
-    productos_manual = cargar_zapatillas_manual()
-    if productos_manual:
-        print(f"\n📦 Stock manual (casa) cargado: {len(productos_manual)} modelo(s) desde {RUTA_ZAPATILLAS_MANUAL}")
-
-    productos_finales = fusionar_stock_tienda_y_casa(productos_manual, productos_proveedor)
-
-    lineas = []
-    incluidos = 0
-    for nombre, talles in productos_finales:
-        texto_talles = formatear_talles_ojota(talles) if es_modelo_ojota(nombre) else formatear_talles(talles)
-        if texto_talles is None:
-            continue
-        lineas.append(nombre)
-        lineas.append(texto_talles)
-        lineas.append("")
-        incluidos += 1
-
-    with open(ARCHIVO_SALIDA, "w", encoding="utf-8") as f:
-        f.write("\n".join(lineas).strip() + "\n")
-
-    print(f"\n✅ Análisis finalizado. {incluidos} modelos con stock real guardados en {ARCHIVO_SALIDA} (stock de casa primero)\n")
-    return True
-
-def parsear_stock_txt():
-    items = []
-    if not os.path.exists(ARCHIVO_SALIDA):
-        return items
-        
-    with open(ARCHIVO_SALIDA, "r", encoding="utf-8") as f:
-        lineas = f.read().strip().split('\n')
-        
-    for i in range(0, len(lineas), 3):
-        if i + 1 < len(lineas):
-            modelo = lineas[i].strip()
-            talles = lineas[i+1].strip()
-            if modelo and talles:
-                items.append({"modelo": modelo, "texto": f"{modelo}\n{talles}"})
-    return items
-
-def obtener_items_con_foto(p):
-    if not actualizar_stock(p):
-        return []
-
-    items = parsear_stock_txt()
-    if not items:
-        print("❌ No hay items para enviar en el archivo de stock.")
-        return []
-
-    print("Revisando fotos disponibles en la carpeta...")
-    items_con_foto = []
-    extensiones = ['.jpg', '.jpeg', '.png', '.webp']
-
-    for item in items:
-        modelo_original = item["modelo"]
-        modelo_archivo = limpiar_nombre_archivo(modelo_original)
-
-        foto_encontrada = None
-        for ext in extensiones:
-            ruta_prueba = os.path.join(CARPETA_FOTOS, f"{modelo_archivo}{ext}")
-            if os.path.exists(ruta_prueba):
-                foto_encontrada = ruta_prueba
-                break
-
-        if foto_encontrada:
-            item["ruta_foto"] = foto_encontrada
-            items_con_foto.append(item)
-        else:
-            print(f"⚠️ Sin foto para: '{modelo_original}' (buscado como '{modelo_archivo}'). El bot no descarga fotos: las baja el piloto automático en su próximo ciclo.")
-
-    if not items_con_foto:
-        print("\n❌ No hay fotos disponibles para enviar.")
-
-    return items_con_foto
-
-def enviar_item(page, item):
-    modelo = item["modelo"]
-    texto = item["texto"]
-    foto_a_subir = item["ruta_foto"]
-
+def abrir_whatsapp(p):
     try:
-        print(f"Preparando foto de: {modelo}...")
-
-        copiar_imagen_al_portapapeles(foto_a_subir)
-
-        barra_mensaje = page.locator('div[contenteditable="true"]').last
-        barra_mensaje.click()
-        page.wait_for_timeout(500)
-
-        page.keyboard.press("Control+V")
-        page.wait_for_timeout(3500)
-
-        lineas_texto = texto.split('\n')
-        for i, linea in enumerate(lineas_texto):
-            page.keyboard.insert_text(linea)
-            if i < len(lineas_texto) - 1:
-                page.keyboard.press("Shift+Enter")
-
-        page.wait_for_timeout(1000)
-
-        page.keyboard.press("Enter")
-        page.wait_for_timeout(1000)
-
-        # TIEMPO DE ESPERA AJUSTADO: Entre 5 y 20 segundos
-        espera = random.uniform(5, 15)
-        print(f"✅ Enviado: {modelo}. Esperando {espera:.1f} segundos...")
-        time.sleep(espera)
-        return True
-
-    except Exception as e:
-        print(f"❌ Error al enviar {modelo}: {e}")
-        page.keyboard.press("Escape")
-        page.wait_for_timeout(1000)
-        page.keyboard.press("Escape")
-        return False
-
-def main():
-    # A diferencia de antes (una corrida = un envío y listo), esto ahora
-    # queda "prendido" como el piloto_automatico: abre WhatsApp Web UNA sola
-    # vez, hace el paso manual UNA sola vez (para destrabar el bloqueo de
-    # WhatsApp), y de ahí en más cada ENTER escanea el stock de nuevo y
-    # manda una tanda entera 100% automática, sin cerrar ni reabrir nada.
-    with sync_playwright() as p:
-        browser = p.chromium.launch_persistent_context(
-            user_data_dir=os.path.join(SCRIPT_DIR, "sesion_wsp"),
-            headless=False
-        )
-        page = browser.new_page()
-
+        contexto = p.chromium.launch_persistent_context(user_data_dir=str(SCRIPT_DIR / "sesion_wsp"), headless=False)
+    except Exception as error:
+        raise RuntimeError(f"No pude abrir el perfil de WhatsApp ({error}). ¿Quedó otra ventana del bot abierta?")
+    page = contexto.pages[0] if contexto.pages else contexto.new_page()
+    try:
         print("Abriendo WhatsApp Web...")
         _goto_con_reintentos(page, "https://web.whatsapp.com/")
+        _esperar_lista_de_chats(page)
+    except Exception:
+        contexto.close()
+        raise
+    return contexto, page
 
-        primera_tanda = True
 
-        while True:
-            if not primera_tanda:
-                print("\n" + "=" * 65)
-                input("👉 Apretá ENTER para escanear el stock y mandar una tanda nueva (o cerrá esta ventana para salir): ")
-
-            print("\n--- FASE 1: ESCANEANDO STOCK ---")
-            items_con_foto = obtener_items_con_foto(p)
-            if not items_con_foto:
-                print("No hay nada para enviar en esta tanda.")
-                primera_tanda = False
-                continue
-
-            print("\n--- FASE 2: ENVIANDO POR WHATSAPP ---")
-            if primera_tanda:
-                primer_item = items_con_foto[0]
-                items_a_enviar = items_con_foto[1:]
-
-                print("\n" + "=" * 65)
-                print("🛑 PASO MANUAL, SOLO ESTA PRIMERA VEZ (DESTROZANDO EL BLOQUEO DE WHATSAPP) 🛑")
-                print("1. Entrá a tu grupo de WhatsApp en la ventana que se abrió.")
-                print(f"2. Buscá y adjuntá a mano la primera foto: {primer_item['modelo']}")
-                print("3. Ponele este texto:")
-                print("-" * 30)
-                print(primer_item['texto'])
-                print("-" * 30)
-                input("👉 Cuando la foto esté ENVIADA, apretá ENTER acá: ")
-                print("=" * 65 + "\n")
-                enviados = 1
-                primera_tanda = False
-            else:
-                items_a_enviar = items_con_foto
-                enviados = 0
-
-            print("¡Iniciando el envío automático!...")
-            page.wait_for_timeout(3000)
-
-            for item in items_a_enviar:
-                if enviar_item(page, item):
-                    enviados += 1
-
-            print("\nMandando el mensaje final de precios...")
+def _esperar_lista_de_chats(page):
+    """Espera a que WhatsApp Web muestre los chats. Distingue tres situaciones:
+    - cargó la lista de chats: listo;
+    - muestra el código QR: la sesión venció, hay que volver a vincular (aviso inmediato);
+    - "Cargando tus chats" (re-sincroniza el historial, lento en esta laptop): se espera hasta
+      LIMITE_CARGA_MIN, sin cerrar la ventana, porque cerrarla corta la sincronización."""
+    inicio = time.time()
+    ultimo_aviso = 0
+    while True:
+        if page.locator("#pane-side").count():
+            return
+        cargando = page.locator('[data-testid="wa-web-loading-screen"]').count() > 0
+        if not cargando and page.locator("canvas").count() and time.time() - inicio > 15:
+            raise SesionVencida("WhatsApp Web pide el código QR: la sesión venció. "
+                                "Hay que volver a vincular el teléfono abriendo el bot a mano.")
+        limite = LIMITE_CARGA_MIN * 60 if cargando else 90
+        if time.time() - inicio > limite:
+            raise RuntimeError(f"WhatsApp Web no terminó de cargar en {limite // 60} min "
+                               f"({'sigue sincronizando' if cargando else 'no mostró ni chats ni QR'}).")
+        if time.time() - ultimo_aviso > 60:
+            ultimo_aviso = time.time()
+            texto = ""
             try:
-                page.wait_for_timeout(1500)
-                enviar_mensaje_texto(page, MENSAJE_FINAL_PRECIOS)
-                print("✅ Mensaje final de precios enviado.")
-            except Exception as e:
-                print(f"❌ Error al mandar el mensaje final de precios: {e}")
+                texto = page.locator('[data-testid="wa-web-loading-screen"]').first.inner_text(timeout=1000).replace("\n", " ")
+            except Exception:
+                pass
+            print(f"⏳ WhatsApp Web cargando... {texto[:60]}")
+        page.wait_for_timeout(2000)
 
-            print(f"\n¡Tanda terminada! Se enviaron {enviados} fotos con éxito.")
+
+def _chat_abierto(page):
+    """Nombre normalizado del chat abierto (o None)."""
+    try:
+        titulo = page.locator('#main header [data-testid="conversation-info-header-chat-title"]').first.inner_text(timeout=2000)
+        return _norm(titulo)
+    except Exception:
+        return None
+
+
+def abrir_grupo(page, nombre):
+    """Abre el grupo buscándolo por nombre y comprueba que el chat abierto sea ESE grupo."""
+    objetivo = _norm(nombre)
+    if _chat_abierto(page) == objetivo:
+        return
+    page.keyboard.press("Control+Alt+/")                 # atajo de WhatsApp Web: foco en el buscador
+    page.wait_for_timeout(600)
+    page.keyboard.insert_text(nombre)
+    page.wait_for_timeout(2000)
+    fila = None
+    for candidato in page.locator("#pane-side span[title]").all():
+        if _norm(candidato.get_attribute("title")) == objetivo:
+            fila = candidato
+            break
+    if fila is None:
+        page.keyboard.press("Escape")
+        raise GrupoNoEncontrado(f"No encontré ningún chat llamado exactamente «{nombre}».")
+    fila.click()
+    page.wait_for_timeout(1500)
+    if _chat_abierto(page) != objetivo:
+        raise GrupoNoEncontrado(f"Abrí un chat distinto de «{nombre}»: no mando nada.")
+
+
+def _ultima_fila(page):
+    """(data-id, texto) del último mensaje visible del chat abierto; (None, '') si no se puede leer."""
+    try:
+        fila = page.locator("#main [data-id]").last
+        return fila.get_attribute("data-id", timeout=1500), fila.inner_text(timeout=1500)
+    except Exception:
+        return None, ""
+
+
+def esperar_envio_nuevo(page, id_anterior, texto_esperado, timeout_seg=25):
+    """True cuando aparece una fila nueva al final del chat que contiene el texto que mandamos."""
+    # Se comparan solo letras y números: WhatsApp dibuja los emojis como imágenes y no
+    # aparecen en el texto leído de la página (el mensaje salía bien pero no se reconocía).
+    esperado = _solo_alfanumerico(texto_esperado.split("\n")[0])
+    fin = time.time() + timeout_seg
+    while time.time() < fin:
+        id_actual, texto = _ultima_fila(page)
+        if id_actual and id_actual != id_anterior and esperado in _solo_alfanumerico(texto):
+            return True
+        page.wait_for_timeout(500)
+    return False
+
+
+def esperar_envios_pendientes(page, timeout_seg=120):
+    """Antes de cerrar el navegador, espera a que ningún mensaje reciente siga con el relojito de 'enviando'."""
+    fin = time.time() + timeout_seg
+    while time.time() < fin:
+        if page.locator('#main [data-icon="msg-time"]').count() == 0:
+            return True
+        page.wait_for_timeout(1000)
+    print("⚠️ Quedaron mensajes todavía 'enviándose' al cerrar.")
+    return False
+
+
+def _escribir_y_enviar(page, texto):
+    lineas = texto.split("\n")
+    for i, linea in enumerate(lineas):
+        page.keyboard.insert_text(linea)
+        if i < len(lineas) - 1:
+            page.keyboard.press("Shift+Enter")
+    page.wait_for_timeout(1000)
+    page.keyboard.press("Enter")
+
+
+def enviar_foto_con_texto(page, producto):
+    foto = obtener_foto(producto["foto"])
+    copiar_imagen_al_portapapeles(foto)
+    id_anterior, _ = _ultima_fila(page)
+    caja = page.locator('div[contenteditable="true"]').last
+    caja.click()
+    page.wait_for_timeout(500)
+    page.keyboard.press("Control+V")
+    page.wait_for_timeout(3500)
+    _escribir_y_enviar(page, producto["texto"])
+    return esperar_envio_nuevo(page, id_anterior, producto["texto"])
+
+
+def enviar_texto(page, texto):
+    id_anterior, _ = _ultima_fila(page)
+    page.locator('div[contenteditable="true"]').last.click()
+    page.wait_for_timeout(500)
+    _escribir_y_enviar(page, texto)
+    return esperar_envio_nuevo(page, id_anterior, texto)
+
+
+def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=False):
+    """Manda los productos (los que falten, si hay estado) y el mensaje de precios. Devuelve un resumen."""
+    ya = set(estado["enviados"]) if estado else set()
+    pendientes = [x for x in productos if x["id"] not in ya]
+    enviados = fallidos = seguidas = 0
+    precios = bool(estado and estado.get("precios_enviados"))
+    print(f"📨 Grupo «{grupo}»: {len(pendientes)} por mandar ({len(ya)} ya enviados antes).")
+
+    contexto, page = abrir_whatsapp(p)
+    try:
+        abrir_grupo(page, grupo)
+        for numero, producto in enumerate(pendientes, 1):
+            abrir_grupo(page, grupo)                       # vuelve a comprobar que sea el grupo correcto
+            if paso_manual and enviados == 0 and not ya:
+                print(f"\n🛑 PASO MANUAL: mandá a mano la foto de «{producto['name']}» con este texto:\n{producto['texto']}")
+                input("👉 Cuando esté ENVIADA, apretá ENTER acá: ")
+                ok = True
+            else:
+                ok = False
+                for intento in (1, 2):
+                    try:
+                        ok = enviar_foto_con_texto(page, producto)
+                    except Exception as error:
+                        print(f"  ⚠️ {producto['name']} (intento {intento}): {error}")
+                        page.keyboard.press("Escape")
+                        page.wait_for_timeout(1000)
+                    if ok:
+                        break
+            if ok:
+                enviados += 1
+                seguidas = 0
+                if estado is not None:
+                    estado["enviados"].append(producto["id"])
+                    guardar()
+                pausa = random.uniform(*PAUSA_ENTRE_ENVIOS)
+                print(f"✅ [{numero}/{len(pendientes)}] {producto['name']}. Pausa de {pausa:.0f}s...")
+                time.sleep(pausa)
+            else:
+                fallidos += 1
+                seguidas += 1
+                print(f"❌ [{numero}/{len(pendientes)}] {producto['name']}: no salió.")
+                if enviados == 0 and seguidas >= 2:
+                    raise EnvioBloqueado("WhatsApp no aceptó el primer envío automático. "
+                                         "Puede hacer falta el paso manual (--paso-manual).")
+                if seguidas >= 3:
+                    raise EnvioBloqueado("Fallaron 3 envíos seguidos: se corta para no seguir a ciegas.")
+
+        if not precios:
+            abrir_grupo(page, grupo)
+            print("Mandando el mensaje final de precios...")
+            if enviar_texto(page, MENSAJE_FINAL_PRECIOS):
+                precios = True
+                if estado is not None:
+                    estado["precios_enviados"] = True
+                    guardar()
+                print("✅ Mensaje de precios enviado.")
+            else:
+                print("❌ El mensaje de precios no salió.")
+        esperar_envios_pendientes(page)
+    finally:
+        contexto.close()
+    return {"enviados": enviados, "fallidos": fallidos, "precios": precios}
+
+
+# --- Estado diario -----------------------------------------------------------------
+def cargar_estado():
+    try:
+        return json.loads(ARCHIVO_ESTADO.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def guardar_estado(estado):
+    temporal = ARCHIVO_ESTADO.with_suffix(".tmp")
+    temporal.write_text(json.dumps(estado, ensure_ascii=False, indent=1), encoding="utf-8")
+    os.replace(temporal, ARCHIVO_ESTADO)
+
+
+def sortear_hora():
+    inicio = HORA_DESDE[0] * 3600 + HORA_DESDE[1] * 60
+    fin = HORA_HASTA[0] * 3600 + HORA_HASTA[1] * 60
+    segundos = random.randint(inicio, fin)
+    return f"{segundos // 3600:02d}:{segundos % 3600 // 60:02d}:{segundos % 60:02d}"
+
+
+def estado_de_hoy(forzar_ahora=False):
+    hoy = datetime.now().date().isoformat()
+    estado = cargar_estado()
+    if estado.get("dia") != hoy:
+        estado = {"dia": hoy, "hora": sortear_hora(), "enviados": [], "precios_enviados": False,
+                  "terminado": False, "intentos": 0, "resultado": None}
+        print(f"📅 Hoy ({hoy}) el bot manda a las {estado['hora']}.")
+    if forzar_ahora and not estado["terminado"]:
+        estado["hora"] = datetime.now().strftime("%H:%M:%S")
+    guardar_estado(estado)
+    return estado
+
+
+def ejecutar_envio_real(estado):
+    """Un intento de envío al grupo real. Actualiza el estado según resultado."""
+    estado["intentos"] += 1
+    guardar_estado(estado)
+    try:
+        catalogo, origen = esperar_catalogo_fresco()
+        productos = armar_productos(catalogo)
+        print(f"📚 Catálogo de {origen} ({catalogo['generatedAt']}): {len(productos)} modelos para mandar.")
+        with sync_playwright() as p:
+            resumen = enviar_tanda(p, GRUPO_REAL, productos, estado, lambda: guardar_estado(estado))
+        estado["terminado"] = True
+        estado["resultado"] = f"OK: {resumen['enviados']} enviados, {resumen['fallidos']} fallidos, precios={resumen['precios']}"
+        if resumen["fallidos"]:
+            avisar("Bot de WhatsApp", f"Terminó, pero {resumen['fallidos']} modelo(s) no salieron. Revisá el log.")
+        print(f"🏁 {estado['resultado']}")
+    except (SesionVencida, GrupoNoEncontrado, EnvioBloqueado) as error:
+        estado["terminado"] = True
+        estado["resultado"] = f"ERROR: {error}"
+        avisar("Bot de WhatsApp: necesita atención", str(error))
+    except Exception as error:
+        print(f"❌ Intento {estado['intentos']}/{MAX_INTENTOS_DIA} falló: {type(error).__name__}: {error}")
+        if estado["intentos"] >= MAX_INTENTOS_DIA:
+            estado["terminado"] = True
+            estado["resultado"] = f"ERROR tras {MAX_INTENTOS_DIA} intentos: {error}"
+            avisar("Bot de WhatsApp: no pudo mandar hoy", str(error))
+        else:
+            print(f"Reintento en {ESPERA_ENTRE_INTENTOS_MIN} min (lo ya enviado no se repite).")
+            guardar_estado(estado)
+            time.sleep(ESPERA_ENTRE_INTENTOS_MIN * 60)
+    guardar_estado(estado)
+
+
+def ciclo_diario():
+    ahora = datetime.now()
+    estado = estado_de_hoy()
+    if estado["terminado"]:
+        manana = (ahora + timedelta(days=1)).replace(hour=0, minute=5, second=0, microsecond=0)
+        time.sleep(max(60, min((manana - ahora).total_seconds(), 3600)))
+        return
+    h, m, s = map(int, estado["hora"].split(":"))
+    objetivo = ahora.replace(hour=h, minute=m, second=s, microsecond=0)
+    if ahora < objetivo:
+        time.sleep(max(1, min((objetivo - ahora).total_seconds(), 600)))
+        return
+    if ahora > objetivo + timedelta(minutes=TOLERANCIA_TARDE_MIN) and estado["intentos"] == 0:
+        estado["terminado"] = True
+        estado["resultado"] = "Omitido: la laptop estaba apagada o dormida a la hora programada."
+        guardar_estado(estado)
+        avisar("Bot de WhatsApp", estado["resultado"])
+        return
+    ejecutar_envio_real(estado)
+
+
+# --- Modos ----------------------------------------------------------------------------
+def modo_programado(ahora=False):
+    if not GRUPO_REAL:
+        print("❌ Falta configurar GRUPO_REAL en bot_whatsapp.py (todavía solo está el grupo de prueba).")
+        return 2
+    print(f"🤖 Bot de WhatsApp programado: manda a «{GRUPO_REAL}» cada día entre "
+          f"{HORA_DESDE[0]:02d}:{HORA_DESDE[1]:02d} y {HORA_HASTA[0]:02d}:{HORA_HASTA[1]:02d}.")
+    if ahora:
+        ejecutar_envio_real(estado_de_hoy(forzar_ahora=True))
+        return 0
+    while True:
+        try:
+            ciclo_diario()
+        except KeyboardInterrupt:
+            raise
+        except Exception as error:
+            print(f"❌ Error inesperado en el ciclo diario: {type(error).__name__}: {error}")
+            time.sleep(300)
+
+
+def modo_prueba(limite, paso_manual):
+    catalogo, origen = cargar_catalogo()
+    productos = armar_productos(catalogo)
+    if limite:
+        productos = productos[:limite]
+    print(f"🧪 PRUEBA en «{GRUPO_PRUEBA}»: {len(productos)} modelos (catálogo de {origen}, {catalogo['generatedAt']}).")
+    with sync_playwright() as p:
+        resumen = enviar_tanda(p, GRUPO_PRUEBA, productos, paso_manual=paso_manual)
+    print(f"🏁 Prueba terminada: {resumen}")
+    return 0 if not resumen["fallidos"] and resumen["precios"] else 1
+
+
+def modo_dry_run():
+    catalogo, origen = cargar_catalogo()
+    productos = armar_productos(catalogo)
+    print(f"Catálogo de {origen} ({catalogo['generatedAt']}, hace {_edad_catalogo(catalogo)}): "
+          f"{len(catalogo['products'])} productos, {len(productos)} para mandar.")
+    for producto in productos[:3]:
+        print("-" * 40)
+        print(producto["texto"])
+        print("foto:", obtener_foto(producto["foto"]))
+    print("-" * 40)
+    print(f"Grupo de prueba: «{GRUPO_PRUEBA}» | grupo real: {GRUPO_REAL!r} | "
+          f"ventana diaria {HORA_DESDE[0]:02d}:{HORA_DESDE[1]:02d}-{HORA_HASTA[0]:02d}:{HORA_HASTA[1]:02d}")
+    return 0
+
+
+def modo_diagnostico():
+    with sync_playwright() as p:
+        contexto, page = abrir_whatsapp(p)
+        try:
+            print("✅ WhatsApp Web cargó la lista de chats (la sesión está vinculada).")
+            abrir_grupo(page, GRUPO_PRUEBA)
+            print(f"✅ Grupo «{GRUPO_PRUEBA}» abierto y verificado por el título.")
+            print("Cajas de texto (contenteditable):", page.locator('div[contenteditable="true"]').count())
+            print("Mensajes visibles en el chat (data-id):", page.locator("#main [data-id]").count())
+            captura = SCRIPT_DIR / "logs" / "diagnostico_whatsapp.png"
+            page.screenshot(path=str(captura))
+            print("Captura:", captura)
+        finally:
+            contexto.close()
+    return 0
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--prueba", action="store_true")
+    parser.add_argument("--limite", type=int, default=None)
+    parser.add_argument("--ahora", action="store_true")
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--diagnostico", action="store_true")
+    parser.add_argument("--paso-manual", action="store_true")
+    args = parser.parse_args()
+
+    if args.dry_run:
+        return modo_dry_run()
+    candado = tomar_candado_unico()
+    if candado is None:
+        print("❌ Ya hay otro bot de WhatsApp abierto en esta laptop: cierro este para no mandar todo duplicado.")
+        return 3
+    if args.diagnostico:
+        return modo_diagnostico()
+    if args.prueba:
+        return modo_prueba(3 if args.limite is None else args.limite, args.paso_manual)
+    return modo_programado(ahora=args.ahora)
+
 
 if __name__ == "__main__":
-    main()
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        print("Bot detenido.")
