@@ -107,6 +107,18 @@ except Exception:
 GRUPO_PRUEBA = "Notas Whassap"
 GRUPO_REAL = None                 # se completa cuando la prueba salga bien
 
+# Los nombres de los grupos de ESTA laptop se guardan en bot_config.json (junto a este archivo, fuera de
+# git): {"grupo_real": "...", "grupo_prueba": "..."}. Si existe, pisa los valores de arriba.
+CONFIG_LOCAL = SCRIPT_DIR / "bot_config.json"
+try:
+    _config = json.loads(CONFIG_LOCAL.read_text(encoding="utf-8"))
+    GRUPO_REAL = _config.get("grupo_real", GRUPO_REAL)
+    GRUPO_PRUEBA = _config.get("grupo_prueba", GRUPO_PRUEBA)
+except FileNotFoundError:
+    pass
+except Exception as _error:
+    print(f"⚠️ No pude leer {CONFIG_LOCAL.name}: {_error}")
+
 HORA_DESDE = (7, 45)              # cada día se sortea una hora entre estas dos
 HORA_HASTA = (8, 10)
 TOLERANCIA_TARDE_MIN = 120        # si la laptop estaba apagada a esa hora, se manda igual hasta 2 h después
@@ -389,17 +401,39 @@ def abrir_grupo(page, nombre):
         return
     page.keyboard.press("Control+Alt+/")                 # atajo de WhatsApp Web: foco en el buscador
     page.wait_for_timeout(600)
+    page.keyboard.press("Control+A")                     # el buscador conserva la búsqueda anterior: se borra antes de escribir
+    page.keyboard.press("Backspace")
+    page.wait_for_timeout(300)
     page.keyboard.insert_text(" ".join(re.sub(r"[^\w\s]", " ", nombre).split()) or nombre)   # se busca sin emojis
-    page.wait_for_timeout(2000)
-    coincidencias = [c for c in page.locator("#pane-side span[title]").all()
-                     if _clave_chat(c.get_attribute("title")) == objetivo]
-    if not coincidencias:
-        page.keyboard.press("Escape")
-        raise GrupoNoEncontrado(f"No encontré ningún chat llamado exactamente «{nombre}».")
-    if len(coincidencias) > 1:
-        page.keyboard.press("Escape")
-        raise GrupoNoEncontrado(f"Hay {len(coincidencias)} chats llamados «{nombre}»: no sé a cuál mandar, no mando nada.")
-    coincidencias[0].click()
+
+    # La búsqueda muestra primero una fila "Cargando…" y los resultados llegan después, a veces más
+    # tarde de lo que parece. Se espera hasta que dejen de cargar y el resultado esté estable; recién
+    # ahí se decide si el grupo existe y si es único. La lista puede reacomodarse justo antes del
+    # clic, así que si falla se vuelve a leer y se reintenta.
+    selector = page.locator("#pane-side span[title]")
+    for intento in range(1, 4):
+        inicio, estables, indices = time.time(), 0, []
+        while time.time() - inicio < 20:
+            titulos = selector.evaluate_all("elementos => elementos.map(e => e.getAttribute('title'))")
+            cargando = any(_clave_chat(t) == "cargando" for t in titulos)
+            indices = [i for i, t in enumerate(titulos) if _clave_chat(t) == objetivo]
+            estables = estables + 1 if (not cargando and (indices or time.time() - inicio > 4)) else 0
+            if estables >= 2:
+                break
+            page.wait_for_timeout(500)
+        if not indices:
+            page.keyboard.press("Escape")
+            raise GrupoNoEncontrado(f"No encontré ningún chat llamado exactamente «{nombre}».")
+        if len(indices) > 1:
+            page.keyboard.press("Escape")
+            raise GrupoNoEncontrado(f"Hay {len(indices)} chats llamados «{nombre}»: no sé a cuál mandar, no mando nada.")
+        try:
+            selector.nth(indices[0]).click(timeout=4000)
+            break
+        except PlaywrightTimeout:
+            if intento == 3:
+                raise GrupoNoEncontrado(f"Encontré «{nombre}» pero no pude abrirlo (la lista cambiaba).")
+            page.wait_for_timeout(1000)
     page.wait_for_timeout(1500)
     if _chat_abierto(page) != objetivo:
         raise GrupoNoEncontrado(f"Abrí un chat distinto de «{nombre}»: no mando nada.")
@@ -700,17 +734,17 @@ def modo_dry_run():
 
 
 def modo_diagnostico():
+    """Abre WhatsApp y comprueba que cada grupo configurado se encuentre y se abra bien. NO manda nada."""
     with sync_playwright() as p:
         contexto, page = abrir_whatsapp(p)
         try:
             print("✅ WhatsApp Web cargó la lista de chats (la sesión está vinculada).")
-            abrir_grupo(page, GRUPO_PRUEBA)
-            print(f"✅ Grupo «{GRUPO_PRUEBA}» abierto y verificado por el título.")
-            print("Cajas de texto (contenteditable):", page.locator('div[contenteditable="true"]').count())
-            print("Mensajes visibles en el chat (data-id):", page.locator("#main [data-id]").count())
-            captura = SCRIPT_DIR / "logs" / "diagnostico_whatsapp.png"
-            page.screenshot(path=str(captura))
-            print("Captura:", captura)
+            for etiqueta, grupo in (("de prueba", GRUPO_PRUEBA), ("real", GRUPO_REAL)):
+                if not grupo:
+                    print(f"— Grupo {etiqueta}: sin configurar.")
+                    continue
+                abrir_grupo(page, grupo)
+                print(f"✅ Grupo {etiqueta} «{grupo}»: encontrado una sola vez, abierto y verificado por el título.")
         finally:
             contexto.close()
     return 0
