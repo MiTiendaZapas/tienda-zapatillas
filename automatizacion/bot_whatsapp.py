@@ -7,6 +7,7 @@ Modos:
     python bot_whatsapp.py                    programado: cada día a una hora al azar (HORA_DESDE..HORA_HASTA)
     python bot_whatsapp.py --prueba           manda 3 modelos + el mensaje de precios al GRUPO DE PRUEBA
     python bot_whatsapp.py --prueba --limite 10
+    python bot_whatsapp.py --prueba-programador   prueba larga del programa completo (todo el catálogo, hora sorteada en 1-3 min) al GRUPO DE PRUEBA
     python bot_whatsapp.py --ahora            manda ya mismo al grupo real (y cuenta como el envío de hoy)
     python bot_whatsapp.py --dry-run          arma los mensajes y los muestra, sin abrir WhatsApp
     python bot_whatsapp.py --diagnostico      abre WhatsApp y el grupo de prueba, saca una captura; NO manda nada
@@ -246,15 +247,20 @@ def formatear_talles(sizes):
 
 def armar_productos(catalogo):
     """Lista de {id, name, texto, foto} en el orden del catálogo (stock de casa primero)."""
-    productos = []
+    productos, sin_foto = [], []
     for producto in catalogo["products"]:
         talles = formatear_talles(producto["sizes"])
-        if talles is None or not producto.get("images"):
+        if talles is None:
+            continue
+        if not producto.get("images"):
+            sin_foto.append(producto["name"])
             continue
         productos.append({
             "id": producto["id"], "name": producto["name"],
             "texto": f"{producto['name']}\n{talles}", "foto": producto["images"][0]["lg"],
         })
+    if sin_foto:
+        print(f"⚠️ {len(sin_foto)} modelo(s) con stock pero SIN foto en el catálogo, no se mandan: {', '.join(sin_foto)}")
     return productos
 
 
@@ -637,6 +643,28 @@ def modo_programado(ahora=False):
             time.sleep(300)
 
 
+def modo_prueba_programador():
+    """Prueba larga del programa COMPLETO (hora sorteada, espera, catálogo del día, envío de todo el
+    catálogo, estado y reintentos) pero comprimida: la hora se sortea entre 1 y 3 minutos desde ahora.
+    Usa su propio archivo de estado y SIEMPRE manda al grupo de prueba, así que no toca el envío real
+    de mañana ni hay nada que revertir después."""
+    global ARCHIVO_ESTADO, GRUPO_REAL, HORA_DESDE, HORA_HASTA
+    ahora = datetime.now()
+    desde, hasta = ahora + timedelta(minutes=1), ahora + timedelta(minutes=3)
+    HORA_DESDE, HORA_HASTA = (desde.hour, desde.minute), (hasta.hour, hasta.minute)
+    ARCHIVO_ESTADO = SCRIPT_DIR / "estado_bot_prueba.json"
+    ARCHIVO_ESTADO.unlink(missing_ok=True)
+    GRUPO_REAL = GRUPO_PRUEBA
+    print(f"🧪 PRUEBA DEL PROGRAMADOR: manda TODO el catálogo a «{GRUPO_PRUEBA}» entre las "
+          f"{desde:%H:%M} y las {hasta:%H:%M}. No toca el envío real.")
+    while True:
+        ciclo_diario()
+        estado = cargar_estado()
+        if estado.get("terminado"):
+            print(f"🏁 Prueba del programador terminada: {estado.get('resultado')}")
+            return 0 if str(estado.get("resultado", "")).startswith("OK") else 1
+
+
 def modo_prueba(limite, paso_manual):
     catalogo, origen = cargar_catalogo()
     productos = armar_productos(catalogo)
@@ -684,6 +712,7 @@ def modo_diagnostico():
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--prueba", action="store_true")
+    parser.add_argument("--prueba-programador", action="store_true")
     parser.add_argument("--limite", type=int, default=None)
     parser.add_argument("--ahora", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
@@ -699,6 +728,8 @@ def main():
         return 3
     if args.diagnostico:
         return modo_diagnostico()
+    if args.prueba_programador:
+        return modo_prueba_programador()
     if args.prueba:
         return modo_prueba(3 if args.limite is None else args.limite, args.paso_manual)
     return modo_programado(ahora=args.ahora)
