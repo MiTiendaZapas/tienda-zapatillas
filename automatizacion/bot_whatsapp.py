@@ -548,7 +548,16 @@ def estado_de_hoy(forzar_ahora=False):
     if estado.get("dia") != hoy:
         estado = {"dia": hoy, "hora": sortear_hora(), "enviados": [], "precios_enviados": False,
                   "terminado": False, "intentos": 0, "resultado": None}
-        print(f"📅 Hoy ({hoy}) el bot manda a las {estado['hora']}.")
+        h, m, s = map(int, estado["hora"].split(":"))
+        limite = datetime.now().replace(hour=h, minute=m, second=s, microsecond=0) + timedelta(minutes=TOLERANCIA_TARDE_MIN)
+        if not forzar_ahora and datetime.now() > limite:
+            # El bot se abrió después de la hora de hoy (por ejemplo de noche): no es un error ni
+            # hace falta avisar, simplemente el primer envío es mañana.
+            estado["terminado"] = True
+            estado["resultado"] = "El bot arrancó después de la hora de hoy: el primer envío es mañana."
+            print(f"📅 Hoy ({hoy}) ya pasó la hora de envío: el primer envío es mañana.")
+        else:
+            print(f"📅 Hoy ({hoy}) el bot manda a las {estado['hora']}.")
     if forzar_ahora and not estado["terminado"]:
         estado["hora"] = datetime.now().strftime("%H:%M:%S")
     guardar_estado(estado)
