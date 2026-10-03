@@ -309,6 +309,13 @@ def _solo_alfanumerico(texto):
     return " ".join(re.sub(r"[\W_]+", " ", _norm(texto)).split())
 
 
+def _clave_chat(texto):
+    """Nombre de un chat para compararlo: solo letras y números. Los emojis del nombre aparecen en la
+    lista de chats pero no en el título del chat abierto (WhatsApp los dibuja como imágenes), así que
+    comparar con ellos hacía fallar la verificación. Si el nombre es solo emojis, se usa tal cual."""
+    return _solo_alfanumerico(texto) or _norm(texto)
+
+
 def _goto_con_reintentos(page, url, intentos=3, espera_seg=15, **kwargs):
     for intento in range(1, intentos + 1):
         try:
@@ -370,22 +377,22 @@ def _chat_abierto(page):
     """Nombre normalizado del chat abierto (o None)."""
     try:
         titulo = page.locator('#main header [data-testid="conversation-info-header-chat-title"]').first.inner_text(timeout=2000)
-        return _norm(titulo)
+        return _clave_chat(titulo)
     except Exception:
         return None
 
 
 def abrir_grupo(page, nombre):
     """Abre el grupo buscándolo por nombre y comprueba que el chat abierto sea ESE grupo."""
-    objetivo = _norm(nombre)
+    objetivo = _clave_chat(nombre)
     if _chat_abierto(page) == objetivo:
         return
     page.keyboard.press("Control+Alt+/")                 # atajo de WhatsApp Web: foco en el buscador
     page.wait_for_timeout(600)
-    page.keyboard.insert_text(nombre)
+    page.keyboard.insert_text(" ".join(re.sub(r"[^\w\s]", " ", nombre).split()) or nombre)   # se busca sin emojis
     page.wait_for_timeout(2000)
     coincidencias = [c for c in page.locator("#pane-side span[title]").all()
-                     if _norm(c.get_attribute("title")) == objetivo]
+                     if _clave_chat(c.get_attribute("title")) == objetivo]
     if not coincidencias:
         page.keyboard.press("Escape")
         raise GrupoNoEncontrado(f"No encontré ningún chat llamado exactamente «{nombre}».")
