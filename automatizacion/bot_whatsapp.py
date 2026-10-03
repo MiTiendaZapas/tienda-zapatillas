@@ -121,6 +121,7 @@ except Exception as _error:
 
 HORA_DESDE = (7, 45)              # cada día se sortea una hora entre estas dos
 HORA_HASTA = (8, 10)
+DIAS_SIN_ENVIO = (6,)             # días en que NO se manda stock (0 = lunes ... 6 = domingo)
 TOLERANCIA_TARDE_MIN = 120        # si la laptop estaba apagada a esa hora, se manda igual hasta 2 h después
 MAX_INTENTOS_DIA = 3
 ESPERA_ENTRE_INTENTOS_MIN = 15
@@ -619,14 +620,20 @@ def estado_de_hoy(forzar_ahora=False):
     hoy = datetime.now().date().isoformat()
     estado = cargar_estado()
     if estado.get("dia") != hoy:
-        # La hora de hoy ya pudo sortearse (y anunciarse) al terminar el envío de ayer.
+        # La hora de hoy ya pudo sortearse (y anunciarse) al terminar el último envío.
         proxima = estado.get("proxima") or {}
         hora = proxima["hora"] if proxima.get("dia") == hoy else sortear_hora()
         estado = {"dia": hoy, "hora": hora, "enviados": [], "precios_enviados": False,
                   "terminado": False, "intentos": 0, "resultado": None}
+        if proxima.get("dia", "") > hoy:
+            estado["proxima"] = proxima         # lo ya anunciado para un día futuro (ej. el lunes) se conserva
         h, m, s = map(int, estado["hora"].split(":"))
         limite = datetime.now().replace(hour=h, minute=m, second=s, microsecond=0) + timedelta(minutes=TOLERANCIA_TARDE_MIN)
-        if not forzar_ahora and datetime.now() > limite:
+        if not forzar_ahora and datetime.now().weekday() in DIAS_SIN_ENVIO:
+            estado["terminado"] = True
+            estado["resultado"] = "Hoy no se envía stock (domingo)."
+            print(f"📅 Hoy ({hoy}) no se envía stock.")
+        elif not forzar_ahora and datetime.now() > limite:
             # El bot se abrió después de la hora de hoy (por ejemplo de noche): no es un error ni
             # hace falta avisar, simplemente el primer envío es mañana.
             estado["terminado"] = True
@@ -640,15 +647,26 @@ def estado_de_hoy(forzar_ahora=False):
     return estado
 
 
+def proximo_dia_de_envio(desde=None):
+    """Primer día después de `desde` (hoy por defecto) en que se manda stock; salta los DIAS_SIN_ENVIO."""
+    dia = (desde or datetime.now().date()) + timedelta(days=1)
+    while dia.weekday() in DIAS_SIN_ENVIO:
+        dia += timedelta(days=1)
+    return dia
+
+
 def anunciar_proximo_envio(estado):
-    """Sortea (una sola vez) la hora de mañana, la guarda para que sea la que se use, y la muestra."""
-    manana = (datetime.now().date() + timedelta(days=1)).isoformat()
+    """Sortea (una sola vez) la hora del próximo día de envío, la guarda para que sea la que se use, y la muestra."""
+    dia = proximo_dia_de_envio()
     proxima = estado.get("proxima") or {}
-    if proxima.get("dia") != manana:
-        proxima = {"dia": manana, "hora": sortear_hora()}
+    if proxima.get("dia") != dia.isoformat():
+        proxima = {"dia": dia.isoformat(), "hora": sortear_hora()}
         estado["proxima"] = proxima
         guardar_estado(estado)
-    print(f"📅 PRÓXIMO ENVÍO: mañana {manana} a las {proxima['hora']} (el bot lo hace solo; dejá esta ventana abierta).")
+    nombre = ("lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo")[dia.weekday()]
+    cuando = "mañana" if dia == datetime.now().date() + timedelta(days=1) else "el"
+    print(f"📅 PRÓXIMO ENVÍO: {cuando} {nombre} {dia.strftime('%d/%m')} a las {proxima['hora']} "
+          f"(el bot lo hace solo; dejá esta ventana abierta).")
 
 
 def ejecutar_envio_real(estado):
@@ -693,7 +711,7 @@ def ciclo_diario():
     ahora = datetime.now()
     estado = estado_de_hoy()
     if estado["terminado"]:
-        if estado.get("proxima", {}).get("dia") != (ahora.date() + timedelta(days=1)).isoformat() or not _anunciado:
+        if estado.get("proxima", {}).get("dia") != proximo_dia_de_envio().isoformat() or not _anunciado:
             _anunciado.append(True)
             anunciar_proximo_envio(estado)
         manana = (ahora + timedelta(days=1)).replace(hour=0, minute=5, second=0, microsecond=0)
@@ -738,7 +756,8 @@ def modo_prueba_programador():
     catálogo, estado y reintentos) pero comprimida: la hora se sortea entre 1 y 3 minutos desde ahora.
     Usa su propio archivo de estado y SIEMPRE manda al grupo de prueba, así que no toca el envío real
     de mañana ni hay nada que revertir después."""
-    global ARCHIVO_ESTADO, GRUPO_REAL, HORA_DESDE, HORA_HASTA
+    global ARCHIVO_ESTADO, GRUPO_REAL, HORA_DESDE, HORA_HASTA, DIAS_SIN_ENVIO
+    DIAS_SIN_ENVIO = ()        # la prueba corre cualquier día
     ahora = datetime.now()
     desde, hasta = ahora + timedelta(minutes=1), ahora + timedelta(minutes=3)
     HORA_DESDE, HORA_HASTA = (desde.hour, desde.minute), (hasta.hour, hasta.minute)
