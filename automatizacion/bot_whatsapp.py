@@ -497,15 +497,50 @@ def _escribir_y_enviar(page, texto):
     page.keyboard.press("Enter")
 
 
+def _cerrar_vista_previa(page):
+    """Si quedó abierta la vista previa de una foto (sin enviar), la descarta. Escape solo no alcanza:
+    WhatsApp pregunta '¿Quieres descartar la selección?' y hay que apretar Descartar."""
+    for _ in range(3):
+        if page.locator('[aria-label="Añadir archivo"]').count() == 0:
+            return
+        page.keyboard.press("Escape")
+        page.wait_for_timeout(800)
+        boton = page.get_by_text("Descartar", exact=True)
+        if boton.count():
+            boton.first.click()
+            page.wait_for_timeout(800)
+
+
+def _limpiar_antes_de_reintentar(page, texto):
+    """Tras un envío sin confirmar: espera a que termine de salir. True si en realidad salió (no se
+    repite); si no, cierra la vista previa y vacía la caja para que el reintento arranque limpio."""
+    esperar_envios_pendientes(page, 45)
+    _, ultimo = _ultima_fila(page)
+    if _solo_alfanumerico(texto.split("\n")[0]) in _solo_alfanumerico(ultimo) and _ultima_fila_enviada(page):
+        return True
+    _cerrar_vista_previa(page)
+    try:
+        page.locator('div[contenteditable="true"]').last.click()
+        page.keyboard.press("Control+A")
+        page.keyboard.press("Delete")
+    except Exception:
+        pass
+    page.wait_for_timeout(500)
+    return False
+
+
 def enviar_foto_con_texto(page, producto):
     foto = obtener_foto(producto["foto"])
     copiar_imagen_al_portapapeles(foto)
+    _cerrar_vista_previa(page)              # una vista previa colgada taparía la caja de texto
     id_anterior, _ = _ultima_fila(page)
     caja = page.locator('div[contenteditable="true"]').last
     caja.click()
     page.wait_for_timeout(500)
     page.keyboard.press("Control+V")
     page.wait_for_timeout(3500)
+    page.keyboard.press("Control+A")        # por si quedó texto de un intento anterior: no duplicarlo
+    page.keyboard.press("Delete")
     _escribir_y_enviar(page, producto["texto"])
     return esperar_envio_nuevo(page, id_anterior, producto["texto"])
 
@@ -542,10 +577,13 @@ def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=Fal
                         ok = enviar_foto_con_texto(page, producto)
                     except Exception as error:
                         print(f"  ⚠️ {producto['name']} (intento {intento}): {error}")
-                        page.keyboard.press("Escape")
-                        page.wait_for_timeout(1000)
                     if ok:
                         break
+                    if intento == 1:
+                        print(f"  ⚠️ {producto['name']}: el intento 1 no se confirmó, reviso antes de reintentar.")
+                        ok = _limpiar_antes_de_reintentar(page, producto["texto"])
+                        if ok:
+                            break
             if ok:
                 enviados += 1
                 seguidas = 0
