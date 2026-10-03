@@ -448,25 +448,38 @@ def _ultima_fila(page):
         return None, ""
 
 
-def esperar_envio_nuevo(page, id_anterior, texto_esperado, timeout_seg=25):
-    """True cuando aparece una fila nueva al final del chat que contiene el texto que mandamos."""
+def _ultima_fila_enviada(page):
+    """True si el último mensaje del chat ya no está 'Pendiente' (WhatsApp lo marca Enviado/Entregado/Leído)."""
+    try:
+        etiquetas = page.locator("#main [data-id]").last.evaluate(
+            "fila => [...fila.querySelectorAll('[aria-label]')].map(e => e.getAttribute('aria-label') || '')",
+            timeout=1500)
+    except Exception:
+        return False
+    return any(x.strip() in ("Enviado", "Entregado", "Leído") for x in etiquetas)
+
+
+def esperar_envio_nuevo(page, id_anterior, texto_esperado, timeout_seg=40):
+    """True cuando aparece una fila nueva al final del chat con el texto que mandamos Y WhatsApp ya la
+    marca como enviada (antes pasa por 'Pendiente': si se cierra el navegador en ese momento se pierde)."""
     # Se comparan solo letras y números: WhatsApp dibuja los emojis como imágenes y no
     # aparecen en el texto leído de la página (el mensaje salía bien pero no se reconocía).
     esperado = _solo_alfanumerico(texto_esperado.split("\n")[0])
     fin = time.time() + timeout_seg
     while time.time() < fin:
         id_actual, texto = _ultima_fila(page)
-        if id_actual and id_actual != id_anterior and esperado in _solo_alfanumerico(texto):
+        if (id_actual and id_actual != id_anterior and esperado in _solo_alfanumerico(texto)
+                and _ultima_fila_enviada(page)):
             return True
         page.wait_for_timeout(500)
     return False
 
 
 def esperar_envios_pendientes(page, timeout_seg=120):
-    """Antes de cerrar el navegador, espera a que ningún mensaje reciente siga con el relojito de 'enviando'."""
+    """Antes de cerrar el navegador, espera a que ningún mensaje del chat siga 'Pendiente'."""
     fin = time.time() + timeout_seg
     while time.time() < fin:
-        if page.locator('#main [data-icon="msg-time"]').count() == 0:
+        if page.locator('#main [aria-label="Pendiente"], #main [aria-label=" Pendiente "]').count() == 0:
             return True
         page.wait_for_timeout(1000)
     print("⚠️ Quedaron mensajes todavía 'enviándose' al cerrar.")
@@ -554,8 +567,21 @@ def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=Fal
         if not precios:
             abrir_grupo(page, grupo)
             print("Mandando el mensaje final de precios...")
-            if enviar_texto(page, MENSAJE_FINAL_PRECIOS):
-                precios = True
+            for intento in (1, 2):
+                try:
+                    precios = enviar_texto(page, MENSAJE_FINAL_PRECIOS)
+                except Exception as error:
+                    print(f"  ⚠️ Mensaje de precios (intento {intento}): {error}")
+                    page.keyboard.press("Escape")
+                if not precios and intento == 1:
+                    # Antes de reintentar, ver si el primero en realidad salió tarde (no duplicar).
+                    esperar_envios_pendientes(page, 60)
+                    _, texto = _ultima_fila(page)
+                    primera = _solo_alfanumerico(MENSAJE_FINAL_PRECIOS.split("\n")[0])
+                    precios = primera in _solo_alfanumerico(texto) and _ultima_fila_enviada(page)
+                if precios:
+                    break
+            if precios:
                 if estado is not None:
                     estado["precios_enviados"] = True
                     guardar()
@@ -593,7 +619,10 @@ def estado_de_hoy(forzar_ahora=False):
     hoy = datetime.now().date().isoformat()
     estado = cargar_estado()
     if estado.get("dia") != hoy:
-        estado = {"dia": hoy, "hora": sortear_hora(), "enviados": [], "precios_enviados": False,
+        # La hora de hoy ya pudo sortearse (y anunciarse) al terminar el envío de ayer.
+        proxima = estado.get("proxima") or {}
+        hora = proxima["hora"] if proxima.get("dia") == hoy else sortear_hora()
+        estado = {"dia": hoy, "hora": hora, "enviados": [], "precios_enviados": False,
                   "terminado": False, "intentos": 0, "resultado": None}
         h, m, s = map(int, estado["hora"].split(":"))
         limite = datetime.now().replace(hour=h, minute=m, second=s, microsecond=0) + timedelta(minutes=TOLERANCIA_TARDE_MIN)
@@ -611,6 +640,17 @@ def estado_de_hoy(forzar_ahora=False):
     return estado
 
 
+def anunciar_proximo_envio(estado):
+    """Sortea (una sola vez) la hora de mañana, la guarda para que sea la que se use, y la muestra."""
+    manana = (datetime.now().date() + timedelta(days=1)).isoformat()
+    proxima = estado.get("proxima") or {}
+    if proxima.get("dia") != manana:
+        proxima = {"dia": manana, "hora": sortear_hora()}
+        estado["proxima"] = proxima
+        guardar_estado(estado)
+    print(f"📅 PRÓXIMO ENVÍO: mañana {manana} a las {proxima['hora']} (el bot lo hace solo; dejá esta ventana abierta).")
+
+
 def ejecutar_envio_real(estado):
     """Un intento de envío al grupo real. Actualiza el estado según resultado."""
     estado["intentos"] += 1
@@ -625,7 +665,10 @@ def ejecutar_envio_real(estado):
         estado["resultado"] = f"OK: {resumen['enviados']} enviados, {resumen['fallidos']} fallidos, precios={resumen['precios']}"
         if resumen["fallidos"]:
             avisar("Bot de WhatsApp", f"Terminó, pero {resumen['fallidos']} modelo(s) no salieron. Revisá el log.")
+        if not resumen["precios"]:
+            avisar("Bot de WhatsApp", "El mensaje final de precios NO salió: mandalo a mano en el grupo.")
         print(f"🏁 {estado['resultado']}")
+        anunciar_proximo_envio(estado)
     except (SesionVencida, GrupoNoEncontrado, EnvioBloqueado) as error:
         estado["terminado"] = True
         estado["resultado"] = f"ERROR: {error}"
@@ -643,10 +686,16 @@ def ejecutar_envio_real(estado):
     guardar_estado(estado)
 
 
+_anunciado = []     # para repetir el aviso del próximo envío solo al arrancar el bot
+
+
 def ciclo_diario():
     ahora = datetime.now()
     estado = estado_de_hoy()
     if estado["terminado"]:
+        if estado.get("proxima", {}).get("dia") != (ahora.date() + timedelta(days=1)).isoformat() or not _anunciado:
+            _anunciado.append(True)
+            anunciar_proximo_envio(estado)
         manana = (ahora + timedelta(days=1)).replace(hour=0, minute=5, second=0, microsecond=0)
         time.sleep(max(60, min((manana - ahora).total_seconds(), 3600)))
         return
