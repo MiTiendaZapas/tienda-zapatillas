@@ -378,15 +378,15 @@ def abrir_grupo(page, nombre):
     page.wait_for_timeout(600)
     page.keyboard.insert_text(nombre)
     page.wait_for_timeout(2000)
-    fila = None
-    for candidato in page.locator("#pane-side span[title]").all():
-        if _norm(candidato.get_attribute("title")) == objetivo:
-            fila = candidato
-            break
-    if fila is None:
+    coincidencias = [c for c in page.locator("#pane-side span[title]").all()
+                     if _norm(c.get_attribute("title")) == objetivo]
+    if not coincidencias:
         page.keyboard.press("Escape")
         raise GrupoNoEncontrado(f"No encontré ningún chat llamado exactamente «{nombre}».")
-    fila.click()
+    if len(coincidencias) > 1:
+        page.keyboard.press("Escape")
+        raise GrupoNoEncontrado(f"Hay {len(coincidencias)} chats llamados «{nombre}»: no sé a cuál mandar, no mando nada.")
+    coincidencias[0].click()
     page.wait_for_timeout(1500)
     if _chat_abierto(page) != objetivo:
         raise GrupoNoEncontrado(f"Abrí un chat distinto de «{nombre}»: no mando nada.")
