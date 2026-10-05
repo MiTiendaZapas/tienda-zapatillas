@@ -121,7 +121,8 @@ except Exception as _error:
 
 HORA_DESDE = (7, 45)              # cada día se sortea una hora entre estas dos
 HORA_HASTA = (8, 10)
-DIAS_SIN_ENVIO = (6,)             # días en que NO se manda stock (0 = lunes ... 6 = domingo)
+ESPERA_TRAS_CARGAR_SEG = 90       # pausa tras cargar la lista de chats, antes del primer envío
+DIAS_SIN_ENVIO = (6,)            # días en que NO se manda stock (0 = lunes ... 6 = domingo)
 TOLERANCIA_TARDE_MIN = 120        # si la laptop estaba apagada a esa hora, se manda igual hasta 2 h después
 MAX_INTENTOS_DIA = 3
 ESPERA_ENTRE_INTENTOS_MIN = 15
@@ -350,6 +351,10 @@ def abrir_whatsapp(p):
         print("Abriendo WhatsApp Web...")
         _goto_con_reintentos(page, "https://web.whatsapp.com/")
         _esperar_lista_de_chats(page)
+        # Con la lista ya visible WhatsApp sigue sincronizando un rato y va lento: los primeros envíos
+        # tardaban en aparecer y se reintentaban (foto repetida). Se le da tiempo a asentarse.
+        print(f"⏳ Dejo que WhatsApp termine de sincronizar ({ESPERA_TRAS_CARGAR_SEG}s)...")
+        page.wait_for_timeout(ESPERA_TRAS_CARGAR_SEG * 1000)
     except Exception:
         contexto.close()
         raise
@@ -487,14 +492,44 @@ def esperar_envios_pendientes(page, timeout_seg=120):
     return False
 
 
-def _escribir_y_enviar(page, texto):
+def _escribir_y_enviar(page, texto, seguir=None):
+    """Escribe el texto y aprieta Enter. Si se pasa `seguir`, se consulta justo antes del Enter y,
+    si devuelve False, NO se envía (devuelve False)."""
     lineas = texto.split("\n")
     for i, linea in enumerate(lineas):
         page.keyboard.insert_text(linea)
         if i < len(lineas) - 1:
             page.keyboard.press("Shift+Enter")
     page.wait_for_timeout(1000)
+    if seguir is not None and not seguir():
+        return False
     page.keyboard.press("Enter")
+    return True
+
+
+_JS_FILAS_NUEVAS = """(idBase) => {
+    const filas = [...document.querySelectorAll('#main [data-id]')];
+    const desde = filas.findIndex(f => f.dataset.id === idBase);
+    return filas.slice(desde + 1).map(f => ({
+        txt: f.innerText || '',
+        etiquetas: [...f.querySelectorAll('[aria-label]')].map(x => (x.getAttribute('aria-label') || '').trim())
+    }));
+}"""
+
+
+def _envios_nuevos(page, id_base, texto):
+    """(mensajes con ese texto que hay DESPUÉS del último mensaje que había antes de mandar, cuántos de
+    ellos ya figuran Enviado). Sin id_base no se puede saber: (0, 0)."""
+    if not id_base:
+        return 0, 0
+    try:
+        filas = page.evaluate(_JS_FILAS_NUEVAS, id_base)
+    except Exception:
+        return 0, 0
+    esperado = _solo_alfanumerico(texto.split("\n")[0])
+    coinciden = [f for f in filas if esperado in _solo_alfanumerico(f["txt"])]
+    enviados = [f for f in coinciden if any(e in ("Enviado", "Entregado", "Leído") for e in f["etiquetas"])]
+    return len(coinciden), len(enviados)
 
 
 def _cerrar_vista_previa(page):
@@ -511,12 +546,37 @@ def _cerrar_vista_previa(page):
             page.wait_for_timeout(800)
 
 
-def _limpiar_antes_de_reintentar(page, texto):
-    """Tras un envío sin confirmar: espera a que termine de salir. True si en realidad salió (no se
-    repite); si no, cierra la vista previa y vacía la caja para que el reintento arranque limpio."""
-    esperar_envios_pendientes(page, 45)
-    _, ultimo = _ultima_fila(page)
-    if _solo_alfanumerico(texto.split("\n")[0]) in _solo_alfanumerico(ultimo) and _ultima_fila_enviada(page):
+def _esperar_rastro_del_envio(page, texto, id_base, sin_rastro_seg=60, previa_seg=60, total_seg=180):
+    """Tras un envío sin confirmar, espera MUCHO antes de darlo por perdido (WhatsApp, recién cargado, puede
+    tardar más de un minuto en mostrar un mensaje que sí sale: reintentar antes duplica la foto).
+    True = el mensaje salió o sigue saliendo (NO reintentar); False = sin rastro, se puede reintentar."""
+    inicio = time.time()
+    sin_rastro = None
+    while time.time() - inicio < total_seg:
+        total, enviados = _envios_nuevos(page, id_base, texto)
+        if enviados:
+            return True
+        if total:                                  # está, pero todavía 'Pendiente': esperar
+            sin_rastro = None
+        elif page.locator('[aria-label="Añadir archivo"]').count():
+            sin_rastro = None                      # la vista previa sigue abierta: el Enter no se registró
+            if time.time() - inicio > previa_seg:
+                break
+        else:
+            sin_rastro = sin_rastro or time.time()
+            if time.time() - sin_rastro > sin_rastro_seg:
+                break
+        page.wait_for_timeout(1000)
+    if _envios_nuevos(page, id_base, texto)[0]:
+        print("  ⚠️ El mensaje sigue 'Pendiente': no lo reintento para no duplicarlo.")
+        return True
+    return False
+
+
+def _limpiar_antes_de_reintentar(page, texto, id_base):
+    """Tras un envío sin confirmar: True si en realidad salió (no se repite); si no, cierra la vista
+    previa y vacía la caja para que el reintento arranque limpio."""
+    if _esperar_rastro_del_envio(page, texto, id_base):
         return True
     _cerrar_vista_previa(page)
     try:
@@ -529,11 +589,14 @@ def _limpiar_antes_de_reintentar(page, texto):
     return False
 
 
-def enviar_foto_con_texto(page, producto):
+def enviar_foto_con_texto(page, producto, id_base=None):
+    """id_base: id del último mensaje del chat ANTES de empezar con este modelo (se mantiene igual entre
+    el intento 1 y el 2, para saber si algo de este modelo ya salió)."""
     foto = obtener_foto(producto["foto"])
     copiar_imagen_al_portapapeles(foto)
     _cerrar_vista_previa(page)              # una vista previa colgada taparía la caja de texto
-    id_anterior, _ = _ultima_fila(page)
+    if id_base is None:
+        id_base, _ = _ultima_fila(page)
     caja = page.locator('div[contenteditable="true"]').last
     caja.click()
     page.wait_for_timeout(500)
@@ -541,16 +604,23 @@ def enviar_foto_con_texto(page, producto):
     page.wait_for_timeout(3500)
     page.keyboard.press("Control+A")        # por si quedó texto de un intento anterior: no duplicarlo
     page.keyboard.press("Delete")
-    _escribir_y_enviar(page, producto["texto"])
-    return esperar_envio_nuevo(page, id_anterior, producto["texto"])
+    # Última barrera contra duplicados: si justo ahora ya apareció este modelo (salió tarde), no mandarlo otra vez.
+    if not _escribir_y_enviar(page, producto["texto"], lambda: _envios_nuevos(page, id_base, producto["texto"])[0] == 0):
+        print(f"  ⚠️ {producto['name']} ya había salido: no lo mando de nuevo.")
+        _cerrar_vista_previa(page)
+    return esperar_envio_nuevo(page, id_base, producto["texto"])
 
 
-def enviar_texto(page, texto):
-    id_anterior, _ = _ultima_fila(page)
+def enviar_texto(page, texto, id_base=None):
+    if id_base is None:
+        id_base, _ = _ultima_fila(page)
     page.locator('div[contenteditable="true"]').last.click()
     page.wait_for_timeout(500)
-    _escribir_y_enviar(page, texto)
-    return esperar_envio_nuevo(page, id_anterior, texto)
+    if not _escribir_y_enviar(page, texto, lambda: _envios_nuevos(page, id_base, texto)[0] == 0):
+        print("  ⚠️ El mensaje ya había salido: no lo mando de nuevo.")
+        page.keyboard.press("Control+A")
+        page.keyboard.press("Delete")
+    return esperar_envio_nuevo(page, id_base, texto)
 
 
 def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=False):
@@ -572,18 +642,24 @@ def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=Fal
                 ok = True
             else:
                 ok = False
+                id_base, _ = _ultima_fila(page)     # el mismo para los dos intentos de este modelo
                 for intento in (1, 2):
                     try:
-                        ok = enviar_foto_con_texto(page, producto)
+                        ok = enviar_foto_con_texto(page, producto, id_base)
                     except Exception as error:
                         print(f"  ⚠️ {producto['name']} (intento {intento}): {error}")
                     if ok:
                         break
                     if intento == 1:
-                        print(f"  ⚠️ {producto['name']}: el intento 1 no se confirmó, reviso antes de reintentar.")
-                        ok = _limpiar_antes_de_reintentar(page, producto["texto"])
+                        print(f"  ⚠️ {producto['name']}: el intento 1 no se confirmó, espero y reviso antes de reintentar.")
+                        ok = _limpiar_antes_de_reintentar(page, producto["texto"], id_base)
                         if ok:
                             break
+                if ok:
+                    repetidos = _envios_nuevos(page, id_base, producto["texto"])[0]
+                    if repetidos > 1:
+                        avisar("Bot de WhatsApp: mensaje repetido",
+                               f"«{producto['name']}» salió {repetidos} veces en el grupo. Borrá la repetida a mano.")
             if ok:
                 enviados += 1
                 seguidas = 0
@@ -606,18 +682,16 @@ def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=Fal
         if not precios:
             abrir_grupo(page, grupo)
             print("Mandando el mensaje final de precios...")
+            id_base, _ = _ultima_fila(page)
             for intento in (1, 2):
                 try:
-                    precios = enviar_texto(page, MENSAJE_FINAL_PRECIOS)
+                    precios = enviar_texto(page, MENSAJE_FINAL_PRECIOS, id_base)
                 except Exception as error:
                     print(f"  ⚠️ Mensaje de precios (intento {intento}): {error}")
                     page.keyboard.press("Escape")
                 if not precios and intento == 1:
-                    # Antes de reintentar, ver si el primero en realidad salió tarde (no duplicar).
-                    esperar_envios_pendientes(page, 60)
-                    _, texto = _ultima_fila(page)
-                    primera = _solo_alfanumerico(MENSAJE_FINAL_PRECIOS.split("\n")[0])
-                    precios = primera in _solo_alfanumerico(texto) and _ultima_fila_enviada(page)
+                    # Antes de reintentar, esperar bien por si el primero salió tarde (no duplicar).
+                    precios = _esperar_rastro_del_envio(page, MENSAJE_FINAL_PRECIOS, id_base)
                 if precios:
                     break
             if precios:
