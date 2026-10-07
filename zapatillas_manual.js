@@ -3,5 +3,4 @@
 // no se edita a mano (se pisa en cada vuelta del piloto).
 
 const stock_zapatillas_manual = [
-    { modelo: 'Jordan low blue', talles: [{"talle": 36, "stock": 67}], foto: 'Fotos/Jordan low blue.jpg' },
 ];
