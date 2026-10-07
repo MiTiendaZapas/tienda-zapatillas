@@ -162,6 +162,24 @@ SALUDO_INICIAL = (
     "Les dejo el stock de hoy 👇👇👇"
 )
 
+# Indumentaria (tienda de Beto, la misma de las G5): va al final de todo, con su separador y su lista de precios.
+URL_CATALOGO_INDUMENTARIA = "https://app-beto-seven.vercel.app/api/catalogo"
+SEPARADOR_INDUMENTARIA = (
+    "━━━━━━━━━━━━━━\n"
+    "⬇️ INDUMENTARIA ⬇️\n"
+    "━━━━━━━━━━━━━━"
+)
+MENSAJE_PRECIOS_INDUMENTARIA = (
+    "PRECIOS INDUMENTARIA‼️\n"
+    "\n"
+    "Rompevientos $60.000\n"
+    "Sst $72.000\n"
+    "Conjuntos $70.000\n"
+    "Conjunto short.remera $32.000\n"
+    "Remeras arg blanca $37.000"
+)
+ORDEN_TALLES_ROPA = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "3XL", "4XL", "ÚNICO", "UNICO"]
+
 # Zapatillas calidad G5 (otro proveedor): van aparte de las BR, después de un separador bien visible.
 SEPARADOR_G5 = (
     "━━━━━━━━━━━━━━\n"
@@ -307,6 +325,56 @@ def cargar_productos_g5():
     except Exception as error:
         print(f"⚠️ No pude preparar las G5 ({type(error).__name__}: {error}): se manda solo lo de BR.")
         return []
+
+
+def formatear_talles_ropa(talles):
+    """Talles de ropa con stock, en orden de menor a mayor: "M, L, XL, XXL"."""
+    con_stock = [str(t["talle"]).strip() for t in talles if int(t.get("cantidad") or 0) > 0 and str(t.get("talle") or "").strip()]
+    if not con_stock:
+        return None
+    def orden(t):
+        mayus = t.upper()
+        return (ORDEN_TALLES_ROPA.index(mayus) if mayus in ORDEN_TALLES_ROPA else 99, mayus)
+    return ", ".join(sorted(dict.fromkeys(con_stock), key=orden))
+
+
+def cargar_productos_indumentaria():
+    """Indumentaria de la tienda de Beto lista para mandar. Si algo falla devuelve [] (se manda el resto):
+    la indumentaria nunca debe cortar ni demorar la tanda."""
+    try:
+        datos = json.loads(_descargar(f"{URL_CATALOGO_INDUMENTARIA}?t={int(time.time())}", reintentos=2).decode("utf-8"))
+        productos, sin_foto = [], []
+        for item in datos["productos"]:
+            if str(item.get("categoria") or "").strip().lower() != "indumentaria":
+                continue
+            talles = formatear_talles_ropa(item.get("talles") or [])
+            if talles is None:
+                continue
+            foto = item.get("fotoGrande") or item.get("foto")
+            if not foto:
+                sin_foto.append(item["nombre"])
+                continue
+            productos.append({"id": f"ind-{item['id']}", "name": item["nombre"].strip(),
+                              "texto": f"{item['nombre'].strip()}\nTalles: {talles}", "foto_url": foto})
+        if sin_foto:
+            print(f"⚠️ {len(sin_foto)} prenda(s) con stock pero SIN foto, no se mandan: {', '.join(sin_foto)}")
+        print(f"👕 Indumentaria de la tienda de Beto: {len(productos)} prendas para mandar.")
+        return productos
+    except Exception as error:
+        print(f"⚠️ No pude leer la indumentaria ({type(error).__name__}: {error}): se manda sin ella.")
+        return []
+
+
+def obtener_foto_url(url):
+    """Ruta local de una foto que está en internet (se guarda una vez; los nombres de Beto no se reutilizan)."""
+    nombre = re.sub(r"[^A-Za-z0-9._-]+", "_", url.split("/storage/v1/object/public/", 1)[-1])[-150:]
+    destino = CACHE_FOTOS / f"url__{nombre}"
+    if not destino.exists():
+        CACHE_FOTOS.mkdir(exist_ok=True)
+        temporal = destino.with_name(destino.name + f".{os.getpid()}.part")
+        temporal.write_bytes(_descargar(url))
+        os.replace(temporal, destino)
+    return destino
 
 
 def armar_productos(catalogo, g5=False):
@@ -657,7 +725,7 @@ def _limpiar_antes_de_reintentar(page, texto, id_base):
 def enviar_foto_con_texto(page, producto, id_base=None):
     """id_base: id del último mensaje del chat ANTES de empezar con este modelo (se mantiene igual entre
     el intento 1 y el 2, para saber si algo de este modelo ya salió)."""
-    foto = obtener_foto(producto["foto"])
+    foto = obtener_foto_url(producto["foto_url"]) if producto.get("foto_url") else obtener_foto(producto["foto"])
     copiar_imagen_al_portapapeles(foto)
     _cerrar_vista_previa(page)              # una vista previa colgada taparía la caja de texto
     if id_base is None:
@@ -688,25 +756,32 @@ def enviar_texto(page, texto, id_base=None):
     return esperar_envio_nuevo(page, id_base, texto)
 
 
-def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=False, productos_g5=None):
-    """Manda, en este orden: fotos BR, precios BR, separador G5, fotos G5, precios G5 (lo que falte, si hay
-    estado). Los problemas con las G5 nunca cortan lo ya mandado de BR. Devuelve un resumen."""
+def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=False, productos_g5=None,
+                 productos_indumentaria=None, incluir_br=True):
+    """Manda, en este orden: saludo, fotos BR, precios BR, separador G5, fotos G5, precios G5, separador
+    indumentaria, fotos de indumentaria, precios de indumentaria (lo que falte, si hay estado). Un problema
+    con las G5 o la indumentaria nunca corta lo ya mandado antes. Con incluir_br=False se saltean el saludo,
+    las BR y sus precios (y no se mandan las G5): sirve para mandar solo la indumentaria. Devuelve un resumen."""
     productos_g5 = productos_g5 or []
+    productos_indumentaria = productos_indumentaria or []
     ya = set(estado["enviados"]) if estado else set()
     pendientes = [x for x in productos if x["id"] not in ya]
     pendientes_g5 = [x for x in productos_g5 if x["id"] not in ya]
+    pendientes_ind = [x for x in productos_indumentaria if x["id"] not in ya]
     marcas = estado if estado is not None else {}   # sin estado (modo prueba) las marcas viven solo en esta tanda
     cuenta = {"enviados": 0, "fallidos": 0, "seguidas": 0}
     g5_cortado = False
     print(f"📨 Grupo «{grupo}»: {len(pendientes)} por mandar ({len(ya)} ya enviados antes)"
-          + (f", más {len(pendientes_g5)} G5." if productos_g5 else "."))
+          + (f", más {len(pendientes_g5)} G5" if productos_g5 else "")
+          + (f", más {len(pendientes_ind)} de indumentaria." if productos_indumentaria else "."))
 
     contexto, page = abrir_whatsapp(p)
     try:
         abrir_grupo(page, grupo)
 
-        def enviar_lista(lista, g5=False):
-            """False solo si, en G5, fallaron 3 seguidas y se dejó de intentar (en BR eso corta todo)."""
+        def enviar_lista(lista, etiqueta="", tolerante=False):
+            """False solo si, en una sección tolerante (G5, indumentaria), fallaron 3 seguidas y se dejó de
+            intentar (en BR eso corta todo)."""
             for numero, producto in enumerate(lista, 1):
                 abrir_grupo(page, grupo)                       # vuelve a comprobar que sea el grupo correcto
                 if paso_manual and cuenta["enviados"] == 0 and not ya:
@@ -733,7 +808,6 @@ def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=Fal
                         if repetidos > 1:
                             avisar("Bot de WhatsApp: mensaje repetido",
                                    f"«{producto['name']}» salió {repetidos} veces en el grupo. Borrá la repetida a mano.")
-                etiqueta = "G5 " if g5 else ""
                 if ok:
                     cuenta["enviados"] += 1
                     cuenta["seguidas"] = 0
@@ -747,9 +821,10 @@ def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=Fal
                     cuenta["fallidos"] += 1
                     cuenta["seguidas"] += 1
                     print(f"❌ [{etiqueta}{numero}/{len(lista)}] {producto['name']}: no salió.")
-                    if g5:
+                    if tolerante:
                         if cuenta["seguidas"] >= 3:
-                            avisar("Bot de WhatsApp", "Fallaron 3 fotos G5 seguidas: dejo las G5 (lo de BR ya salió).")
+                            avisar("Bot de WhatsApp", f"Fallaron 3 fotos seguidas en la sección {etiqueta.strip()}: "
+                                                      "la dejo (lo anterior ya salió).")
                             return False
                         continue
                     if cuenta["enviados"] == 0 and cuenta["seguidas"] >= 2:
@@ -787,21 +862,22 @@ def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=Fal
                 print(f"❌ {nombre[0].upper() + nombre[1:]}: no salió.")
             return ok
 
-        if pendientes and not marcas.get("saludo_enviado"):
-            if enviar_mensaje("saludo_enviado", SALUDO_INICIAL, "el saludo inicial"):
-                time.sleep(random.uniform(*PAUSA_ENTRE_ENVIOS))
-        enviar_lista(pendientes)
-        precios = enviar_mensaje("precios_enviados", MENSAJE_FINAL_PRECIOS, "el mensaje final de precios BR")
+        precios = precios_g5 = precios_ind = None
+        if incluir_br:
+            if pendientes and not marcas.get("saludo_enviado"):
+                if enviar_mensaje("saludo_enviado", SALUDO_INICIAL, "el saludo inicial"):
+                    time.sleep(random.uniform(*PAUSA_ENTRE_ENVIOS))
+            enviar_lista(pendientes)
+            precios = enviar_mensaje("precios_enviados", MENSAJE_FINAL_PRECIOS, "el mensaje final de precios BR")
 
-        precios_g5 = None
-        if productos_g5:
+        if productos_g5 and incluir_br:
             try:
                 if not marcas.get("separador_g5_enviado"):
                     pausa = random.uniform(*PAUSA_ANTES_SEPARADOR_G5)
                     print(f"Pausa de {pausa:.0f}s antes del separador G5...")
                     time.sleep(pausa)
                     enviar_mensaje("separador_g5_enviado", SEPARADOR_G5, "el separador G5")
-                g5_cortado = not enviar_lista(pendientes_g5, g5=True)
+                g5_cortado = not enviar_lista(pendientes_g5, "G5 ", True)
                 if not g5_cortado:
                     precios_g5 = enviar_mensaje("precios_g5_enviados", MENSAJE_PRECIOS_G5, "el mensaje de precios G5")
                 else:
@@ -809,11 +885,27 @@ def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=Fal
             except EnvioBloqueado as error:
                 avisar("Bot de WhatsApp", f"Las G5 no se pudieron mandar: {error}")
                 precios_g5 = False
+
+        if productos_indumentaria:
+            try:
+                if not marcas.get("separador_indumentaria_enviado"):
+                    pausa = random.uniform(*PAUSA_ANTES_SEPARADOR_G5)
+                    print(f"Pausa de {pausa:.0f}s antes del separador de indumentaria...")
+                    time.sleep(pausa)
+                    enviar_mensaje("separador_indumentaria_enviado", SEPARADOR_INDUMENTARIA, "el separador de indumentaria")
+                if enviar_lista(pendientes_ind, "IND ", True):
+                    precios_ind = enviar_mensaje("precios_indumentaria_enviados", MENSAJE_PRECIOS_INDUMENTARIA,
+                                                 "el mensaje de precios de indumentaria")
+                else:
+                    precios_ind = False
+            except EnvioBloqueado as error:
+                avisar("Bot de WhatsApp", f"La indumentaria no se pudo mandar: {error}")
+                precios_ind = False
         esperar_envios_pendientes(page)
     finally:
         contexto.close()
     return {"enviados": cuenta["enviados"], "fallidos": cuenta["fallidos"], "precios": precios,
-            "precios_g5": precios_g5}
+            "precios_g5": precios_g5, "precios_indumentaria": precios_ind}
 
 
 # --- Estado diario -----------------------------------------------------------------
@@ -846,6 +938,7 @@ def estado_de_hoy(forzar_ahora=False):
         hora = proxima["hora"] if proxima.get("dia") == hoy else sortear_hora()
         estado = {"dia": hoy, "hora": hora, "enviados": [], "precios_enviados": False,
                   "saludo_enviado": False, "separador_g5_enviado": False, "precios_g5_enviados": False,
+                  "separador_indumentaria_enviado": False, "precios_indumentaria_enviados": False,
                   "terminado": False, "intentos": 0, "resultado": None}
         if proxima.get("dia", "") > hoy:
             estado["proxima"] = proxima         # lo ya anunciado para un día futuro (ej. el lunes) se conserva
@@ -900,19 +993,24 @@ def ejecutar_envio_real(estado):
         productos = armar_productos(catalogo)
         print(f"📚 Catálogo de {origen} ({catalogo['generatedAt']}): {len(productos)} modelos para mandar.")
         productos_g5 = cargar_productos_g5()
+        productos_ind = cargar_productos_indumentaria()
         with sync_playwright() as p:
             resumen = enviar_tanda(p, GRUPO_REAL, productos, estado, lambda: guardar_estado(estado),
-                                   productos_g5=productos_g5)
+                                   productos_g5=productos_g5, productos_indumentaria=productos_ind)
         estado["terminado"] = True
         estado["resultado"] = f"OK: {resumen['enviados']} enviados, {resumen['fallidos']} fallidos, precios={resumen['precios']}"
         if resumen["precios_g5"] is not None:
             estado["resultado"] += f", precios G5={resumen['precios_g5']}"
+        if resumen["precios_indumentaria"] is not None:
+            estado["resultado"] += f", precios indumentaria={resumen['precios_indumentaria']}"
         if resumen["fallidos"]:
             avisar("Bot de WhatsApp", f"Terminó, pero {resumen['fallidos']} modelo(s) no salieron. Revisá el log.")
         if not resumen["precios"]:
             avisar("Bot de WhatsApp", "El mensaje final de precios NO salió: mandalo a mano en el grupo.")
         if resumen["precios_g5"] is False:
             avisar("Bot de WhatsApp", "El mensaje de precios G5 NO salió: revisá el grupo y mandalo a mano si falta.")
+        if resumen["precios_indumentaria"] is False:
+            avisar("Bot de WhatsApp", "El mensaje de precios de INDUMENTARIA NO salió: revisá el grupo y mandalo a mano si falta.")
         print(f"🏁 {estado['resultado']}")
         anunciar_proximo_envio(estado)
     except (SesionVencida, GrupoNoEncontrado, EnvioBloqueado) as error:
@@ -1006,14 +1104,47 @@ def modo_prueba(limite, paso_manual):
     catalogo, origen = cargar_catalogo()
     productos = armar_productos(catalogo)
     productos_g5 = cargar_productos_g5()
+    productos_ind = cargar_productos_indumentaria()
     if limite:
-        productos, productos_g5 = productos[:limite], productos_g5[:limite]
-    print(f"🧪 PRUEBA en «{GRUPO_PRUEBA}»: {len(productos)} modelos BR + {len(productos_g5)} G5 "
-          f"(catálogo de {origen}, {catalogo['generatedAt']}).")
+        productos, productos_g5, productos_ind = productos[:limite], productos_g5[:limite], productos_ind[:limite]
+    print(f"🧪 PRUEBA en «{GRUPO_PRUEBA}»: {len(productos)} modelos BR + {len(productos_g5)} G5 + "
+          f"{len(productos_ind)} de indumentaria (catálogo de {origen}, {catalogo['generatedAt']}).")
     with sync_playwright() as p:
-        resumen = enviar_tanda(p, GRUPO_PRUEBA, productos, paso_manual=paso_manual, productos_g5=productos_g5)
+        resumen = enviar_tanda(p, GRUPO_PRUEBA, productos, paso_manual=paso_manual, productos_g5=productos_g5,
+                               productos_indumentaria=productos_ind)
     print(f"🏁 Prueba terminada: {resumen}")
-    return 0 if not resumen["fallidos"] and resumen["precios"] and resumen["precios_g5"] is not False else 1
+    bien = (not resumen["fallidos"] and resumen["precios"] and resumen["precios_g5"] is not False
+            and resumen["precios_indumentaria"] is not False)
+    return 0 if bien else 1
+
+
+def modo_solo_indumentaria(en_prueba, limite):
+    """Manda SOLO la indumentaria (separador, prendas y precios), sin saludo ni BR ni G5. Sirve para ponerse al día
+    cuando un día se mandó todo menos la indumentaria. En el grupo real lleva su propio estado del día, así
+    que si se corta y se vuelve a correr no repite lo ya enviado."""
+    productos_ind = cargar_productos_indumentaria()
+    if not productos_ind:
+        print("❌ No hay indumentaria para mandar (sin stock o no se pudo leer): no mando nada.")
+        return 1
+    if limite:
+        productos_ind = productos_ind[:limite]
+    grupo = GRUPO_PRUEBA if en_prueba else GRUPO_REAL
+    if not grupo:
+        print("❌ Falta el grupo real en bot_config.json.")
+        return 2
+    global ARCHIVO_ESTADO
+    estado = None
+    if not en_prueba:
+        ARCHIVO_ESTADO = SCRIPT_DIR / "estado_bot_indumentaria.json"
+        estado = cargar_estado()
+        if estado.get("dia") != datetime.now().date().isoformat():
+            estado = {"dia": datetime.now().date().isoformat(), "enviados": []}
+    print(f"👕 SOLO INDUMENTARIA a «{grupo}»: {len(productos_ind)} prendas" + (" (PRUEBA)." if en_prueba else "."))
+    with sync_playwright() as p:
+        resumen = enviar_tanda(p, grupo, [], estado, (lambda: guardar_estado(estado)) if estado is not None else None,
+                               productos_indumentaria=productos_ind, incluir_br=False)
+    print(f"🏁 Indumentaria terminada: {resumen}")
+    return 0 if not resumen["fallidos"] and resumen["precios_indumentaria"] else 1
 
 
 def modo_dry_run():
@@ -1022,9 +1153,12 @@ def modo_dry_run():
     print(f"Catálogo de {origen} ({catalogo['generatedAt']}, hace {_edad_catalogo(catalogo)}): "
           f"{len(catalogo['products'])} productos, {len(productos)} para mandar.")
     productos_g5 = cargar_productos_g5()
+    productos_ind = cargar_productos_indumentaria()
     print("=" * 40)
     print(f"ORDEN DE LA TANDA: 0) saludo  1) {len(productos)} fotos BR  2) precios BR  "
-          + (f"3) separador G5  4) {len(productos_g5)} fotos G5  5) precios G5" if productos_g5 else "(sin G5 hoy)"))
+          + (f"3) separador G5  4) {len(productos_g5)} fotos G5  5) precios G5  " if productos_g5 else "(sin G5 hoy)  ")
+          + (f"6) separador indumentaria  7) {len(productos_ind)} prendas  8) precios indumentaria"
+             if productos_ind else "(sin indumentaria hoy)"))
     print("=" * 40)
     print("[0] SALUDO INICIAL:\n" + SALUDO_INICIAL)
     print("-" * 40)
@@ -1048,6 +1182,18 @@ def modo_dry_run():
         if len(productos_g5) > 3:
             print(f"... ({len(productos_g5) - 3} modelos G5 más)")
         print("[5] MENSAJE DE PRECIOS G5:\n" + MENSAJE_PRECIOS_G5)
+    if productos_ind:
+        print("-" * 40)
+        print("[6] SEPARADOR DE INDUMENTARIA:" + chr(10) + SEPARADOR_INDUMENTARIA)
+        print("-" * 40)
+        print("[7] PRENDAS (las 3 primeras):")
+        for producto in productos_ind[:3]:
+            print(producto["texto"])
+            print("foto:", producto["foto_url"])
+            print("-" * 40)
+        if len(productos_ind) > 3:
+            print(f"... ({len(productos_ind) - 3} prendas más)")
+        print("[8] MENSAJE DE PRECIOS DE INDUMENTARIA:" + chr(10) + MENSAJE_PRECIOS_INDUMENTARIA)
     print("-" * 40)
     print(f"Grupo de prueba: «{GRUPO_PRUEBA}» | grupo real: {GRUPO_REAL!r} | "
           f"ventana diaria {HORA_DESDE[0]:02d}:{HORA_DESDE[1]:02d}-{HORA_HASTA[0]:02d}:{HORA_HASTA[1]:02d}")
@@ -1080,6 +1226,8 @@ def main():
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--diagnostico", action="store_true")
     parser.add_argument("--paso-manual", action="store_true")
+    parser.add_argument("--solo-indumentaria", action="store_true",
+                        help="manda solo la indumentaria al grupo real (con --prueba, al grupo de prueba)")
     args = parser.parse_args()
 
     if args.dry_run:
@@ -1092,6 +1240,8 @@ def main():
         return modo_diagnostico()
     if args.prueba_programador:
         return modo_prueba_programador()
+    if args.solo_indumentaria:
+        return modo_solo_indumentaria(args.prueba, args.limite)
     if args.prueba:
         return modo_prueba(3 if args.limite is None else args.limite, args.paso_manual)
     return modo_programado(ahora=args.ahora)
