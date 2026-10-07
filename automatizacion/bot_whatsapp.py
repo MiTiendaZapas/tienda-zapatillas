@@ -156,6 +156,12 @@ MENSAJE_FINAL_PRECIOS = (
     "Por mayor $50.000c/u ‼️"
 )
 
+# Primer mensaje del día, antes de las fotos.
+SALUDO_INICIAL = (
+    "Buen día gente\n"
+    "Les dejo el stock de hoy 👇👇👇"
+)
+
 # Zapatillas calidad G5 (otro proveedor): van aparte de las BR, después de un separador bien visible.
 SEPARADOR_G5 = (
     "━━━━━━━━━━━━━━\n"
@@ -781,6 +787,9 @@ def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=Fal
                 print(f"❌ {nombre[0].upper() + nombre[1:]}: no salió.")
             return ok
 
+        if pendientes and not marcas.get("saludo_enviado"):
+            if enviar_mensaje("saludo_enviado", SALUDO_INICIAL, "el saludo inicial"):
+                time.sleep(random.uniform(*PAUSA_ENTRE_ENVIOS))
         enviar_lista(pendientes)
         precios = enviar_mensaje("precios_enviados", MENSAJE_FINAL_PRECIOS, "el mensaje final de precios BR")
 
@@ -836,7 +845,7 @@ def estado_de_hoy(forzar_ahora=False):
         proxima = estado.get("proxima") or {}
         hora = proxima["hora"] if proxima.get("dia") == hoy else sortear_hora()
         estado = {"dia": hoy, "hora": hora, "enviados": [], "precios_enviados": False,
-                  "separador_g5_enviado": False, "precios_g5_enviados": False,
+                  "saludo_enviado": False, "separador_g5_enviado": False, "precios_g5_enviados": False,
                   "terminado": False, "intentos": 0, "resultado": None}
         if proxima.get("dia", "") > hoy:
             estado["proxima"] = proxima         # lo ya anunciado para un día futuro (ej. el lunes) se conserva
@@ -1014,9 +1023,11 @@ def modo_dry_run():
           f"{len(catalogo['products'])} productos, {len(productos)} para mandar.")
     productos_g5 = cargar_productos_g5()
     print("=" * 40)
-    print(f"ORDEN DE LA TANDA: 1) {len(productos)} fotos BR  2) precios BR  "
+    print(f"ORDEN DE LA TANDA: 0) saludo  1) {len(productos)} fotos BR  2) precios BR  "
           + (f"3) separador G5  4) {len(productos_g5)} fotos G5  5) precios G5" if productos_g5 else "(sin G5 hoy)"))
     print("=" * 40)
+    print("[0] SALUDO INICIAL:\n" + SALUDO_INICIAL)
+    print("-" * 40)
     print("[1] FOTOS BR (las 3 primeras):")
     for producto in productos[:3]:
         print(producto["texto"])
