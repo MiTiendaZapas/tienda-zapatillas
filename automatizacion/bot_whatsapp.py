@@ -121,7 +121,8 @@ except Exception as _error:
 
 HORA_DESDE = (7, 45)              # cada día se sortea una hora entre estas dos
 HORA_HASTA = (8, 10)
-ESPERA_TRAS_CARGAR_SEG = 90       # pausa tras cargar la lista de chats, antes del primer envío
+PRECALENTAR_MIN = 12              # WhatsApp Web se abre esta cantidad de minutos ANTES de la hora sorteada
+ESPERA_TRAS_CARGAR_SEG = 90      # pausa tras cargar la lista de chats, antes del primer envío
 DIAS_SIN_ENVIO = (6,)            # días en que NO se manda stock (0 = lunes ... 6 = domingo)
 TOLERANCIA_TARDE_MIN = 120        # si la laptop estaba apagada a esa hora, se manda igual hasta 2 h después
 MAX_INTENTOS_DIA = 3
@@ -501,18 +502,23 @@ def _esperar_lista_de_chats(page):
     - "Cargando tus chats" (re-sincroniza el historial, lento en esta laptop): se espera hasta
       LIMITE_CARGA_MIN, sin cerrar la ventana, porque cerrarla corta la sincronización."""
     inicio = time.time()
+    ultima_carga = inicio       # última vez que se vio la pantalla de carga (o el inicio)
     ultimo_aviso = 0
     while True:
         if page.locator("#pane-side").count():
             return
         cargando = page.locator('[data-testid="wa-web-loading-screen"]').count() > 0
+        if cargando:
+            ultima_carga = time.time()
         if not cargando and page.locator("canvas").count() and time.time() - inicio > 15:
             raise SesionVencida("WhatsApp Web pide el código QR: la sesión venció. "
                                 "Hay que volver a vincular el teléfono abriendo el bot a mano.")
-        limite = LIMITE_CARGA_MIN * 60 if cargando else 90
-        if time.time() - inicio > limite:
-            raise RuntimeError(f"WhatsApp Web no terminó de cargar en {limite // 60} min "
-                               f"({'sigue sincronizando' if cargando else 'no mostró ni chats ni QR'}).")
+        # Hay un instante entre que desaparece "Cargando tus chats" y aparecen los chats: los 90 s de "no se
+        # ve nada" se cuentan desde que se dejó de ver la carga, no desde el inicio (antes fallaba justo ahí).
+        if cargando and time.time() - inicio > LIMITE_CARGA_MIN * 60:
+            raise RuntimeError(f"WhatsApp Web no terminó de cargar en {LIMITE_CARGA_MIN} min (sigue sincronizando).")
+        if not cargando and time.time() - ultima_carga > 90:
+            raise RuntimeError("WhatsApp Web no mostró ni chats ni QR en 90 s.")
         if time.time() - ultimo_aviso > 60:
             ultimo_aviso = time.time()
             texto = ""
@@ -757,7 +763,7 @@ def enviar_texto(page, texto, id_base=None):
 
 
 def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=False, productos_g5=None,
-                 productos_indumentaria=None, incluir_br=True):
+                 productos_indumentaria=None, incluir_br=True, sesion=None):
     """Manda, en este orden: saludo, fotos BR, precios BR, separador G5, fotos G5, precios G5, separador
     indumentaria, fotos de indumentaria, precios de indumentaria (lo que falte, si hay estado). Un problema
     con las G5 o la indumentaria nunca corta lo ya mandado antes. Con incluir_br=False se saltean el saludo,
@@ -775,7 +781,7 @@ def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=Fal
           + (f", más {len(pendientes_g5)} G5" if productos_g5 else "")
           + (f", más {len(pendientes_ind)} de indumentaria." if productos_indumentaria else "."))
 
-    contexto, page = abrir_whatsapp(p)
+    contexto, page = sesion if sesion else abrir_whatsapp(p)   # sesion: WhatsApp ya abierto y asentado de antemano
     try:
         abrir_grupo(page, grupo)
 
@@ -984,19 +990,75 @@ def anunciar_proximo_envio(estado):
           f"(el bot lo hace solo; dejá esta ventana abierta).")
 
 
-def ejecutar_envio_real(estado):
-    """Un intento de envío al grupo real. Actualiza el estado según resultado."""
+def _precalentar_whatsapp(p, hora_objetivo):
+    """Abre WhatsApp Web de antemano (tarda ~5 min en cargar y otro rato en asentarse) y lo deja esperando
+    hasta la hora sorteada, así el primer mensaje sale a esa hora. Devuelve (contexto, page), o None si
+    algo falla (entonces se abre a la hora, como antes). Una sesión vencida (QR) sí se informa ya."""
+    contexto = None
+    try:
+        print(f"🔥 Abro WhatsApp Web ahora para que esté listo a las {hora_objetivo:%H:%M:%S}...")
+        contexto, page = abrir_whatsapp(p)
+        try:
+            abrir_grupo(page, GRUPO_REAL)               # si hay un problema con el grupo, se ve con tiempo
+        except GrupoNoEncontrado as error:
+            print(f"  ⚠️ {error} (se vuelve a intentar a la hora de enviar)")
+        ultima_revision = time.time()
+        while datetime.now() < hora_objetivo:
+            restante = (hora_objetivo - datetime.now()).total_seconds()
+            page.wait_for_timeout(int(max(0.2, min(restante, 5)) * 1000))
+            if time.time() - ultima_revision > 60:
+                ultima_revision = time.time()
+                if not page.locator("#pane-side").count():
+                    raise RuntimeError("WhatsApp Web dejó de mostrar los chats mientras esperaba")
+        print("✅ WhatsApp Web listo: empiezo a enviar.")
+        return contexto, page
+    except SesionVencida:
+        if contexto:
+            contexto.close()
+        raise
+    except Exception as error:
+        print(f"⚠️ No pude dejar WhatsApp listo de antemano ({type(error).__name__}: {error}): lo abro a la hora.")
+        try:
+            if contexto:
+                contexto.close()
+        except Exception:
+            pass
+        return None
+
+
+def ejecutar_envio_real(estado, hora_objetivo=None):
+    """Un intento de envío al grupo real. Actualiza el estado según resultado. Con hora_objetivo (todavía
+    en el futuro) abre WhatsApp antes y lo deja esperando hasta esa hora."""
     estado["intentos"] += 1
     guardar_estado(estado)
     try:
-        catalogo, origen = esperar_catalogo_fresco()
-        productos = armar_productos(catalogo)
-        print(f"📚 Catálogo de {origen} ({catalogo['generatedAt']}): {len(productos)} modelos para mandar.")
-        productos_g5 = cargar_productos_g5()
-        productos_ind = cargar_productos_indumentaria()
         with sync_playwright() as p:
+            sesion = None
+            if hora_objetivo and datetime.now() < hora_objetivo:
+                for _ in range(3):      # si no sale a la primera, se reintenta mientras quede tiempo
+                    if (hora_objetivo - datetime.now()).total_seconds() < 150:
+                        break
+                    sesion = _precalentar_whatsapp(p, hora_objetivo)
+                    if sesion:
+                        break
+                    time.sleep(20)
+                faltan = (hora_objetivo - datetime.now()).total_seconds()
+                if not sesion and faltan > 0:
+                    print(f"⏳ Espero hasta las {hora_objetivo:%H:%M:%S} (la hora sorteada) para enviar.")
+                    time.sleep(faltan)
+            try:
+                # El catálogo se lee DESPUÉS de la espera: así el stock es el más fresco al momento de enviar.
+                catalogo, origen = esperar_catalogo_fresco()
+                productos = armar_productos(catalogo)
+                print(f"📚 Catálogo de {origen} ({catalogo['generatedAt']}): {len(productos)} modelos para mandar.")
+                productos_g5 = cargar_productos_g5()
+                productos_ind = cargar_productos_indumentaria()
+            except Exception:
+                if sesion:
+                    sesion[0].close()
+                raise
             resumen = enviar_tanda(p, GRUPO_REAL, productos, estado, lambda: guardar_estado(estado),
-                                   productos_g5=productos_g5, productos_indumentaria=productos_ind)
+                                   productos_g5=productos_g5, productos_indumentaria=productos_ind, sesion=sesion)
         estado["terminado"] = True
         estado["resultado"] = f"OK: {resumen['enviados']} enviados, {resumen['fallidos']} fallidos, precios={resumen['precios']}"
         if resumen["precios_g5"] is not None:
@@ -1046,7 +1108,12 @@ def ciclo_diario():
     h, m, s = map(int, estado["hora"].split(":"))
     objetivo = ahora.replace(hour=h, minute=m, second=s, microsecond=0)
     if ahora < objetivo:
-        time.sleep(max(1, min((objetivo - ahora).total_seconds(), 600)))
+        falta = (objetivo - ahora).total_seconds()
+        if falta > PRECALENTAR_MIN * 60 + 5:
+            # Todavía falta: se duerme hasta el momento de abrir WhatsApp de antemano (o 10 min como máximo).
+            time.sleep(max(1, min(falta - PRECALENTAR_MIN * 60, 600)))
+            return
+        ejecutar_envio_real(estado, hora_objetivo=objetivo)   # abre WhatsApp ya y espera la hora
         return
     if ahora > objetivo + timedelta(minutes=TOLERANCIA_TARDE_MIN) and estado["intentos"] == 0:
         estado["terminado"] = True
