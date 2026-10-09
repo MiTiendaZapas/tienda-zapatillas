@@ -131,9 +131,12 @@ LIMITE_CARGA_MIN = 20             # tiempo máximo que se espera a que WhatsApp 
 ESPERA_CATALOGO_FRESCO_MIN = 30   # el piloto arranca a las 7:30: se espera a que publique su primera vuelta
 CATALOGO_FRESCO_DESDE = (7, 30)
 
-URL_CATALOGO = "https://mitiendazapas.github.io/catalogo/productos.json"
-URL_CATALOGO_G5 = "https://mitiendazapas.github.io/catalogo/productos-g5.json"
-URL_BASE_CATALOGO = "https://mitiendazapas.github.io/catalogo/"
+# Donde el piloto publica el catálogo y las fotos. Desde el 09/10 el principal es Cloudflare; GitHub sigue
+# recibiendo lo mismo durante la mudanza y sirve de respaldo.
+FUENTES_CATALOGO = [
+    ("Cloudflare", "https://catalogo.mitiendastock.com/"),
+    ("GitHub", "https://mitiendazapas.github.io/catalogo/"),
+]
 CATALOGO_LOCAL = REPO_ROOT.parent / "mitiendazapas.github.io" / "catalogo"   # copia que mantiene el piloto en esta laptop
 CACHE_FOTOS = SCRIPT_DIR / "_cache_fotos"
 ARCHIVO_ESTADO = SCRIPT_DIR / "estado_bot.json"
@@ -244,11 +247,32 @@ def _descargar(url, timeout=30, reintentos=3):
             time.sleep(5 * intento)
 
 
+def _leer_catalogo_web(nombre, reintentos=2):
+    """Lee `nombre` (productos.json o productos-g5.json) de Cloudflare y de GitHub y devuelve (datos, origen)
+    con el más reciente (si empatan, Cloudflare). Mirar los dos evita mandar stock viejo si una de las
+    publicaciones se atrasa o falla. Si ninguna responde, lanza el último error."""
+    leidos, ultimo_error = [], None
+    for origen, base in FUENTES_CATALOGO:
+        try:
+            datos = json.loads(_descargar(f"{base}{nombre}?t={int(time.time())}", reintentos=reintentos).decode("utf-8"))
+            datetime.fromisoformat(datos["generatedAt"])
+            leidos.append((datos, origen))
+        except Exception as error:
+            ultimo_error = error
+            print(f"⚠️ {nombre}: no pude leerlo de {origen} ({type(error).__name__}: {error}).")
+    if not leidos:
+        raise ultimo_error
+    mejor = max(leidos, key=lambda x: datetime.fromisoformat(x[0]["generatedAt"]))   # max() deja el primero si empatan
+    if len(leidos) > 1 and len({d["generatedAt"] for d, _ in leidos}) > 1:
+        partes = ", ".join(o + "=" + d["generatedAt"] for d, o in leidos)
+        print(f"ℹ️ {nombre}: las dos copias no coinciden ({partes}): uso la de {mejor[1]}.")
+    return mejor
+
+
 def cargar_catalogo():
-    """Devuelve (catalogo, origen). Primero la web publicada; si falla, la copia local del piloto."""
+    """Devuelve (catalogo, origen). Primero lo publicado (Cloudflare/GitHub); si falla, la copia local del piloto."""
     try:
-        datos = json.loads(_descargar(f"{URL_CATALOGO}?t={int(time.time())}").decode("utf-8"))
-        origen = "web"
+        datos, origen = _leer_catalogo_web("productos.json")
     except Exception as error:
         local = CATALOGO_LOCAL / "productos.json"
         if not local.exists():
@@ -305,8 +329,7 @@ def cargar_productos_g5():
     las G5 nunca deben cortar ni demorar la tanda de siempre."""
     try:
         try:
-            datos = json.loads(_descargar(f"{URL_CATALOGO_G5}?t={int(time.time())}", reintentos=2).decode("utf-8"))
-            origen = "web"
+            datos, origen = _leer_catalogo_web("productos-g5.json")
         except Exception as error:
             local = CATALOGO_LOCAL / "productos-g5.json"
             if not local.exists():
@@ -409,7 +432,13 @@ def obtener_foto(ruta_relativa):
     if not destino.exists():
         CACHE_FOTOS.mkdir(exist_ok=True)
         temporal = destino.with_name(destino.name + f".{os.getpid()}.part")
-        temporal.write_bytes(_descargar(URL_BASE_CATALOGO + ruta_relativa))
+        for numero, (_, base) in enumerate(FUENTES_CATALOGO):
+            try:
+                temporal.write_bytes(_descargar(base + ruta_relativa, reintentos=2))
+                break
+            except Exception:
+                if numero == len(FUENTES_CATALOGO) - 1:
+                    raise
         os.replace(temporal, destino)
     return destino
 
