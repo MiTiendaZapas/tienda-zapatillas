@@ -184,6 +184,15 @@ MENSAJE_PRECIOS_INDUMENTARIA = (
 )
 ORDEN_TALLES_ROPA = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "3XL", "4XL", "ÚNICO", "UNICO"]
 
+# Último mensaje de la tanda, después de todo el stock: la oferta de armar una tienda propia.
+MENSAJE_PROMO_TIENDA = (
+    "Recuerden que si quieren tener una tienda como la nuestra, se la armamos con su nombre, su logo y sus propios "
+    "precios 🛍️ Tiene el mismo stock de zapatillas BR, que se actualiza solo todos los días, y los pedidos llegan "
+    "directo a su WhatsApp 📲\n"
+    "Todo por solo $25.000 por mes 💰\n"
+    "Si están interesados, escríbanme al 11 5377-3771 📞"
+)
+
 # Zapatillas calidad G5 (otro proveedor): van aparte de las BR, después de un separador bien visible.
 SEPARADOR_G5 = (
     "━━━━━━━━━━━━━━\n"
@@ -936,11 +945,20 @@ def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=Fal
             except EnvioBloqueado as error:
                 avisar("Bot de WhatsApp", f"La indumentaria no se pudo mandar: {error}")
                 precios_ind = False
+
+        promo = None
+        if incluir_br:
+            # Cierre del día: la oferta de tienda propia, después de todo el stock.
+            if not marcas.get("promo_enviada"):
+                pausa = random.uniform(*PAUSA_ANTES_SEPARADOR_G5)
+                print(f"Pausa de {pausa:.0f}s antes del mensaje final de la tienda...")
+                time.sleep(pausa)
+            promo = enviar_mensaje("promo_enviada", MENSAJE_PROMO_TIENDA, "el mensaje final de la tienda")
         esperar_envios_pendientes(page)
     finally:
         contexto.close()
     return {"enviados": cuenta["enviados"], "fallidos": cuenta["fallidos"], "precios": precios,
-            "precios_g5": precios_g5, "precios_indumentaria": precios_ind}
+            "precios_g5": precios_g5, "precios_indumentaria": precios_ind, "promo": promo}
 
 
 # --- Estado diario -----------------------------------------------------------------
@@ -974,6 +992,7 @@ def estado_de_hoy(forzar_ahora=False):
         estado = {"dia": hoy, "hora": hora, "enviados": [], "precios_enviados": False,
                   "saludo_enviado": False, "separador_g5_enviado": False, "precios_g5_enviados": False,
                   "separador_indumentaria_enviado": False, "precios_indumentaria_enviados": False,
+                  "promo_enviada": False,
                   "terminado": False, "intentos": 0, "resultado": None}
         if proxima.get("dia", "") > hoy:
             estado["proxima"] = proxima         # lo ya anunciado para un día futuro (ej. el lunes) se conserva
@@ -1094,6 +1113,8 @@ def ejecutar_envio_real(estado, hora_objetivo=None):
             estado["resultado"] += f", precios G5={resumen['precios_g5']}"
         if resumen["precios_indumentaria"] is not None:
             estado["resultado"] += f", precios indumentaria={resumen['precios_indumentaria']}"
+        if resumen.get("promo") is not None:
+            estado["resultado"] += f", mensaje final={resumen['promo']}"
         if resumen["fallidos"]:
             avisar("Bot de WhatsApp", f"Terminó, pero {resumen['fallidos']} modelo(s) no salieron. Revisá el log.")
         if not resumen["precios"]:
@@ -1102,6 +1123,8 @@ def ejecutar_envio_real(estado, hora_objetivo=None):
             avisar("Bot de WhatsApp", "El mensaje de precios G5 NO salió: revisá el grupo y mandalo a mano si falta.")
         if resumen["precios_indumentaria"] is False:
             avisar("Bot de WhatsApp", "El mensaje de precios de INDUMENTARIA NO salió: revisá el grupo y mandalo a mano si falta.")
+        if resumen.get("promo") is False:
+            avisar("Bot de WhatsApp", "El mensaje final de la tienda NO salió: revisá el grupo y mandalo a mano si falta.")
         print(f"🏁 {estado['resultado']}")
         anunciar_proximo_envio(estado)
     except (SesionVencida, GrupoNoEncontrado, EnvioBloqueado) as error:
@@ -1210,7 +1233,7 @@ def modo_prueba(limite, paso_manual):
                                productos_indumentaria=productos_ind)
     print(f"🏁 Prueba terminada: {resumen}")
     bien = (not resumen["fallidos"] and resumen["precios"] and resumen["precios_g5"] is not False
-            and resumen["precios_indumentaria"] is not False)
+            and resumen["precios_indumentaria"] is not False and resumen.get("promo") is not False)
     return 0 if bien else 1
 
 
@@ -1253,8 +1276,9 @@ def modo_dry_run():
     print("=" * 40)
     print(f"ORDEN DE LA TANDA: 0) saludo  1) {len(productos)} fotos BR  2) precios BR  "
           + (f"3) separador G5  4) {len(productos_g5)} fotos G5  5) precios G5  " if productos_g5 else "(sin G5 hoy)  ")
-          + (f"6) separador indumentaria  7) {len(productos_ind)} prendas  8) precios indumentaria"
-             if productos_ind else "(sin indumentaria hoy)"))
+          + (f"6) separador indumentaria  7) {len(productos_ind)} prendas  8) precios indumentaria  "
+             if productos_ind else "(sin indumentaria hoy)  ")
+          + "9) mensaje final de la tienda")
     print("=" * 40)
     print("[0] SALUDO INICIAL:\n" + SALUDO_INICIAL)
     print("-" * 40)
@@ -1290,6 +1314,8 @@ def modo_dry_run():
         if len(productos_ind) > 3:
             print(f"... ({len(productos_ind) - 3} prendas más)")
         print("[8] MENSAJE DE PRECIOS DE INDUMENTARIA:" + chr(10) + MENSAJE_PRECIOS_INDUMENTARIA)
+    print("-" * 40)
+    print("[9] MENSAJE FINAL DE LA TIENDA:" + chr(10) + MENSAJE_PROMO_TIENDA)
     print("-" * 40)
     print(f"Grupo de prueba: «{GRUPO_PRUEBA}» | grupo real: {GRUPO_REAL!r} | "
           f"ventana diaria {HORA_DESDE[0]:02d}:{HORA_DESDE[1]:02d}-{HORA_HASTA[0]:02d}:{HORA_HASTA[1]:02d}")
