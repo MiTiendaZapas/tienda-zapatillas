@@ -186,11 +186,17 @@ ORDEN_TALLES_ROPA = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "3XL", "4X
 
 # Último mensaje de la tanda, después de todo el stock: la oferta de armar una tienda propia.
 MENSAJE_PROMO_TIENDA = (
-    "Recuerden que si quieren tener una tienda como la nuestra, se la armamos con su nombre, su logo y sus propios "
-    "precios 🛍️ Tiene el mismo stock de zapatillas BR, que se actualiza solo todos los días, y los pedidos llegan "
-    "directo a su WhatsApp 📲\n"
-    "Todo por solo $25.000 por mes 💰\n"
-    "Si están interesados, escríbanme al 11 5377-3771 📞"
+    "🛍️ *Recuerden que si quieren tener una tienda como la nuestra*\n"
+    "\n"
+    "Se la armamos con:\n"
+    "✅ Su nombre y su logo\n"
+    "✅ Sus propios precios\n"
+    "✅ El mismo stock de zapatillas BR, que se actualiza solo todos los días\n"
+    "✅ Los pedidos les llegan directo a su WhatsApp\n"
+    "\n"
+    "💰 *Todo por solo $25.000 por mes*\n"
+    "\n"
+    "📲 Si están interesados, escríbanme al *11 5377-3771*"
 )
 
 # Zapatillas calidad G5 (otro proveedor): van aparte de las BR, después de un separador bien visible.
