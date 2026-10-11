@@ -495,6 +495,12 @@ def _linea_clave(texto):
     return _solo_alfanumerico(texto)
 
 
+def _clave_exacta(texto):
+    """Nombre de un chat CON sus emojis, sin marcas invisibles ni diferencias de espacios o mayúsculas."""
+    limpio = re.sub("[️‍‎‏‪-‮]", "", texto or "")
+    return " ".join(limpio.split()).casefold()
+
+
 def _clave_chat(texto):
     """Nombre de un chat para compararlo: solo letras y números. Los emojis del nombre aparecen en la
     lista de chats pero no en el título del chat abierto (WhatsApp los dibuja como imágenes), así que
@@ -608,8 +614,15 @@ def abrir_grupo(page, nombre):
             page.keyboard.press("Escape")
             raise GrupoNoEncontrado(f"No encontré ningún chat llamado exactamente «{nombre}».")
         if len(indices) > 1:
-            page.keyboard.press("Escape")
-            raise GrupoNoEncontrado(f"Hay {len(indices)} chats llamados «{nombre}»: no sé a cuál mandar, no mando nada.")
+            # Varios chats con el mismo nombre sin emojis (ej. «⚡️Equipo de trabajo ⚡️» y «Equipo de trabajo 🤝🏽»):
+            # se elige el que coincide EXACTO (con emojis) con el nombre de la configuración, si es uno solo.
+            exactos = [i for i in indices if _clave_exacta(titulos[i]) == _clave_exacta(nombre)]
+            if len(exactos) == 1:
+                indices = exactos
+            else:
+                page.keyboard.press("Escape")
+                raise GrupoNoEncontrado(f"Hay {len(indices)} chats llamados «{nombre}»: no sé a cuál mandar, no mando nada. "
+                                        "Poné en bot_config.json el nombre completo del grupo, con sus emojis.")
         try:
             selector.nth(indices[0]).click(timeout=4000)
             break
