@@ -128,8 +128,8 @@ TOLERANCIA_TARDE_MIN = 120        # si la laptop estaba apagada a esa hora, se m
 MAX_INTENTOS_DIA = 3
 ESPERA_ENTRE_INTENTOS_MIN = 15
 LIMITE_CARGA_MIN = 20             # tiempo máximo que se espera a que WhatsApp Web termine de sincronizar
-ESPERA_CATALOGO_FRESCO_MIN = 0    # minutos que espera el catálogo del día; 0 = manda con el último publicado (el piloto descansa de 00:00 a 07:30)
-CATALOGO_FRESCO_DESDE = (7, 30)   # solo se usa si ESPERA_CATALOGO_FRESCO_MIN > 0
+ESPERA_CATALOGO_FRESCO_MIN = 10   # minutos máximos que espera el catálogo del día (el piloto arranca a las 5:15); 0 = no espera
+CATALOGO_FRESCO_DESDE = (5, 15)   # el catálogo cuenta como 'del día' si se generó desde esta hora
 
 # Donde el piloto publica el catálogo y las fotos. Desde el 09/10 el principal es Cloudflare; GitHub sigue
 # recibiendo lo mismo durante la mudanza y sirve de respaldo.
