@@ -119,8 +119,8 @@ except FileNotFoundError:
 except Exception as _error:
     print(f"⚠️ No pude leer {CONFIG_LOCAL.name}: {_error}")
 
-HORA_DESDE = (7, 45)              # cada día se sortea una hora entre estas dos
-HORA_HASTA = (8, 10)
+HORA_DESDE = (5, 45)              # cada día se sortea una hora entre estas dos
+HORA_HASTA = (6, 10)
 PRECALENTAR_MIN = 12              # WhatsApp Web se abre esta cantidad de minutos ANTES de la hora sorteada
 ESPERA_TRAS_CARGAR_SEG = 90      # pausa tras cargar la lista de chats, antes del primer envío
 DIAS_SIN_ENVIO = (6,)            # días en que NO se manda stock (0 = lunes ... 6 = domingo)
@@ -128,8 +128,8 @@ TOLERANCIA_TARDE_MIN = 120        # si la laptop estaba apagada a esa hora, se m
 MAX_INTENTOS_DIA = 3
 ESPERA_ENTRE_INTENTOS_MIN = 15
 LIMITE_CARGA_MIN = 20             # tiempo máximo que se espera a que WhatsApp Web termine de sincronizar
-ESPERA_CATALOGO_FRESCO_MIN = 30   # el piloto arranca a las 7:30: se espera a que publique su primera vuelta
-CATALOGO_FRESCO_DESDE = (7, 30)
+ESPERA_CATALOGO_FRESCO_MIN = 30   # el piloto arranca a las 5:30: se espera a que publique su primera vuelta
+CATALOGO_FRESCO_DESDE = (5, 30)
 
 # Donde el piloto publica el catálogo y las fotos. Desde el 09/10 el principal es Cloudflare; GitHub sigue
 # recibiendo lo mismo durante la mudanza y sirve de respaldo.
