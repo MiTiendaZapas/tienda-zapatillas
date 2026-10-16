@@ -3,7 +3,7 @@
 // no se edita a mano (se pisa en cada vuelta del piloto).
 
 const stock_zapatillas_manual = [
-    { modelo: 'Air forcé 1 blancas', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 2}, {"talle": 37, "stock": 3}], foto: 'Fotos/Air forcé 1 blancas.jpeg' },
+    { modelo: 'Air forcé 1 blancas', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 3}], foto: 'Fotos/Air forcé 1 blancas.jpeg' },
     { modelo: 'Jordan 1 botitas charol negra', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 1}], foto: 'Fotos/Jordan 1 botitas charol negra.jpeg' },
     { modelo: 'Jordan low vérmelo', talles: [{"talle": 36, "stock": 4}, {"talle": 37, "stock": 3}, {"talle": 38, "stock": 3}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 1}], foto: 'Fotos/Jordan low vérmelo.jpeg' },
     { modelo: 'NB 530 blanca/negro', talles: [{"talle": 34, "stock": 2}, {"talle": 35, "stock": 2}, {"talle": 37, "stock": 1}], foto: 'Fotos/NB 530 blanca negro.jpeg' },
