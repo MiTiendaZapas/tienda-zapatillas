@@ -9,7 +9,7 @@ const stock_zapatillas_manual = [
     { modelo: 'NB 530 blanca/negro', talles: [{"talle": 34, "stock": 2}, {"talle": 35, "stock": 2}], foto: 'Fotos/NB 530 blanca negro.jpeg' },
     { modelo: 'New balance 9060 nova', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 1}], foto: 'Fotos/New balance 9060 nova.jpeg' },
     { modelo: 'Nike dunk cerecita🍒', talles: [{"talle": 36, "stock": 1}, {"talle": 38, "stock": 1}, {"talle": 40, "stock": 1}], foto: 'Fotos/Nike dunk cerecita🍒.jpg' },
-    { modelo: 'Nike initiator gris ⚡️', talles: [{"talle": 37, "stock": 2}, {"talle": 38, "stock": 2}, {"talle": 39, "stock": 1}], foto: 'Fotos/Nike initiator gris ⚡️.jpg' },
+    { modelo: 'Nike initiator gris ⚡️', talles: [{"talle": 38, "stock": 1}, {"talle": 39, "stock": 1}], foto: 'Fotos/Nike initiator gris ⚡️.jpg' },
     { modelo: 'Shox blanca roja ⚡️', talles: [{"talle": 39, "stock": 1}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 3}, {"talle": 42, "stock": 3}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Shox blanca roja ⚡️.jpg' },
     { modelo: 'T90 dorado', talles: [{"talle": 42, "stock": 1}, {"talle": 43, "stock": 1}], foto: 'Fotos/T90 dorado.jpeg' },
     { modelo: 'Vans Haylan total black', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 3}], foto: 'Fotos/Vans Haylan total black.jpeg' },
