@@ -148,16 +148,16 @@ USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTM
 # Es texto fijo: si cambian los precios hay que actualizarlo acá a mano.
 MENSAJE_FINAL_PRECIOS = (
     "Zapatillas calidad Brasil 🇧🇷 (primera línea,luxo)\n"
-    "Talles de adulto $43.000 por unidad ‼️\n"
-    "🔥 A PARTIR DE 5 unidades te quedan en $37.000/$39.000/$41.000 🔥\n"
-    "🚨 TALLE NIÑO $35.000c/u 🚨\n"
-    "Por mayor $30.000c/u ‼️\n"
-    "🚨OJOTAS $35.000c/u🚨\n"
-    "Por mayor $31.000c/u‼️\n"
-    "🚨 OJOTAS  MIND  $37.000c/u🚨\n"
-    "Por mayor $35.000c/u ‼️\n"
-    "🚨 JORDAN 11 Y RETRO 11 PANDA $55.000c/u 🚨\n"
-    "Por mayor $50.000c/u ‼️"
+    "Talles de adulto $44.000 por unidad ‼️\n"
+    "🔥 A PARTIR DE 5 unidades te quedan en $38.000/$40.000/$42.000 🔥\n"
+    "🚨 TALLE NIÑO $36.000c/u 🚨\n"
+    "Por mayor $31.000c/u ‼️\n"
+    "🚨OJOTAS $36.000c/u🚨\n"
+    "Por mayor $32.000c/u‼️\n"
+    "🚨 OJOTAS  MIND  $38.000c/u🚨\n"
+    "Por mayor $36.000c/u ‼️\n"
+    "🚨 JORDAN 11 Y RETRO 11 PANDA $56.000c/u 🚨\n"
+    "Por mayor $51.000c/u ‼️"
 )
 
 # Primer mensaje del día, antes de las fotos.
@@ -192,6 +192,8 @@ MENSAJE_PROMO_TIENDA = (
     "✅ Su nombre y su logo\n"
     "✅ Sus propios precios\n"
     "✅ El mismo stock de zapatillas BR, que se actualiza solo todos los días\n"
+    "✅ Ahora también pueden agregar el stock G5\n"
+    "✅ Pueden agregar sus propios productos\n"
     "✅ Los pedidos les llegan directo a su WhatsApp\n"
     "\n"
     "💰 *Todo por solo $25.000 por mes*\n"
