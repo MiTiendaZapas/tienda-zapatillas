@@ -188,11 +188,10 @@ ORDEN_TALLES_ROPA = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "3XL", "4X
 MENSAJE_PROMO_TIENDA = (
     "🛍️ *Recuerden que si quieren tener una tienda como la nuestra*\n"
     "\n"
-    "Se la armamos con:\n"
+    "Beneficios:\n"
     "✅ Su nombre y su logo\n"
     "✅ Sus propios precios\n"
-    "✅ El mismo stock de zapatillas BR, que se actualiza solo todos los días\n"
-    "✅ Ahora también pueden agregar el stock G5\n"
+    "✅ El mismo stock de zapatillas BR y G5, que se actualiza solo todos los días\n"
     "✅ Pueden agregar sus propios productos\n"
     "✅ Los pedidos les llegan directo a su WhatsApp\n"
     "\n"
