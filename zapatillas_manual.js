@@ -12,7 +12,7 @@ const stock_zapatillas_manual = [
     { modelo: 'Ojotas camuflada bege', talles: [{"talle": "37/38", "stock": 3}, {"talle": "39/40", "stock": 7}, {"talle": "41/42", "stock": 10}, {"talle": "43/44", "stock": 3}], foto: 'Fotos/Ojotas camuflada bege.jpg' },
     { modelo: 'Ojotas Louis Vuitton bege', talles: [{"talle": "39/40", "stock": 4}, {"talle": "41/42", "stock": 1}], foto: 'Fotos/Ojotas Louis Vuitton bege.jpg' },
     { modelo: 'Ojotas Louis Vuitton negras', talles: [{"talle": "39/40", "stock": 1}, {"talle": "41/42", "stock": 1}, {"talle": "43/44", "stock": 1}], foto: 'Fotos/Ojotas Louis Vuitton negras.jpg' },
-    { modelo: 'Ojotas total black', talles: [{"talle": "37/38", "stock": 5}, {"talle": "39/40", "stock": 10}, {"talle": "41/42", "stock": 11}, {"talle": "43/44", "stock": 4}], foto: 'Fotos/Ojotas total black.jpg' },
+    { modelo: 'Ojotas total black', talles: [{"talle": "37/38", "stock": 4}, {"talle": "39/40", "stock": 10}, {"talle": "41/42", "stock": 11}, {"talle": "43/44", "stock": 4}], foto: 'Fotos/Ojotas total black.jpg' },
     { modelo: 'Shox blanca roja ⚡️', talles: [{"talle": 39, "stock": 1}, {"talle": 40, "stock": 2}, {"talle": 41, "stock": 2}, {"talle": 42, "stock": 3}, {"talle": 43, "stock": 2}, {"talle": 44, "stock": 1}], foto: 'Fotos/Shox blanca roja ⚡️.jpg' },
     { modelo: 'T90 dorado', talles: [{"talle": 43, "stock": 1}], foto: 'Fotos/T90 dorado.jpg' },
     { modelo: 'Vans Haylan total black', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 2}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 2}], foto: 'Fotos/Vans Haylan total black.jpg' },
