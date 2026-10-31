@@ -140,6 +140,7 @@ FUENTES_CATALOGO = [
 CATALOGO_LOCAL = REPO_ROOT.parent / "mitiendazapas.github.io" / "catalogo"   # copia que mantiene el piloto en esta laptop
 CACHE_FOTOS = SCRIPT_DIR / "_cache_fotos"
 ARCHIVO_ESTADO = SCRIPT_DIR / "estado_bot.json"
+OJOTAS_DE_CASA = SCRIPT_DIR / "ojotas_de_casa.json"   # memoria: ojotas que alguna vez tuvieron pares de casa
 PAUSA_ENTRE_ENVIOS = (5, 15)      # segundos, al azar
 PAUSA_ANTES_SEPARADOR_G5 = (20, 35)   # más larga que entre fotos, para que el separador quede aparte
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36"
@@ -421,12 +422,35 @@ def obtener_foto_url(url):
     return destino
 
 
+def _ojotas_de_casa(catalogo):
+    """Ids de las ojotas "de casa": las que tienen o alguna vez tuvieron pares de casa. Regla del 26/10 de las
+    tiendas: esas ojotas se venden SOLO con los pares de casa, sin sumar los del proveedor, y si los pares
+    llegan a 0 quedan agotadas (no vuelven al proveedor). Por eso se recuerdan en un archivo."""
+    try:
+        conocidas = set(json.loads(OJOTAS_DE_CASA.read_text(encoding="utf-8")))
+    except Exception:
+        conocidas = set()
+    con_pares = {p["id"] for p in catalogo["products"]
+                 if p.get("category") == "ojotas" and any((s.get("casa") or 0) > 0 for s in p["sizes"])}
+    if con_pares - conocidas:
+        try:
+            OJOTAS_DE_CASA.write_text(json.dumps(sorted(conocidas | con_pares), indent=1), encoding="utf-8")
+        except OSError as error:
+            print(f"⚠️ No pude guardar la memoria de ojotas de casa ({error}).")
+    return conocidas | con_pares
+
+
 def armar_productos(catalogo, g5=False):
     """Lista de {id, name, texto, foto} en el orden del catálogo (stock de casa primero).
     Con g5=True el texto lleva arriba la calidad y los talles se aclaran como europeos."""
     productos, sin_foto = [], []
+    de_casa = set() if g5 else _ojotas_de_casa(catalogo)
     for producto in catalogo["products"]:
-        talles = formatear_talles(producto["sizes"])
+        talles_del_modelo = producto["sizes"]
+        if producto["id"] in de_casa:
+            # Ojota de casa: solo los pares de casa (columna "casa"), no el stock total con el del proveedor.
+            talles_del_modelo = [{"size": t["size"], "stock": int(t.get("casa") or 0)} for t in talles_del_modelo]
+        talles = formatear_talles(talles_del_modelo)
         if talles is None:
             continue
         if not producto.get("images"):
