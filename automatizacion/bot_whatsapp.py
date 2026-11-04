@@ -125,8 +125,10 @@ PRECALENTAR_MIN = 12              # WhatsApp Web se abre esta cantidad de minuto
 ESPERA_TRAS_CARGAR_SEG = 90      # pausa tras cargar la lista de chats, antes del primer envío
 DIAS_SIN_ENVIO = (6,)            # días en que NO se manda stock (0 = lunes ... 6 = domingo)
 TOLERANCIA_TARDE_MIN = 120        # si la laptop estaba apagada a esa hora, se manda igual hasta 2 h después
-MAX_INTENTOS_DIA = 3
+MAX_INTENTOS_DIA = 4
 ESPERA_ENTRE_INTENTOS_MIN = 15
+ESPERA_TRAS_COLGARSE_MIN = 3      # si WhatsApp se cuelga a mitad del envío, se reintenta con sesión nueva a los 3 min
+BUSQUEDA_VACIA_SEG = 15           # una búsqueda del grupo sin resultados no cuenta como "no existe" antes de esto
 LIMITE_CARGA_MIN = 20             # tiempo máximo que se espera a que WhatsApp Web termine de sincronizar
 ESPERA_CATALOGO_FRESCO_MIN = 10   # minutos máximos que espera el catálogo del día (el piloto arranca a las 5:15); 0 = no espera
 CATALOGO_FRESCO_DESDE = (5, 15)   # el catálogo cuenta como 'del día' si se generó desde esta hora
@@ -222,6 +224,15 @@ class SesionVencida(Exception):
 
 class GrupoNoEncontrado(Exception):
     """No se pudo abrir el grupo, o el chat abierto no es el que corresponde."""
+
+
+class GrupoAmbiguo(GrupoNoEncontrado):
+    """Hay varios chats con ese nombre: es un problema de configuración, reintentar no lo arregla."""
+
+
+class NavegadorColgado(Exception):
+    """WhatsApp Web dejó de responder a mitad del envío (buscador vacío, caja que no contesta...).
+    A diferencia de un grupo mal configurado, se arregla abriendo una sesión nueva: se reintenta."""
 
 
 class EnvioBloqueado(Exception):
@@ -637,11 +648,13 @@ def abrir_grupo(page, nombre):
     selector = page.locator("#pane-side span[title]")
     for intento in range(1, 4):
         inicio, estables, indices = time.time(), 0, []
-        while time.time() - inicio < 20:
+        while time.time() - inicio < BUSQUEDA_VACIA_SEG + 12:
             titulos = selector.evaluate_all("elementos => elementos.map(e => e.getAttribute('title'))")
             cargando = any(_clave_chat(t) == "cargando" for t in titulos)
             indices = [i for i, t in enumerate(titulos) if _clave_chat(t) == objetivo]
-            estables = estables + 1 if (not cargando and (indices or time.time() - inicio > 4)) else 0
+            # Una búsqueda vacía recién cuenta como "no existe" tras BUSQUEDA_VACIA_SEG: con WhatsApp lento los
+            # resultados tardan (el 04/11 se dio por perdido el grupo a los 4 s y se cortó el día entero).
+            estables = estables + 1 if (not cargando and (indices or time.time() - inicio > BUSQUEDA_VACIA_SEG)) else 0
             if estables >= 2:
                 break
             page.wait_for_timeout(500)
@@ -656,7 +669,7 @@ def abrir_grupo(page, nombre):
                 indices = exactos
             else:
                 page.keyboard.press("Escape")
-                raise GrupoNoEncontrado(f"Hay {len(indices)} chats llamados «{nombre}»: no sé a cuál mandar, no mando nada. "
+                raise GrupoAmbiguo(f"Hay {len(indices)} chats llamados «{nombre}»: no sé a cuál mandar, no mando nada. "
                                         "Poné en bot_config.json el nombre completo del grupo, con sus emojis.")
         try:
             selector.nth(indices[0]).click(timeout=4000)
@@ -668,6 +681,41 @@ def abrir_grupo(page, nombre):
     page.wait_for_timeout(1500)
     if _chat_abierto(page) != objetivo:
         raise GrupoNoEncontrado(f"Abrí un chat distinto de «{nombre}»: no mando nada.")
+
+
+def abrir_grupo_robusto(page, nombre):
+    """abrir_grupo, pero si WhatsApp está colgado o lento (buscador vacío, lista que no responde) recarga la
+    página y reintenta una vez. Si sigue mal levanta NavegadorColgado (se reintenta con una sesión nueva);
+    un grupo ambiguo (varios con ese nombre) sí es un error de configuración y se propaga tal cual."""
+    try:
+        abrir_grupo(page, nombre)
+        return
+    except GrupoAmbiguo:
+        raise
+    except (GrupoNoEncontrado, PlaywrightTimeout) as error:
+        print(f"  ⚠️ No pude abrir el grupo ({error}). Recargo WhatsApp Web y reintento...")
+    try:
+        _goto_con_reintentos(page, "https://web.whatsapp.com/")
+        _esperar_lista_de_chats(page)
+        page.wait_for_timeout(30 * 1000)                 # que termine de asentarse tras recargar
+        abrir_grupo(page, nombre)
+    except SesionVencida:
+        raise
+    except GrupoAmbiguo:
+        raise
+    except Exception as error:
+        raise NavegadorColgado(f"WhatsApp Web no responde ({type(error).__name__}: {error})")
+
+
+def _esta_en_las_ultimas_filas(page, texto, cuantas=15):
+    """True si alguno de los últimos mensajes del chat ya tiene este texto (un envío dudoso que sí salió)."""
+    esperado = _linea_clave(texto)
+    try:
+        filas = page.evaluate(
+            "(n) => [...document.querySelectorAll('#main [data-id]')].slice(-n).map(f => f.innerText || '')", cuantas)
+    except Exception:
+        return False
+    return any(esperado in _solo_alfanumerico(t) for t in filas)
 
 
 def _ultima_fila(page):
@@ -869,13 +917,26 @@ def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=Fal
 
     contexto, page = sesion if sesion else abrir_whatsapp(p)   # sesion: WhatsApp ya abierto y asentado de antemano
     try:
-        abrir_grupo(page, grupo)
+        abrir_grupo_robusto(page, grupo)
+        if estado is not None:
+            # Reanudación tras un corte: el último modelo que falló pudo haber salido igual (WhatsApp lo muestra
+            # tarde). Si ya está en el chat se da por enviado en vez de mandarlo repetido.
+            for x in list(productos) + list(productos_g5) + list(productos_indumentaria):
+                if x["id"] in estado.get("dudosos", []) and x["id"] not in ya:
+                    if _esta_en_las_ultimas_filas(page, x["texto"]):
+                        print(f"  ℹ️ {x['name']} figuraba como fallido pero ya está en el chat: no lo repito.")
+                        estado["enviados"].append(x["id"])
+                        ya.add(x["id"])
+                        guardar()
+            pendientes = [x for x in productos if x["id"] not in ya]
+            pendientes_g5 = [x for x in productos_g5 if x["id"] not in ya]
+            pendientes_ind = [x for x in productos_indumentaria if x["id"] not in ya]
 
         def enviar_lista(lista, etiqueta="", tolerante=False):
             """False solo si, en una sección tolerante (G5, indumentaria), fallaron 3 seguidas y se dejó de
             intentar (en BR eso corta todo)."""
             for numero, producto in enumerate(lista, 1):
-                abrir_grupo(page, grupo)                       # vuelve a comprobar que sea el grupo correcto
+                abrir_grupo_robusto(page, grupo)               # vuelve a comprobar que sea el grupo correcto
                 if paso_manual and cuenta["enviados"] == 0 and not ya:
                     print(f"\n🛑 PASO MANUAL: mandá a mano la foto de «{producto['name']}» con este texto:\n{producto['texto']}")
                     input("👉 Cuando esté ENVIADA, apretá ENTER acá: ")
@@ -905,6 +966,9 @@ def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=Fal
                     cuenta["seguidas"] = 0
                     if estado is not None:
                         estado["enviados"].append(producto["id"])
+                        # Un fallo seguido de envíos buenos casi siempre es un mensaje que llegó tarde: ya no es
+                        # "dudoso" (si no, una reanudación lo mandaría repetido). Queda en el aviso final.
+                        estado["dudosos"] = []
                         guardar()
                     pausa = random.uniform(*PAUSA_ENTRE_ENVIOS)
                     print(f"✅ [{etiqueta}{numero}/{len(lista)}] {producto['name']}. Pausa de {pausa:.0f}s...")
@@ -913,6 +977,9 @@ def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=Fal
                     cuenta["fallidos"] += 1
                     cuenta["seguidas"] += 1
                     print(f"❌ [{etiqueta}{numero}/{len(lista)}] {producto['name']}: no salió.")
+                    if estado is not None:
+                        estado.setdefault("dudosos", []).append(producto["id"])
+                        guardar()
                     if tolerante:
                         if cuenta["seguidas"] >= 3:
                             avisar("Bot de WhatsApp", f"Fallaron 3 fotos seguidas en la sección {etiqueta.strip()}: "
@@ -923,14 +990,16 @@ def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=Fal
                         raise EnvioBloqueado("WhatsApp no aceptó el primer envío automático. "
                                              "Puede hacer falta el paso manual (--paso-manual).")
                     if cuenta["seguidas"] >= 3:
-                        raise EnvioBloqueado("Fallaron 3 envíos seguidos: se corta para no seguir a ciegas.")
+                        # Ya salieron envíos antes, así que WhatsApp sí acepta mensajes: lo más probable es que la
+                        # página se haya colgado. Se corta para no seguir a ciegas y se reintenta con sesión nueva.
+                        raise NavegadorColgado("Fallaron 3 envíos seguidos: se corta para no seguir a ciegas.")
             return True
 
         def enviar_mensaje(marca, texto, nombre):
             """Manda un texto suelto una sola vez por día (la marca queda en el estado)."""
             if marcas.get(marca):
                 return True
-            abrir_grupo(page, grupo)
+            abrir_grupo_robusto(page, grupo)
             print(f"Mandando {nombre}...")
             id_base, _ = _ultima_fila(page)
             ok = False
@@ -1186,9 +1255,11 @@ def ejecutar_envio_real(estado, hora_objetivo=None):
             estado["resultado"] = f"ERROR tras {MAX_INTENTOS_DIA} intentos: {error}"
             avisar("Bot de WhatsApp: no pudo mandar hoy", str(error))
         else:
-            print(f"Reintento en {ESPERA_ENTRE_INTENTOS_MIN} min (lo ya enviado no se repite).")
+            # Si WhatsApp se colgó a mitad del envío, una sesión nueva suele bastar: se reintenta enseguida.
+            espera = ESPERA_TRAS_COLGARSE_MIN if isinstance(error, NavegadorColgado) else ESPERA_ENTRE_INTENTOS_MIN
+            print(f"Reintento en {espera} min con una sesión nueva (lo ya enviado no se repite).")
             guardar_estado(estado)
-            time.sleep(ESPERA_ENTRE_INTENTOS_MIN * 60)
+            time.sleep(espera * 60)
     guardar_estado(estado)
 
 
