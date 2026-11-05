@@ -629,12 +629,32 @@ def _chat_abierto(page):
         return None
 
 
+_JS_TITULO_CON_EMOJIS = """() => {
+    const h = document.querySelector('#main header [data-testid="conversation-info-header-chat-title"]');
+    if (!h) return null;
+    const partes = [];
+    const rec = n => { if (n.nodeType === 3) partes.push(n.textContent); else if (n.tagName === 'IMG') partes.push(n.alt || ''); else n.childNodes.forEach(rec); };
+    rec(h);
+    return partes.join('');
+}"""
+
+
+def _chat_abierto_exacto(page):
+    """Nombre del chat abierto CON sus emojis (WhatsApp los dibuja como <img alt=...>), normalizado como
+    _clave_exacta; None si no se puede leer. Distingue «⚡️Equipo de trabajo ⚡️» de «Equipo de trabajo 🤝🏽»."""
+    try:
+        titulo = page.evaluate(_JS_TITULO_CON_EMOJIS)
+    except Exception:
+        return None
+    return _clave_exacta(titulo) if titulo else None
+
+
 def abrir_grupo(page, nombre):
     """Abre el grupo buscándolo por nombre y comprueba que el chat abierto sea ESE grupo."""
-    objetivo = _clave_chat(nombre)
-    if _chat_abierto(page) == objetivo:
+    exacto = _clave_exacta(nombre)
+    if _chat_abierto_exacto(page) == exacto:
         return
-    page.keyboard.press("Control+Alt+/")                 # atajo de WhatsApp Web: foco en el buscador
+    page.keyboard.press("Control+Alt+/")               # atajo de WhatsApp Web: foco en el buscador
     page.wait_for_timeout(600)
     page.keyboard.press("Control+A")                     # el buscador conserva la búsqueda anterior: se borra antes de escribir
     page.keyboard.press("Backspace")
@@ -651,7 +671,10 @@ def abrir_grupo(page, nombre):
         while time.time() - inicio < BUSQUEDA_VACIA_SEG + 12:
             titulos = selector.evaluate_all("elementos => elementos.map(e => e.getAttribute('title'))")
             cargando = any(_clave_chat(t) == "cargando" for t in titulos)
-            indices = [i for i, t in enumerate(titulos) if _clave_chat(t) == objetivo]
+            # Solo cuenta el chat cuyo nombre coincide EXACTO, con emojis. Antes se aceptaba cualquiera con el mismo
+            # nombre sin emojis: el 05/11, con la lista a medio cargar tras recargar, el único resultado visible era
+            # «Equipo de trabajo 🤝🏽» (otro grupo) y se mandaron ~54 modelos ahí. Mientras no aparezca el exacto, se espera.
+            indices = [i for i, t in enumerate(titulos) if _clave_exacta(t) == exacto]
             # Una búsqueda vacía recién cuenta como "no existe" tras BUSQUEDA_VACIA_SEG: con WhatsApp lento los
             # resultados tardan (el 04/11 se dio por perdido el grupo a los 4 s y se cortó el día entero).
             estables = estables + 1 if (not cargando and (indices or time.time() - inicio > BUSQUEDA_VACIA_SEG)) else 0
@@ -661,16 +684,8 @@ def abrir_grupo(page, nombre):
         if not indices:
             page.keyboard.press("Escape")
             raise GrupoNoEncontrado(f"No encontré ningún chat llamado exactamente «{nombre}».")
-        if len(indices) > 1:
-            # Varios chats con el mismo nombre sin emojis (ej. «⚡️Equipo de trabajo ⚡️» y «Equipo de trabajo 🤝🏽»):
-            # se elige el que coincide EXACTO (con emojis) con el nombre de la configuración, si es uno solo.
-            exactos = [i for i in indices if _clave_exacta(titulos[i]) == _clave_exacta(nombre)]
-            if len(exactos) == 1:
-                indices = exactos
-            else:
-                page.keyboard.press("Escape")
-                raise GrupoAmbiguo(f"Hay {len(indices)} chats llamados «{nombre}»: no sé a cuál mandar, no mando nada. "
-                                        "Poné en bot_config.json el nombre completo del grupo, con sus emojis.")
+        # Si el mismo título aparece varias veces (la fila del chat y filas de "Mensajes" que lo mencionan), la
+        # primera es la del chat: la sección "Chats" va antes que "Mensajes".
         try:
             selector.nth(indices[0]).click(timeout=4000)
             break
@@ -679,7 +694,7 @@ def abrir_grupo(page, nombre):
                 raise GrupoNoEncontrado(f"Encontré «{nombre}» pero no pude abrirlo (la lista cambiaba).")
             page.wait_for_timeout(1000)
     page.wait_for_timeout(1500)
-    if _chat_abierto(page) != objetivo:
+    if _chat_abierto_exacto(page) != exacto:
         raise GrupoNoEncontrado(f"Abrí un chat distinto de «{nombre}»: no mando nada.")
 
 
