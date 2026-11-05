@@ -542,9 +542,9 @@ def _linea_clave(texto):
 
 
 def _clave_exacta(texto):
-    """Nombre de un chat CON sus emojis, sin marcas invisibles ni diferencias de espacios o mayúsculas."""
+    """Nombre de un chat CON sus emojis, sin marcas invisibles ni diferencias de espacios. Distingue mayúsculas de minúsculas."""
     limpio = re.sub("[️‍‎‏‪-‮]", "", texto or "")
-    return " ".join(limpio.split()).casefold()
+    return " ".join(limpio.split())      # SIN pasar a minúsculas: «equipo de trabajo» y «Equipo de trabajo» son grupos distintos
 
 
 def _clave_chat(texto):
