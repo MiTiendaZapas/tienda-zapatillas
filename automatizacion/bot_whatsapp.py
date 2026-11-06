@@ -694,6 +694,10 @@ def abrir_grupo(page, nombre):
                 raise GrupoNoEncontrado(f"Encontré «{nombre}» pero no pude abrirlo (la lista cambiaba).")
             page.wait_for_timeout(1000)
     page.wait_for_timeout(1500)
+    for _ in range(16):             # con WhatsApp lento la cabecera tarda en actualizarse: hasta ~8 s más
+        if _chat_abierto_exacto(page) == exacto:
+            break
+        page.wait_for_timeout(500)
     if _chat_abierto_exacto(page) != exacto:
         raise GrupoNoEncontrado(f"Abrí un chat distinto de «{nombre}»: no mando nada.")
 
@@ -735,11 +739,16 @@ def _esta_en_las_ultimas_filas(page, texto, cuantas=15):
 
 def _ultima_fila(page):
     """(data-id, texto) del último mensaje visible del chat abierto; (None, '') si no se puede leer."""
-    try:
-        fila = page.locator("#main [data-id]").last
-        return fila.get_attribute("data-id", timeout=1500), fila.inner_text(timeout=1500)
-    except Exception:
-        return None, ""
+    # Con WhatsApp lento 1,5 s no alcanzaba: sin esta referencia no se puede saber si un envío salió, y se
+    # reintentaba (mensaje repetido). Se da más margen y un segundo intento.
+    for intento in (1, 2):
+        try:
+            datos = page.locator("#main [data-id]").last.evaluate(
+                "f => [f.dataset.id, f.innerText || '']", timeout=6000)
+            return datos[0], datos[1]
+        except Exception:
+            page.wait_for_timeout(1500)
+    return None, ""
 
 
 def _ultima_fila_enviada(page):
@@ -834,7 +843,7 @@ def _cerrar_vista_previa(page):
             page.wait_for_timeout(800)
 
 
-def _esperar_rastro_del_envio(page, texto, id_base, sin_rastro_seg=60, previa_seg=60, total_seg=180):
+def _esperar_rastro_del_envio(page, texto, id_base, sin_rastro_seg=120, previa_seg=60, total_seg=300):
     """Tras un envío sin confirmar, espera MUCHO antes de darlo por perdido (WhatsApp, recién cargado, puede
     tardar más de un minuto en mostrar un mensaje que sí sale: reintentar antes duplica la foto).
     True = el mensaje salió o sigue saliendo (NO reintentar); False = sin rastro, se puede reintentar."""
@@ -889,7 +898,14 @@ def enviar_foto_con_texto(page, producto, id_base=None):
     caja.click()
     page.wait_for_timeout(500)
     page.keyboard.press("Control+V")
-    page.wait_for_timeout(3500)
+    # Se espera a que la vista previa de la foto esté realmente abierta antes de escribir: con WhatsApp lento
+    # tardaba más de 3,5 s, el texto no entraba como pie de foto y salía la foto sola (y luego otra con texto).
+    fin_previa = time.time() + 45
+    while time.time() < fin_previa and page.locator('[aria-label="Añadir archivo"]').count() == 0:
+        page.wait_for_timeout(500)
+    if page.locator('[aria-label="Añadir archivo"]').count() == 0:
+        raise RuntimeError("La vista previa de la foto no se abrió en 45 s (WhatsApp lento): no escribo el texto.")
+    page.wait_for_timeout(1500)
     page.keyboard.press("Control+A")        # por si quedó texto de un intento anterior: no duplicarlo
     page.keyboard.press("Delete")
     # Última barrera contra duplicados: si justo ahora ya apareció este modelo (salió tarde), no mandarlo otra vez.
@@ -971,6 +987,11 @@ def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=Fal
                             ok = _limpiar_antes_de_reintentar(page, producto["texto"], id_base)
                             if ok:
                                 break
+                    if not ok:
+                        # Última mirada: con WhatsApp muy lento un mensaje puede aparecer minutos después. Si llegó, se
+                        # da por enviado (si no, figuraría fallido y una reanudación lo mandaría repetido).
+                        ok = _esperar_rastro_del_envio(page, producto["texto"], id_base,
+                                                       sin_rastro_seg=45, previa_seg=30, total_seg=120)
                     if ok:
                         repetidos = _envios_nuevos(page, id_base, producto["texto"])[0]
                         if repetidos > 1:
@@ -1029,6 +1050,8 @@ def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=Fal
                     ok = _esperar_rastro_del_envio(page, texto, id_base)
                 if ok:
                     break
+            if not ok:
+                ok = _esperar_rastro_del_envio(page, texto, id_base, sin_rastro_seg=45, previa_seg=30, total_seg=120)
             if ok:
                 marcas[marca] = True
                 if estado is not None:
