@@ -143,6 +143,9 @@ CATALOGO_LOCAL = REPO_ROOT.parent / "mitiendazapas.github.io" / "catalogo"   # c
 CACHE_FOTOS = SCRIPT_DIR / "_cache_fotos"
 ARCHIVO_ESTADO = SCRIPT_DIR / "estado_bot.json"
 OJOTAS_DE_CASA = SCRIPT_DIR / "ojotas_de_casa.json"   # memoria: ojotas que alguna vez tuvieron pares de casa
+# Desde el 02/11 las tiendas suman proveedor + casa en las ojotas ("solo casa" quedó solo para Fabri), así que el
+# bot manda el stock COMPLETO. Con True volvería la regla del 31/10 (solo los pares de casa).
+OJOTAS_SOLO_CASA = False
 PAUSA_ENTRE_ENVIOS = (5, 15)      # segundos, al azar
 PAUSA_ANTES_SEPARADOR_G5 = (20, 35)   # más larga que entre fotos, para que el separador quede aparte
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36"
@@ -455,7 +458,7 @@ def armar_productos(catalogo, g5=False):
     """Lista de {id, name, texto, foto} en el orden del catálogo (stock de casa primero).
     Con g5=True el texto lleva arriba la calidad y los talles se aclaran como europeos."""
     productos, sin_foto = [], []
-    de_casa = set() if g5 else _ojotas_de_casa(catalogo)
+    de_casa = _ojotas_de_casa(catalogo) if (OJOTAS_SOLO_CASA and not g5) else set()
     for producto in catalogo["products"]:
         talles_del_modelo = producto["sizes"]
         if producto["id"] in de_casa:
