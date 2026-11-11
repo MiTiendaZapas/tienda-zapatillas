@@ -155,15 +155,15 @@ USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTM
 MENSAJE_FINAL_PRECIOS = (
     "Zapatillas calidad Brasil 🇧🇷 (primera línea,luxo)\n"
     "Talles de adulto $44.000 por unidad ‼️\n"
-    "🔥 A PARTIR DE 5 unidades te quedan en $38.000/$40.000/$42.000 🔥\n"
-    "🚨 TALLE NIÑO $36.000c/u 🚨\n"
-    "Por mayor $31.000c/u ‼️\n"
-    "🚨OJOTAS $36.000c/u🚨\n"
-    "Por mayor $32.000c/u‼️\n"
-    "🚨 OJOTAS  MIND  $38.000c/u🚨\n"
-    "Por mayor $36.000c/u ‼️\n"
-    "🚨 JORDAN 11 Y RETRO 11 PANDA $56.000c/u 🚨\n"
-    "Por mayor $51.000c/u ‼️"
+    "🔥 A PARTIR DE 5 unidades te quedan en $39.000/$41.000/$43.000 🔥\n"
+    "🚨 TALLE NIÑO $37.000c/u 🚨\n"
+    "Por mayor $32.000c/u ‼️\n"
+    "🚨OJOTAS $37.000c/u🚨\n"
+    "Por mayor $33.000c/u‼️\n"
+    "🚨 OJOTAS  MIND  $39.000c/u🚨\n"
+    "Por mayor $37.000c/u ‼️\n"
+    "🚨 JORDAN 11 Y RETRO 11 PANDA $57.000c/u 🚨\n"
+    "Por mayor $52.000c/u ‼️"
 )
 
 # Primer mensaje del día, antes de las fotos.
