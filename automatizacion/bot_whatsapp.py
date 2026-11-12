@@ -220,6 +220,14 @@ MENSAJE_PRECIOS_G5 = (
     "🚨 A partir de 5 las de adulto $78.000c/u🚨"
 )
 
+# Zapatillas BR de la segunda tienda ("Brasil 2", tienda de Beto): solo se mandan a pedido (--solo-br2).
+SEPARADOR_BR2 = (
+    "━━━━━━━━━━━━━━\n"
+    "⬇️ ZAPATILLAS BR - SEGUNDA TIENDA ⬇️\n"
+    "(talles BR)\n"
+    "━━━━━━━━━━━━━━"
+)
+
 
 class SesionVencida(Exception):
     """WhatsApp Web pide vincular de nuevo (código QR)."""
@@ -384,6 +392,38 @@ def cargar_productos_g5():
     except Exception as error:
         print(f"⚠️ No pude preparar las G5 ({type(error).__name__}: {error}): se manda solo lo de BR.")
         return []
+
+
+def cargar_productos_br2():
+    """Zapatillas BR de la segunda tienda (productos-br2.json, tienda de Beto) listas para mandar, con los talles
+    aclarados como BR. Las chinelas (ojotas) no entran: ya van, sumadas, en las ojotas de la tanda de siempre."""
+    try:
+        datos, origen = _leer_catalogo_web("productos-br2.json")
+    except Exception as error:
+        local = CATALOGO_LOCAL / "productos-br2.json"
+        if not local.exists():
+            print(f"❌ No hay catálogo BR de la segunda tienda ({error}).")
+            return []
+        print(f"⚠️ Catálogo BR2 de la web no disponible ({error}); uso la copia local.")
+        datos = json.loads(local.read_text(encoding="utf-8"))
+        origen = "copia local"
+    productos, sin_foto = [], []
+    for producto in datos.get("products", []):
+        nombre = producto["name"].replace("�", "ñ").strip()
+        if nombre.lower().startswith("chinela"):
+            continue
+        talles = formatear_talles(producto["sizes"])
+        if talles is None:
+            continue
+        if not producto.get("images"):
+            sin_foto.append(nombre)
+            continue
+        productos.append({"id": producto["id"], "name": nombre,
+                          "texto": f"{nombre}\nTalles BR: {talles}", "foto": producto["images"][0]["lg"]})
+    if sin_foto:
+        print(f"⚠️ {len(sin_foto)} modelo(s) BR2 con stock pero SIN foto, no se mandan: {', '.join(sin_foto)}")
+    print(f"🇧🇷 Catálogo BR2 de {origen} ({datos.get('generatedAt')}): {len(productos)} modelos para mandar.")
+    return productos
 
 
 def formatear_talles_ropa(talles):
@@ -931,7 +971,9 @@ def enviar_texto(page, texto, id_base=None):
 
 
 def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=False, productos_g5=None,
-                 productos_indumentaria=None, incluir_br=True, sesion=None):
+                 productos_indumentaria=None, incluir_br=True, sesion=None,
+                 texto_separador_ind=SEPARADOR_INDUMENTARIA, texto_precios_ind=MENSAJE_PRECIOS_INDUMENTARIA,
+                 etiqueta_ind="IND "):
     """Manda, en este orden: saludo, fotos BR, precios BR, separador G5, fotos G5, precios G5, separador
     indumentaria, fotos de indumentaria, precios de indumentaria (lo que falte, si hay estado). Un problema
     con las G5 o la indumentaria nunca corta lo ya mandado antes. Con incluir_br=False se saltean el saludo,
@@ -1094,10 +1136,12 @@ def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=Fal
                     pausa = random.uniform(*PAUSA_ANTES_SEPARADOR_G5)
                     print(f"Pausa de {pausa:.0f}s antes del separador de indumentaria...")
                     time.sleep(pausa)
-                    enviar_mensaje("separador_indumentaria_enviado", SEPARADOR_INDUMENTARIA, "el separador de indumentaria")
-                if enviar_lista(pendientes_ind, "IND ", True):
-                    precios_ind = enviar_mensaje("precios_indumentaria_enviados", MENSAJE_PRECIOS_INDUMENTARIA,
-                                                 "el mensaje de precios de indumentaria")
+                    enviar_mensaje("separador_indumentaria_enviado", texto_separador_ind, "el separador de indumentaria")
+                if enviar_lista(pendientes_ind, etiqueta_ind, True):
+                    # texto_precios_ind=None: sección sin mensaje de precios (por ejemplo --solo-br2)
+                    precios_ind = (enviar_mensaje("precios_indumentaria_enviados", texto_precios_ind,
+                                                  "el mensaje de precios de indumentaria")
+                                   if texto_precios_ind else True)
                 else:
                     precios_ind = False
             except EnvioBloqueado as error:
@@ -1426,6 +1470,36 @@ def modo_solo_indumentaria(en_prueba, limite):
     return 0 if not resumen["fallidos"] and resumen["precios_indumentaria"] else 1
 
 
+def modo_solo_br2(en_prueba, limite):
+    """Manda SOLO las zapatillas BR de la segunda tienda (separador que aclara «talles BR» + fotos con sus talles),
+    sin saludo, precios ni mensaje final. En el grupo real lleva su propio estado del día: si se corta y se vuelve a
+    correr, no repite lo ya enviado."""
+    productos_br2 = cargar_productos_br2()
+    if not productos_br2:
+        print("❌ No hay zapatillas BR2 para mandar (sin stock o no se pudo leer): no mando nada.")
+        return 1
+    if limite:
+        productos_br2 = productos_br2[:limite]
+    grupo = GRUPO_PRUEBA if en_prueba else GRUPO_REAL
+    if not grupo:
+        print("❌ Falta el grupo real en bot_config.json.")
+        return 2
+    global ARCHIVO_ESTADO
+    estado = None
+    if not en_prueba:
+        ARCHIVO_ESTADO = SCRIPT_DIR / "estado_bot_br2.json"
+        estado = cargar_estado()
+        if estado.get("dia") != datetime.now().date().isoformat():
+            estado = {"dia": datetime.now().date().isoformat(), "enviados": []}
+    print(f"🇧🇷 SOLO BR2 a «{grupo}»: {len(productos_br2)} modelos" + (" (PRUEBA)." if en_prueba else "."))
+    with sync_playwright() as p:
+        resumen = enviar_tanda(p, grupo, [], estado, (lambda: guardar_estado(estado)) if estado is not None else None,
+                               productos_indumentaria=productos_br2, incluir_br=False,
+                               texto_separador_ind=SEPARADOR_BR2, texto_precios_ind=None, etiqueta_ind="BR2 ")
+    print(f"🏁 BR2 terminado: {resumen}")
+    return 0 if not resumen["fallidos"] else 1
+
+
 def modo_dry_run():
     catalogo, origen = cargar_catalogo()
     productos = armar_productos(catalogo)
@@ -1510,8 +1584,19 @@ def main():
     parser.add_argument("--paso-manual", action="store_true")
     parser.add_argument("--solo-indumentaria", action="store_true",
                         help="manda solo la indumentaria al grupo real (con --prueba, al grupo de prueba)")
+    parser.add_argument("--solo-br2", action="store_true",
+                        help="manda solo las zapatillas BR de la segunda tienda (talles BR) al grupo real (con --prueba, al de prueba)")
+    parser.add_argument("--ver-br2", action="store_true",
+                        help="muestra cómo saldrían las zapatillas BR2 (sin abrir WhatsApp ni mandar nada)")
     args = parser.parse_args()
 
+    if args.ver_br2:
+        productos = cargar_productos_br2()
+        print(SEPARADOR_BR2)
+        for x in productos:
+            print("-" * 30)
+            print(x["texto"])
+        return 0
     if args.dry_run:
         return modo_dry_run()
     candado = tomar_candado_unico()
@@ -1524,6 +1609,8 @@ def main():
         return modo_prueba_programador()
     if args.solo_indumentaria:
         return modo_solo_indumentaria(args.prueba, args.limite)
+    if args.solo_br2:
+        return modo_solo_br2(args.prueba, args.limite)
     if args.prueba:
         return modo_prueba(3 if args.limite is None else args.limite, args.paso_manual)
     return modo_programado(ahora=args.ahora)
