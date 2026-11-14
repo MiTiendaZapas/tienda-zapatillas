@@ -6,7 +6,7 @@ const stock_zapatillas_manual = [
     { modelo: 'Botines phantom Nike', talles: [{"talle": 38, "stock": 1}, {"talle": 39, "stock": 2}, {"talle": 40, "stock": 3}, {"talle": 41, "stock": 1}], foto: 'Fotos/Botines phantom Nike.jpg' },
     { modelo: 'Jordan 1 botitas charol negra', talles: [{"talle": 35, "stock": 1}, {"talle": 36, "stock": 1}, {"talle": 37, "stock": 1}], foto: 'Fotos/Jordan 1 botitas charol negra.jpg' },
     { modelo: 'Jordan 1 rosa/celeste', talles: [{"talle": 35, "stock": 1}, {"talle": 37, "stock": 1}, {"talle": 38, "stock": 1}, {"talle": 39, "stock": 1}], foto: 'Fotos/Jordan 1 rosa celeste.jpg' },
-    { modelo: 'Jordan low vérmelo', talles: [{"talle": 36, "stock": 3}, {"talle": 37, "stock": 2}], foto: 'Fotos/Jordan low vérmelo.jpg' },
+    { modelo: 'Jordan low vérmelo', talles: [{"talle": 36, "stock": 2}, {"talle": 37, "stock": 2}], foto: 'Fotos/Jordan low vérmelo.jpg' },
     { modelo: 'NB 530 blanca / negro', talles: [{"talle": 34, "stock": 2}, {"talle": 35, "stock": 1}], foto: 'Fotos/NB 530 blanca negro.jpg' },
     { modelo: 'New balance 530 negra', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 1}, {"talle": 36, "stock": 3}, {"talle": 37, "stock": 2}, {"talle": 38, "stock": 2}], foto: 'Fotos/New balance 530 negra.jpg' },
     { modelo: 'New balance 9060 nova', talles: [{"talle": 34, "stock": 1}, {"talle": 35, "stock": 1}], foto: 'Fotos/New balance 9060 nova.jpg' },
