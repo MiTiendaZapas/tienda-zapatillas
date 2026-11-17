@@ -228,6 +228,17 @@ SEPARADOR_BR2 = (
     "━━━━━━━━━━━━━━"
 )
 
+# Neceser / carteras (17/11): salen del panel de L.A IMP (categoría "nesecer", así está escrita en el panel).
+# Van al final de todo el stock, antes del mensaje final de la tienda.
+URL_PANEL_NECESER = "https://mitiendastock.com/api/tienda/laimp/productos.json"
+URL_FOTOS_PANEL_NECESER = "https://catalogo.mitiendastock.com/tiendas/laimp/"
+CATEGORIA_NECESER = "nesecer"
+SEPARADOR_NECESER = (
+    "━━━━━━━━━━━━━━\n"
+    "⬇️ NECESER ⬇️\n"
+    "━━━━━━━━━━━━━━"
+)
+
 
 class SesionVencida(Exception):
     """WhatsApp Web pide vincular de nuevo (código QR)."""
@@ -391,6 +402,40 @@ def cargar_productos_g5():
         return productos
     except Exception as error:
         print(f"⚠️ No pude preparar las G5 ({type(error).__name__}: {error}): se manda solo lo de BR.")
+        return []
+
+
+def cargar_productos_neceser():
+    """Neceser/carteras con stock del panel de L.A IMP, listos para mandar (una foto por producto, la primera).
+    Si algo falla devuelve [] (se manda el resto): el neceser nunca debe cortar ni demorar la tanda."""
+    try:
+        datos = json.loads(_descargar(f"{URL_PANEL_NECESER}?t={int(time.time())}", reintentos=2).decode("utf-8"))
+        productos, sin_foto = [], []
+        for item in datos.get("products", []):
+            if str(item.get("category") or "").strip().lower() != CATEGORIA_NECESER or item.get("hidden"):
+                continue
+            unidades = sum(int(t.get("stock") or 0) for t in item.get("sizes", []))
+            if unidades <= 0:
+                continue
+            nombre = re.sub(r"(?i)nesecer", "Neceser", str(item.get("name") or "Neceser").strip())
+            nombre = re.sub(r"(?i)premiun", "premium", nombre)
+            nombre = nombre[:1].upper() + nombre[1:].lower()
+            imagenes = item.get("images") or []
+            if not imagenes or not imagenes[0].get("lg"):
+                sin_foto.append(nombre)
+                continue
+            numero = len(productos) + 1
+            lg = imagenes[0]["lg"]
+            productos.append({"id": f"nec-{item['id']}", "name": f"{nombre} {numero}",
+                              # el número distingue los textos (los modelos se llaman igual) y evita confundir uno con otro
+                              "texto": f"{nombre} - modelo {numero}\nStock: {unidades}",
+                              "foto_url": lg if lg.startswith("http") else URL_FOTOS_PANEL_NECESER + lg})
+        if sin_foto:
+            print(f"⚠️ {len(sin_foto)} neceser con stock pero SIN foto, no se mandan.")
+        print(f"👜 Neceser del panel de L.A IMP: {len(productos)} para mandar.")
+        return productos
+    except Exception as error:
+        print(f"⚠️ No pude leer el neceser ({type(error).__name__}: {error}): se manda sin él.")
         return []
 
 
@@ -973,23 +1018,26 @@ def enviar_texto(page, texto, id_base=None):
 def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=False, productos_g5=None,
                  productos_indumentaria=None, incluir_br=True, sesion=None,
                  texto_separador_ind=SEPARADOR_INDUMENTARIA, texto_precios_ind=MENSAJE_PRECIOS_INDUMENTARIA,
-                 etiqueta_ind="IND "):
+                 etiqueta_ind="IND ", productos_neceser=None):
     """Manda, en este orden: saludo, fotos BR, precios BR, separador G5, fotos G5, precios G5, separador
     indumentaria, fotos de indumentaria, precios de indumentaria (lo que falte, si hay estado). Un problema
     con las G5 o la indumentaria nunca corta lo ya mandado antes. Con incluir_br=False se saltean el saludo,
     las BR y sus precios (y no se mandan las G5): sirve para mandar solo la indumentaria. Devuelve un resumen."""
     productos_g5 = productos_g5 or []
     productos_indumentaria = productos_indumentaria or []
+    productos_neceser = productos_neceser or []
     ya = set(estado["enviados"]) if estado else set()
     pendientes = [x for x in productos if x["id"] not in ya]
     pendientes_g5 = [x for x in productos_g5 if x["id"] not in ya]
     pendientes_ind = [x for x in productos_indumentaria if x["id"] not in ya]
+    pendientes_nec = [x for x in productos_neceser if x["id"] not in ya]
     marcas = estado if estado is not None else {}   # sin estado (modo prueba) las marcas viven solo en esta tanda
     cuenta = {"enviados": 0, "fallidos": 0, "seguidas": 0}
     g5_cortado = False
     print(f"📨 Grupo «{grupo}»: {len(pendientes)} por mandar ({len(ya)} ya enviados antes)"
           + (f", más {len(pendientes_g5)} G5" if productos_g5 else "")
-          + (f", más {len(pendientes_ind)} de indumentaria." if productos_indumentaria else "."))
+          + (f", más {len(pendientes_ind)} de indumentaria" if productos_indumentaria else "")
+          + (f", más {len(pendientes_nec)} de neceser." if productos_neceser else "."))
 
     contexto, page = sesion if sesion else abrir_whatsapp(p)   # sesion: WhatsApp ya abierto y asentado de antemano
     try:
@@ -997,7 +1045,7 @@ def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=Fal
         if estado is not None:
             # Reanudación tras un corte: el último modelo que falló pudo haber salido igual (WhatsApp lo muestra
             # tarde). Si ya está en el chat se da por enviado en vez de mandarlo repetido.
-            for x in list(productos) + list(productos_g5) + list(productos_indumentaria):
+            for x in list(productos) + list(productos_g5) + list(productos_indumentaria) + list(productos_neceser):
                 if x["id"] in estado.get("dudosos", []) and x["id"] not in ya:
                     if _esta_en_las_ultimas_filas(page, x["texto"]):
                         print(f"  ℹ️ {x['name']} figuraba como fallido pero ya está en el chat: no lo repito.")
@@ -1007,6 +1055,7 @@ def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=Fal
             pendientes = [x for x in productos if x["id"] not in ya]
             pendientes_g5 = [x for x in productos_g5 if x["id"] not in ya]
             pendientes_ind = [x for x in productos_indumentaria if x["id"] not in ya]
+            pendientes_nec = [x for x in productos_neceser if x["id"] not in ya]
 
         def enviar_lista(lista, etiqueta="", tolerante=False):
             """False solo si, en una sección tolerante (G5, indumentaria), fallaron 3 seguidas y se dejó de
@@ -1148,6 +1197,19 @@ def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=Fal
                 avisar("Bot de WhatsApp", f"La indumentaria no se pudo mandar: {error}")
                 precios_ind = False
 
+        neceser = None
+        if productos_neceser:
+            try:
+                if not marcas.get("separador_neceser_enviado"):
+                    pausa = random.uniform(*PAUSA_ANTES_SEPARADOR_G5)
+                    print(f"Pausa de {pausa:.0f}s antes del separador de neceser...")
+                    time.sleep(pausa)
+                    enviar_mensaje("separador_neceser_enviado", SEPARADOR_NECESER, "el separador de neceser")
+                neceser = enviar_lista(pendientes_nec, "NEC ", True)
+            except EnvioBloqueado as error:
+                avisar("Bot de WhatsApp", f"El neceser no se pudo mandar: {error}")
+                neceser = False
+
         promo = None
         if incluir_br:
             # Cierre del día: la oferta de tienda propia, después de todo el stock.
@@ -1160,7 +1222,7 @@ def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=Fal
     finally:
         contexto.close()
     return {"enviados": cuenta["enviados"], "fallidos": cuenta["fallidos"], "precios": precios,
-            "precios_g5": precios_g5, "precios_indumentaria": precios_ind, "promo": promo}
+            "precios_g5": precios_g5, "precios_indumentaria": precios_ind, "promo": promo, "neceser": neceser}
 
 
 # --- Estado diario -----------------------------------------------------------------
@@ -1303,18 +1365,22 @@ def ejecutar_envio_real(estado, hora_objetivo=None):
                 print(f"📚 Catálogo de {origen} ({catalogo['generatedAt']}): {len(productos)} modelos para mandar.")
                 productos_g5 = cargar_productos_g5()
                 productos_ind = cargar_productos_indumentaria()
+                productos_nec = cargar_productos_neceser()
             except Exception:
                 if sesion:
                     sesion[0].close()
                 raise
             resumen = enviar_tanda(p, GRUPO_REAL, productos, estado, lambda: guardar_estado(estado),
-                                   productos_g5=productos_g5, productos_indumentaria=productos_ind, sesion=sesion)
+                                   productos_g5=productos_g5, productos_indumentaria=productos_ind, sesion=sesion,
+                                   productos_neceser=productos_nec)
         estado["terminado"] = True
         estado["resultado"] = f"OK: {resumen['enviados']} enviados, {resumen['fallidos']} fallidos, precios={resumen['precios']}"
         if resumen["precios_g5"] is not None:
             estado["resultado"] += f", precios G5={resumen['precios_g5']}"
         if resumen["precios_indumentaria"] is not None:
             estado["resultado"] += f", precios indumentaria={resumen['precios_indumentaria']}"
+        if resumen.get("neceser") is not None:
+            estado["resultado"] += f", neceser={resumen['neceser']}"
         if resumen.get("promo") is not None:
             estado["resultado"] += f", mensaje final={resumen['promo']}"
         if resumen["fallidos"]:
@@ -1325,6 +1391,8 @@ def ejecutar_envio_real(estado, hora_objetivo=None):
             avisar("Bot de WhatsApp", "El mensaje de precios G5 NO salió: revisá el grupo y mandalo a mano si falta.")
         if resumen["precios_indumentaria"] is False:
             avisar("Bot de WhatsApp", "El mensaje de precios de INDUMENTARIA NO salió: revisá el grupo y mandalo a mano si falta.")
+        if resumen.get("neceser") is False:
+            avisar("Bot de WhatsApp", "El NECESER no se mandó completo: revisá el grupo.")
         if resumen.get("promo") is False:
             avisar("Bot de WhatsApp", "El mensaje final de la tienda NO salió: revisá el grupo y mandalo a mano si falta.")
         print(f"🏁 {estado['resultado']}")
@@ -1428,13 +1496,16 @@ def modo_prueba(limite, paso_manual):
     productos = armar_productos(catalogo)
     productos_g5 = cargar_productos_g5()
     productos_ind = cargar_productos_indumentaria()
+    productos_nec = cargar_productos_neceser()
     if limite:
-        productos, productos_g5, productos_ind = productos[:limite], productos_g5[:limite], productos_ind[:limite]
+        productos, productos_g5, productos_ind, productos_nec = (productos[:limite], productos_g5[:limite],
+                                                                 productos_ind[:limite], productos_nec[:limite])
     print(f"🧪 PRUEBA en «{GRUPO_PRUEBA}»: {len(productos)} modelos BR + {len(productos_g5)} G5 + "
-          f"{len(productos_ind)} de indumentaria (catálogo de {origen}, {catalogo['generatedAt']}).")
+          f"{len(productos_ind)} de indumentaria + {len(productos_nec)} de neceser "
+          f"(catálogo de {origen}, {catalogo['generatedAt']}).")
     with sync_playwright() as p:
         resumen = enviar_tanda(p, GRUPO_PRUEBA, productos, paso_manual=paso_manual, productos_g5=productos_g5,
-                               productos_indumentaria=productos_ind)
+                               productos_indumentaria=productos_ind, productos_neceser=productos_nec)
     print(f"🏁 Prueba terminada: {resumen}")
     bien = (not resumen["fallidos"] and resumen["precios"] and resumen["precios_g5"] is not False
             and resumen["precios_indumentaria"] is not False and resumen.get("promo") is not False)
@@ -1468,6 +1539,34 @@ def modo_solo_indumentaria(en_prueba, limite):
                                productos_indumentaria=productos_ind, incluir_br=False)
     print(f"🏁 Indumentaria terminada: {resumen}")
     return 0 if not resumen["fallidos"] and resumen["precios_indumentaria"] else 1
+
+
+def modo_solo_neceser(en_prueba, limite):
+    """Manda SOLO el neceser (separador + fotos con su stock), sin saludo, BR, G5, indumentaria ni precios. En el
+    grupo real lleva su propio estado del día (estado_bot_neceser.json): si se corta, no repite lo ya enviado."""
+    productos_nec = cargar_productos_neceser()
+    if not productos_nec:
+        print("❌ No hay neceser para mandar (sin stock o no se pudo leer): no mando nada.")
+        return 1
+    if limite:
+        productos_nec = productos_nec[:limite]
+    grupo = GRUPO_PRUEBA if en_prueba else GRUPO_REAL
+    if not grupo:
+        print("❌ Falta el grupo real en bot_config.json.")
+        return 2
+    global ARCHIVO_ESTADO
+    estado = None
+    if not en_prueba:
+        ARCHIVO_ESTADO = SCRIPT_DIR / "estado_bot_neceser.json"
+        estado = cargar_estado()
+        if estado.get("dia") != datetime.now().date().isoformat():
+            estado = {"dia": datetime.now().date().isoformat(), "enviados": []}
+    print(f"👜 SOLO NECESER a «{grupo}»: {len(productos_nec)} productos" + (" (PRUEBA)." if en_prueba else "."))
+    with sync_playwright() as p:
+        resumen = enviar_tanda(p, grupo, [], estado, (lambda: guardar_estado(estado)) if estado is not None else None,
+                               productos_neceser=productos_nec, incluir_br=False)
+    print(f"🏁 Neceser terminado: {resumen}")
+    return 0 if not resumen["fallidos"] and resumen["neceser"] is not False else 1
 
 
 def modo_solo_br2(en_prueba, limite):
@@ -1588,8 +1687,21 @@ def main():
                         help="manda solo las zapatillas BR de la segunda tienda (talles BR) al grupo real (con --prueba, al de prueba)")
     parser.add_argument("--ver-br2", action="store_true",
                         help="muestra cómo saldrían las zapatillas BR2 (sin abrir WhatsApp ni mandar nada)")
+    parser.add_argument("--solo-neceser", action="store_true",
+                        help="manda solo el neceser al grupo real (con --prueba, al grupo de prueba)")
+    parser.add_argument("--ver-neceser", action="store_true",
+                        help="muestra cómo saldría el neceser y baja las fotos (sin abrir WhatsApp ni mandar nada)")
     args = parser.parse_args()
 
+    if args.ver_neceser:
+        productos = cargar_productos_neceser()
+        print(SEPARADOR_NECESER)
+        for x in productos:
+            print("-" * 30)
+            print(x["texto"])
+            foto = obtener_foto_url(x["foto_url"])
+            print("foto:", foto, f"({foto.stat().st_size // 1024} KB)")
+        return 0
     if args.ver_br2:
         productos = cargar_productos_br2()
         print(SEPARADOR_BR2)
@@ -1611,6 +1723,8 @@ def main():
         return modo_solo_indumentaria(args.prueba, args.limite)
     if args.solo_br2:
         return modo_solo_br2(args.prueba, args.limite)
+    if args.solo_neceser:
+        return modo_solo_neceser(args.prueba, args.limite)
     if args.prueba:
         return modo_prueba(3 if args.limite is None else args.limite, args.paso_manual)
     return modo_programado(ahora=args.ahora)
