@@ -154,16 +154,17 @@ USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTM
 # Es texto fijo: si cambian los precios hay que actualizarlo acá a mano.
 MENSAJE_FINAL_PRECIOS = (
     "Zapatillas calidad Brasil 🇧🇷 (primera línea,luxo)\n"
-    "Talles de adulto $43.000 por unidad ‼️\n"
-    "🔥 A PARTIR DE 5 unidades te quedan en $37.000/$39.000/$41.000 🔥\n"
-    "🚨OJOTAS $35.000c/u🚨\n"
-    "Por mayor $31.000c/u‼️\n"
-    "🚨 OJOTAS  MIND  $37.000c/u🚨\n"
-    "Por mayor $35.000c/u ‼️\n"
+    "Talles de adulto $44.000 por unidad ‼️\n"
+    "🔥 A PARTIR DE 5 unidades te quedan en $38.000/$40.000/$43.000 🔥\n"
+    "🚨OJOTAS $36.000c/u🚨\n"
+    "Por mayor $32.000c/u‼️\n"
+    "🚨 OJOTAS  MIND  $38.000c/u🚨\n"
+    "Por mayor $36.000c/u ‼️\n"
     "🚨 OJOTAS JORDAN $25.500c/u 🚨\n"
     "Por mayor $23.500c/u ‼️"
-)   # 18/11: sin talle niño ni Jordan 11 / Retro 11 Panda; precios igualados a la lista de la tienda de revendedores
-#     (precios-mayorista.json) + ojotas Jordan nuevas. Si cambian los precios de la tienda, hay que editarlos acá.
+)   # 18/11: sin talle niño ni Jordan 11 / Retro 11 Panda. Precios = los que muestra la tienda de revendedores:
+#     precios-mayorista.json + el ajuste del panel "Cambiar precios" (+$1.000 en Brasil, ajustes.json de la tienda;
+#     ver motor/js/pricing.js) + las ojotas Jordan nuevas (precio propio del panel). Si cambian, editarlos acá.
 
 # Primer mensaje del día, antes de las fotos.
 SALUDO_INICIAL = (
