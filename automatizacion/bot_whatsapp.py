@@ -156,15 +156,11 @@ MENSAJE_FINAL_PRECIOS = (
     "Zapatillas calidad Brasil 🇧🇷 (primera línea,luxo)\n"
     "Talles de adulto $44.000 por unidad ‼️\n"
     "🔥 A PARTIR DE 5 unidades te quedan en $39.000/$41.000/$43.000 🔥\n"
-    "🚨 TALLE NIÑO $37.000c/u 🚨\n"
-    "Por mayor $32.000c/u ‼️\n"
     "🚨OJOTAS $37.000c/u🚨\n"
     "Por mayor $33.000c/u‼️\n"
     "🚨 OJOTAS  MIND  $39.000c/u🚨\n"
-    "Por mayor $37.000c/u ‼️\n"
-    "🚨 JORDAN 11 Y RETRO 11 PANDA $57.000c/u 🚨\n"
-    "Por mayor $52.000c/u ‼️"
-)
+    "Por mayor $37.000c/u ‼️"
+)   # 18/11: se sacaron las líneas de talle niño y de Jordan 11 / Retro 11 Panda
 
 # Primer mensaje del día, antes de las fotos.
 SALUDO_INICIAL = (
@@ -183,11 +179,20 @@ MENSAJE_PRECIOS_INDUMENTARIA = (
     "PRECIOS INDUMENTARIA‼️\n"
     "\n"
     "Rompevientos $60.000\n"
+    "\n"
     "Sst $72.000\n"
+    "\n"
     "Conjuntos $70.000\n"
+    "\n"
     "Conjunto short.remera $32.000\n"
-    "Remeras arg blanca $37.000"
-)
+    "\n"
+    "Remeras arg blanca $37.000\n"
+    "\n"
+    "Remera algodón $20.000 unidad\n"
+    "$18.000 x mayor de 5\n"
+    "\n"
+    "Chomba arg línea $39.000"
+)   # texto tomado tal cual del mensaje que dejó el usuario en «Notas Whassap» el 18/11
 ORDEN_TALLES_ROPA = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "3XL", "4XL", "ÚNICO", "UNICO"]
 
 # Último mensaje de la tanda, después de todo el stock: la oferta de armar una tienda propia.
