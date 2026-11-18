@@ -1558,11 +1558,18 @@ def modo_solo_indumentaria(en_prueba, limite):
     return 0 if not resumen["fallidos"] and resumen["precios_indumentaria"] else 1
 
 
-def modo_textos_prueba():
+def modo_textos_prueba(cuales=None):
     """Manda a «Notas Whassap» (grupo de PRUEBA) los textos de precios que usa el bot, para revisarlos: BR, indumentaria
-    y neceser. No toca el grupo real."""
-    textos = [("precios BR", MENSAJE_FINAL_PRECIOS), ("precios de indumentaria", MENSAJE_PRECIOS_INDUMENTARIA),
-              ("precios de neceser", MENSAJE_PRECIOS_NECESER)]
+    y neceser (o solo los de `cuales`, por ejemplo ["br"]). No toca el grupo real."""
+    textos = [("br", "precios BR", MENSAJE_FINAL_PRECIOS),
+              ("indumentaria", "precios de indumentaria", MENSAJE_PRECIOS_INDUMENTARIA),
+              ("neceser", "precios de neceser", MENSAJE_PRECIOS_NECESER)]
+    if cuales:
+        textos = [t for t in textos if t[0] in [c.lower() for c in cuales]]
+    textos = [(nombre, texto) for _, nombre, texto in textos]
+    if not textos:
+        print("❌ Elegí al menos uno de: br, indumentaria, neceser.")
+        return 2
     with sync_playwright() as p:
         contexto, page = abrir_whatsapp(p)
         try:
@@ -1738,8 +1745,9 @@ def main():
                         help="manda solo el neceser al grupo real (con --prueba, al grupo de prueba)")
     parser.add_argument("--ver-neceser", action="store_true",
                         help="muestra cómo saldría el neceser y baja las fotos (sin abrir WhatsApp ni mandar nada)")
-    parser.add_argument("--textos-prueba", action="store_true",
-                        help="manda a «Notas Whassap» (solo prueba) los textos de precios: BR, indumentaria y neceser")
+    parser.add_argument("--textos-prueba", nargs="*", default=None, metavar="CUALES",
+                        help="manda a «Notas Whassap» (solo prueba) los textos de precios: sin más, BR, indumentaria y "
+                             "neceser; o solo los que digas (br indumentaria neceser)")
     args = parser.parse_args()
 
     if args.ver_neceser:
@@ -1774,8 +1782,8 @@ def main():
         return modo_solo_br2(args.prueba, args.limite)
     if args.solo_neceser:
         return modo_solo_neceser(args.prueba, args.limite)
-    if args.textos_prueba:
-        return modo_textos_prueba()
+    if args.textos_prueba is not None:
+        return modo_textos_prueba(args.textos_prueba)
     if args.prueba:
         return modo_prueba(3 if args.limite is None else args.limite, args.paso_manual)
     return modo_programado(ahora=args.ahora)
