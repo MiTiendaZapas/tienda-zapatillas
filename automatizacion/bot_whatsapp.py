@@ -154,13 +154,16 @@ USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTM
 # Es texto fijo: si cambian los precios hay que actualizarlo acá a mano.
 MENSAJE_FINAL_PRECIOS = (
     "Zapatillas calidad Brasil 🇧🇷 (primera línea,luxo)\n"
-    "Talles de adulto $44.000 por unidad ‼️\n"
-    "🔥 A PARTIR DE 5 unidades te quedan en $39.000/$41.000/$43.000 🔥\n"
-    "🚨OJOTAS $37.000c/u🚨\n"
-    "Por mayor $33.000c/u‼️\n"
-    "🚨 OJOTAS  MIND  $39.000c/u🚨\n"
-    "Por mayor $37.000c/u ‼️"
-)   # 18/11: se sacaron las líneas de talle niño y de Jordan 11 / Retro 11 Panda
+    "Talles de adulto $43.000 por unidad ‼️\n"
+    "🔥 A PARTIR DE 5 unidades te quedan en $37.000/$39.000/$41.000 🔥\n"
+    "🚨OJOTAS $35.000c/u🚨\n"
+    "Por mayor $31.000c/u‼️\n"
+    "🚨 OJOTAS  MIND  $37.000c/u🚨\n"
+    "Por mayor $35.000c/u ‼️\n"
+    "🚨 OJOTAS JORDAN $25.500c/u 🚨\n"
+    "Por mayor $23.500c/u ‼️"
+)   # 18/11: sin talle niño ni Jordan 11 / Retro 11 Panda; precios igualados a la lista de la tienda de revendedores
+#     (precios-mayorista.json) + ojotas Jordan nuevas. Si cambian los precios de la tienda, hay que editarlos acá.
 
 # Primer mensaje del día, antes de las fotos.
 SALUDO_INICIAL = (
@@ -242,6 +245,11 @@ SEPARADOR_NECESER = (
     "━━━━━━━━━━━━━━\n"
     "⬇️ NECESER ⬇️\n"
     "━━━━━━━━━━━━━━"
+)
+# Precios del neceser (panel de L.A IMP, lista de revendedores: $15.000 y por mayor $12.000). Van después de todas las fotos.
+MENSAJE_PRECIOS_NECESER = (
+    "🚨 NECESER $15.000c/u 🚨\n"
+    "Por mayor $12.000c/u ‼️"
 )
 
 
@@ -1211,6 +1219,9 @@ def enviar_tanda(p, grupo, productos, estado=None, guardar=None, paso_manual=Fal
                     time.sleep(pausa)
                     enviar_mensaje("separador_neceser_enviado", SEPARADOR_NECESER, "el separador de neceser")
                 neceser = enviar_lista(pendientes_nec, "NEC ", True)
+                if neceser:     # el mensaje de precios va después de TODAS las fotos
+                    neceser = enviar_mensaje("precios_neceser_enviados", MENSAJE_PRECIOS_NECESER,
+                                             "el mensaje de precios de neceser")
             except EnvioBloqueado as error:
                 avisar("Bot de WhatsApp", f"El neceser no se pudo mandar: {error}")
                 neceser = False
@@ -1546,6 +1557,36 @@ def modo_solo_indumentaria(en_prueba, limite):
     return 0 if not resumen["fallidos"] and resumen["precios_indumentaria"] else 1
 
 
+def modo_textos_prueba():
+    """Manda a «Notas Whassap» (grupo de PRUEBA) los textos de precios que usa el bot, para revisarlos: BR, indumentaria
+    y neceser. No toca el grupo real."""
+    textos = [("precios BR", MENSAJE_FINAL_PRECIOS), ("precios de indumentaria", MENSAJE_PRECIOS_INDUMENTARIA),
+              ("precios de neceser", MENSAJE_PRECIOS_NECESER)]
+    with sync_playwright() as p:
+        contexto, page = abrir_whatsapp(p)
+        try:
+            abrir_grupo_robusto(page, GRUPO_PRUEBA)
+            for nombre, texto in textos:
+                id_base, _ = _ultima_fila(page)
+                ok = False
+                for intento in (1, 2):
+                    try:
+                        ok = enviar_texto(page, texto, id_base)
+                    except Exception as error:
+                        print(f"  ⚠️ {nombre} (intento {intento}): {error}")
+                        page.keyboard.press("Escape")
+                    if not ok and intento == 1:
+                        ok = _esperar_rastro_del_envio(page, texto, id_base)
+                    if ok:
+                        break
+                print(f"{'✅' if ok else '❌'} Texto de {nombre} en «{GRUPO_PRUEBA}»: {'enviado' if ok else 'NO salió'}.")
+                time.sleep(random.uniform(*PAUSA_ENTRE_ENVIOS))
+            esperar_envios_pendientes(page)
+        finally:
+            contexto.close()
+    return 0
+
+
 def modo_solo_neceser(en_prueba, limite):
     """Manda SOLO el neceser (separador + fotos con su stock), sin saludo, BR, G5, indumentaria ni precios. En el
     grupo real lleva su propio estado del día (estado_bot_neceser.json): si se corta, no repite lo ya enviado."""
@@ -1696,6 +1737,8 @@ def main():
                         help="manda solo el neceser al grupo real (con --prueba, al grupo de prueba)")
     parser.add_argument("--ver-neceser", action="store_true",
                         help="muestra cómo saldría el neceser y baja las fotos (sin abrir WhatsApp ni mandar nada)")
+    parser.add_argument("--textos-prueba", action="store_true",
+                        help="manda a «Notas Whassap» (solo prueba) los textos de precios: BR, indumentaria y neceser")
     args = parser.parse_args()
 
     if args.ver_neceser:
@@ -1730,6 +1773,8 @@ def main():
         return modo_solo_br2(args.prueba, args.limite)
     if args.solo_neceser:
         return modo_solo_neceser(args.prueba, args.limite)
+    if args.textos_prueba:
+        return modo_textos_prueba()
     if args.prueba:
         return modo_prueba(3 if args.limite is None else args.limite, args.paso_manual)
     return modo_programado(ahora=args.ahora)
