@@ -133,11 +133,11 @@ LIMITE_CARGA_MIN = 20             # tiempo máximo que se espera a que WhatsApp 
 ESPERA_CATALOGO_FRESCO_MIN = 10   # minutos máximos que espera el catálogo del día (el piloto arranca a las 5:15); 0 = no espera
 CATALOGO_FRESCO_DESDE = (5, 15)   # el catálogo cuenta como 'del día' si se generó desde esta hora
 
-# Donde el piloto publica el catálogo y las fotos. Desde el 09/10 el principal es Cloudflare; GitHub sigue
-# recibiendo lo mismo durante la mudanza y sirve de respaldo.
+# Donde el piloto publica el catálogo y las fotos: SOLO Cloudflare. Desde el 19/11/2026 (T-001) el piloto ya no sube
+# a GitHub: esa copia queda congelada y usarla, aunque fuera de respaldo, mandaría stock viejo. Si Cloudflare falla,
+# el bot usa la copia local que mantiene el piloto en esta laptop (CATALOGO_LOCAL), nunca GitHub.
 FUENTES_CATALOGO = [
     ("Cloudflare", "https://catalogo.mitiendastock.com/"),
-    ("GitHub", "https://mitiendazapas.github.io/catalogo/"),
 ]
 CATALOGO_LOCAL = REPO_ROOT.parent / "mitiendazapas.github.io" / "catalogo"   # copia que mantiene el piloto en esta laptop
 CACHE_FOTOS = SCRIPT_DIR / "_cache_fotos"
